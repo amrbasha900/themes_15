@@ -1,0 +1,815 @@
+/* List filters: the bar, its chips, the builder popover, the saved-view
+ * tabs (js/core/list_filters.js) and the Explore panel (js/core/list_panel.js).
+ * Scoped to data-tm-list like the rest of the list restyle, so the master
+ * and list switches bring Frappe's own row back. */
+#{$tm-on}[data-tm-list="on"] {
+	/* ---- the bar ---------------------------------------------------------- */
+	.page-form.tm-fform {
+		display: block;
+		padding-block: var(--tm-space-2);
+
+		/* the native row is kept for its controls, out of sight */
+		.tm-fstd,
+		.tm-fsection-old {
+			display: none !important;
+		}
+	}
+
+	.tm-fbar {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: var(--tm-space-2);
+		min-block-size: var(--tm-control-h);
+	}
+
+	.tm-fsearch {
+		position: relative;
+		flex: 0 1 240px;
+		margin: 0 !important;
+
+		.tm-fsearch-icon {
+			position: absolute;
+			inset-inline-start: 9px;
+			inset-block-start: 50%;
+			transform: translateY(-50%);
+			color: var(--tm-text-3);
+			pointer-events: none;
+			display: inline-flex;
+		}
+
+		.form-control {
+			padding-inline-start: 30px;
+			height: var(--tm-control-h);
+			border-radius: var(--tm-radius-full);
+		}
+
+		.control-label,
+		.help-box {
+			display: none;
+		}
+	}
+
+	.tm-fselector {
+		margin: 0;
+
+		.btn-group > .filter-button {
+			height: var(--tm-control-h);
+			border-radius: var(--tm-radius-full) !important;
+			padding-inline: 12px;
+			font-size: var(--tm-text-sm);
+			gap: 6px;
+			display: inline-flex;
+			align-items: center;
+
+			&.btn-primary-light {
+				background: var(--tm-surface-selected);
+				border-color: var(--tm-action-primary);
+				color: var(--tm-action-primary-fg);
+			}
+
+			.filter-label {
+				display: inline-block;
+				min-inline-size: 18px;
+				padding-inline: 5px;
+				border-radius: var(--tm-radius-full);
+				background: var(--tm-action-primary);
+				color: var(--tm-white);
+				font-size: 11px;
+				text-align: center;
+				line-height: 18px;
+			}
+		}
+	}
+
+	.tm-fchips {
+		display: contents;
+	}
+
+	.tm-fchip {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		max-inline-size: 320px;
+		height: calc(var(--tm-control-h) - 4px);
+		padding: 0 6px 0 11px;
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-full);
+		background: var(--tm-surface-sunken);
+		color: var(--tm-text-2);
+		font: inherit;
+		font-size: var(--tm-text-sm);
+		white-space: nowrap;
+		cursor: pointer;
+		transition: border-color var(--tm-dur) var(--tm-ease), background-color var(--tm-dur) var(--tm-ease);
+
+		> span,
+		> b,
+		> em {
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
+
+		b {
+			color: var(--tm-text);
+			font-weight: var(--tm-weight-semibold);
+		}
+
+		em {
+			font-style: normal;
+			display: inline-flex;
+			gap: 4px;
+		}
+
+		u {
+			text-decoration: none;
+			color: var(--tm-text-3);
+			font-size: var(--tm-text-xs);
+			padding-inline: 2px;
+		}
+
+		i {
+			display: inline-flex;
+			color: var(--tm-text-3);
+			border-radius: var(--tm-radius-full);
+			padding: 2px;
+
+			&:hover {
+				background: var(--tm-surface-hover);
+				color: var(--tm-text);
+			}
+		}
+
+		&:hover,
+		&:focus-visible {
+			border-color: var(--tm-border-strong);
+			background: var(--tm-surface);
+		}
+
+		&.is-or {
+			border-style: dashed;
+		}
+	}
+
+	.tm-fclear {
+		color: var(--tm-text-3);
+		font-size: var(--tm-text-sm);
+		padding: 4px 6px;
+		border-radius: var(--tm-radius-sm);
+
+		&:hover {
+			color: var(--tm-text);
+			background: var(--tm-surface-hover);
+		}
+	}
+
+	/* Sort, at the bar's end: one pill in the Filter button's shape —
+	 * [order ↓ | Sort by  Last Updated On]. Frappe's two buttons stay (the
+	 * order toggle and the field dropdown, ui/sort_selector.html), only
+	 * drawn as halves of one control. */
+	.tm-fsort {
+		margin-inline-start: auto;
+
+		.btn-group {
+			display: inline-flex;
+			align-items: stretch;
+			block-size: var(--tm-control-h);
+			border: 1px solid var(--tm-border-strong);
+			border-radius: var(--tm-radius-full);
+			background: var(--tm-surface);
+		}
+
+		.btn-group > .btn {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			block-size: 100%;
+			margin: 0;
+			border: 0;
+			background: transparent;
+			box-shadow: none;
+			color: var(--tm-text);
+			font-size: var(--tm-text-sm);
+
+			&:hover,
+			&:focus-visible {
+				background: var(--tm-surface-hover);
+			}
+		}
+
+		/* Each half is rounded on its outer side only, so the hover fill
+		 * follows the pill. (A blanket radius reset on both buttons, meant
+		 * to square the seam, out-ranked these and squared the pill's ends
+		 * on hover.) Not overflow: hidden on the group — the field list is
+		 * a dropdown inside the button and would be clipped. */
+		.btn-group > .btn.btn-order {
+			padding-inline: 10px 8px;
+			border-start-start-radius: var(--tm-radius-full) !important;
+			border-end-start-radius: var(--tm-radius-full) !important;
+			border-start-end-radius: 0 !important;
+			border-end-end-radius: 0 !important;
+			border-inline-end: 1px solid var(--tm-border) !important;
+			color: var(--tm-text-2);
+		}
+
+		.btn-group > .btn.sort-selector-button {
+			padding-inline: 10px 14px;
+			border-start-start-radius: 0 !important;
+			border-end-start-radius: 0 !important;
+			border-start-end-radius: var(--tm-radius-full) !important;
+			border-end-end-radius: var(--tm-radius-full) !important;
+			max-inline-size: 280px;
+		}
+
+		.tm-fsort-prefix {
+			color: var(--tm-text-3);
+			white-space: nowrap;
+		}
+
+		.dropdown-text {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			font-weight: var(--tm-weight-medium);
+		}
+
+		.dropdown-menu {
+			max-block-size: 360px;
+			overflow-y: auto;
+		}
+	}
+
+	/* Report view's "Add Group" (ui/group_by/group_by.js:229) is inserted
+	 * before the sort control, so it lands in the bar beside it. */
+	.tm-fbar > .group-by-selector {
+		margin-inline-start: auto;
+
+		+ .tm-fsort {
+			margin-inline-start: 0;
+		}
+
+		.group-by-button {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			block-size: var(--tm-control-h);
+			padding-inline: 12px;
+			border-color: var(--tm-border-strong);
+			border-radius: var(--tm-radius-full);
+			font-size: var(--tm-text-sm);
+		}
+	}
+
+	/* ---- saved views as tabs -------------------------------------------- */
+	.tm-vtabs {
+		display: flex;
+		gap: 2px;
+		overflow-x: auto;
+		scrollbar-width: none;
+		margin: calc(var(--tm-space-2) * -1) 0 var(--tm-space-2);
+		border-block-end: 1px solid var(--tm-border);
+
+		&:empty {
+			display: none;
+		}
+	}
+
+	.tm-vtab {
+		display: inline-flex;
+		align-items: center;
+		gap: 5px;
+		padding: 8px 12px;
+		border: 0;
+		border-block-end: 2px solid transparent;
+		background: none;
+		color: var(--tm-text-2);
+		font: inherit;
+		font-size: var(--tm-text-sm);
+		white-space: nowrap;
+		cursor: pointer;
+
+		&:hover {
+			color: var(--tm-text);
+		}
+
+		&.is-active {
+			color: var(--tm-action-primary-fg);
+			border-color: var(--tm-action-primary);
+			font-weight: var(--tm-weight-semibold);
+		}
+
+		&.tm-vtab-add {
+			color: var(--tm-text-3);
+		}
+
+		.tm-vtab-shared {
+			color: var(--tm-text-3);
+			display: inline-flex;
+		}
+
+		.tm-vtab-x {
+			display: none;
+			color: var(--tm-text-3);
+			border-radius: var(--tm-radius-full);
+			padding: 1px;
+
+			&:hover {
+				background: var(--tm-surface-hover);
+				color: var(--tm-danger-text, var(--tm-text));
+			}
+		}
+
+		&:hover .tm-vtab-x {
+			display: inline-flex;
+		}
+	}
+
+	/* ---- the builder (Frappe's popover, restyled) ------------------------ */
+	.filter-popover.tm-fpop {
+		max-inline-size: none;
+		inline-size: min(680px, calc(100vw - 32px));
+		padding: 0;
+		display: flex;
+		flex-direction: column;
+
+		/* the height cap is set per show (list_filters.js); the body scrolls */
+		.popover-body {
+			padding: var(--tm-space-3);
+			overflow-y: auto;
+			min-block-size: 0;
+		}
+
+		.filter-area {
+			position: relative;
+		}
+
+		/* "No filters selected" says nothing the chips and the buttons do not */
+		.empty-filters {
+			display: none !important;
+		}
+
+		/* a row: Where / And — field — condition — value — remove */
+		.filter-box {
+			position: relative;
+			padding-inline-start: 52px;
+			margin-block-end: 6px;
+
+			&::before {
+				content: attr(data-tm-join);
+				position: absolute;
+				inset-inline-start: 0;
+				inset-block-start: 7px;
+				inline-size: 44px;
+				font-size: var(--tm-text-xs);
+				color: var(--tm-text-3);
+			}
+
+			.list_filter.row {
+				margin: 0;
+				display: grid;
+				grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr) minmax(0, 1.3fr) 28px;
+				gap: 6px;
+				align-items: start;
+
+				> [class*="col-"] {
+					padding: 0;
+					inline-size: auto;
+					max-inline-size: none;
+					flex: none;
+					margin: 0;
+				}
+			}
+
+			.form-control,
+			.condition {
+				height: var(--tm-control-h);
+				font-size: var(--tm-text-sm);
+				border-radius: var(--tm-radius-sm);
+			}
+
+			.remove-filter {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				block-size: var(--tm-control-h);
+				color: var(--tm-text-3);
+				cursor: pointer;
+				border-radius: var(--tm-radius-sm);
+
+				&:hover {
+					color: var(--tm-text);
+					background: var(--tm-surface-hover);
+				}
+			}
+
+			.filter-description {
+				grid-column: 3;
+			}
+		}
+
+		hr.divider {
+			display: none;
+		}
+
+		.filter-action-buttons {
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: var(--tm-space-2);
+			margin-block-start: var(--tm-space-2);
+
+			.add-filter,
+			.tm-for-add {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				padding: 4px 6px;
+				border: 0;
+				background: none;
+				color: var(--tm-action-primary-fg);
+				font-size: var(--tm-text-sm);
+				box-shadow: none;
+			}
+
+		}
+
+		.tm-ffoot {
+			display: flex;
+			justify-content: flex-end;
+			margin-block-start: var(--tm-space-2);
+
+			> div {
+				display: flex;
+				gap: 6px;
+			}
+
+			.btn-xs {
+				height: 28px;
+				font-size: var(--tm-text-sm);
+				border-radius: var(--tm-radius-sm);
+			}
+		}
+
+		/* the or-group */
+		.tm-for {
+			margin: 6px 0 4px 52px;
+			padding: 8px 10px 4px;
+			border: 1px solid var(--tm-border);
+			border-radius: var(--tm-radius-md);
+			background: var(--tm-surface-sunken);
+
+			.tm-for-title {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				font-size: var(--tm-text-xs);
+				color: var(--tm-text-2);
+				margin-block-end: 8px;
+
+				em {
+					font-style: normal;
+					font-weight: var(--tm-weight-semibold);
+					padding: 1px 7px;
+					border: 1px solid var(--tm-border-strong);
+					border-radius: var(--tm-radius-sm);
+					background: var(--tm-surface);
+				}
+
+				.tm-for-x {
+					margin-inline-start: auto;
+					color: var(--tm-text-3);
+					display: inline-flex;
+				}
+			}
+
+			.filter-box {
+				padding-inline-start: 0;
+
+				&::before {
+					display: none;
+				}
+			}
+
+			.empty-filters {
+				display: none !important;
+			}
+
+			.filter-action-buttons {
+				margin: 0;
+			}
+		}
+
+		.tm-fquick,
+		.tm-flinked {
+			margin-block-start: var(--tm-space-3);
+			padding-block-start: var(--tm-space-2);
+			border-block-start: 1px solid var(--tm-border);
+			font-size: var(--tm-text-xs);
+			color: var(--tm-text-3);
+			display: flex;
+			flex-wrap: wrap;
+			gap: 6px;
+			align-items: center;
+
+			button {
+				border: 1px dashed var(--tm-border-strong);
+				border-radius: var(--tm-radius-full);
+				padding: 2px 9px;
+				color: var(--tm-text-2);
+				font-size: var(--tm-text-xs);
+
+				&:hover {
+					border-style: solid;
+					color: var(--tm-action-primary-fg);
+					border-color: var(--tm-action-primary);
+				}
+
+				&[hidden] {
+					display: none;
+				}
+			}
+		}
+
+		/* linked documents (linked_filters.js): under the quick picks, one rule */
+		.tm-fquick + .tm-flinked {
+			margin-block-start: var(--tm-space-2);
+			padding-block-start: 0;
+			border-block-start: 0;
+		}
+
+		.tm-flinked button {
+			border-style: solid;
+			border-color: var(--tm-border);
+			background: var(--tm-surface-sunken);
+		}
+
+		.tm-flinked .tm-flinked-more {
+			border-color: transparent;
+			background: none;
+			color: var(--tm-action-primary-fg);
+		}
+	}
+
+	/* ---- the Explore panel ---------------------------------------------- */
+	.list-sidebar.tm-explore-host {
+		/* Frappe's own sections are the panel's controllers, not its face */
+		> :not(.tm-explore) {
+			display: none !important;
+		}
+	}
+
+	.tm-explore {
+		font-size: var(--tm-text-sm);
+
+		.tm-explore-head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			font-weight: var(--tm-weight-semibold);
+			color: var(--tm-text);
+			padding-block: 4px 8px;
+
+			.tm-explore-fold {
+				color: var(--tm-text-3);
+				display: inline-flex;
+				border-radius: var(--tm-radius-sm);
+				padding: 2px;
+				transform: scaleX(-1);
+
+				&:hover {
+					background: var(--tm-surface-hover);
+					color: var(--tm-text);
+				}
+			}
+		}
+
+		h4 {
+			margin: 14px 0 6px;
+			font-size: 11px;
+			font-weight: var(--tm-weight-semibold);
+			letter-spacing: 0.05em;
+			text-transform: uppercase;
+			color: var(--tm-text-3);
+		}
+
+		section:first-child h4 {
+			margin-block-start: 4px;
+		}
+
+		.tm-x-chips {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 5px;
+
+			button {
+				display: inline-flex;
+				align-items: center;
+				gap: 5px;
+				padding: 3px 9px;
+				border: 1px solid var(--tm-border);
+				border-radius: var(--tm-radius-full);
+				background: var(--tm-surface);
+				color: var(--tm-text-2);
+				font: inherit;
+				font-size: var(--tm-text-xs);
+				cursor: pointer;
+
+				span {
+					color: var(--tm-text-3);
+				}
+
+				&:hover {
+					border-color: var(--tm-border-strong);
+					color: var(--tm-text);
+				}
+
+				&.is-on {
+					background: var(--tm-surface-selected);
+					border-color: var(--tm-action-primary);
+					color: var(--tm-action-primary-fg);
+				}
+			}
+		}
+
+		.tm-x-rows {
+			display: grid;
+			gap: 2px;
+
+			button {
+				position: relative;
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) auto;
+				gap: 8px;
+				padding: 4px 6px;
+				border: 0;
+				border-radius: var(--tm-radius-sm);
+				background: none;
+				color: var(--tm-text-2);
+				font: inherit;
+				font-size: var(--tm-text-sm);
+				text-align: start;
+				cursor: pointer;
+
+				&::before {
+					content: "";
+					position: absolute;
+					inset-inline-start: 6px;
+					inset-block-end: 1px;
+					block-size: 2px;
+					inline-size: calc(var(--w) * 0.9);
+					max-inline-size: calc(100% - 12px);
+					border-radius: 2px;
+					background: var(--tm-action-primary);
+					opacity: 0.3;
+				}
+
+				b {
+					font-weight: 500;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+
+				span {
+					color: var(--tm-text-3);
+					font-variant-numeric: tabular-nums;
+				}
+
+				&:hover {
+					background: var(--tm-surface-hover);
+					color: var(--tm-text);
+				}
+
+				&.is-on {
+					background: var(--tm-surface-selected);
+
+					b {
+						color: var(--tm-action-primary-fg);
+					}
+
+					&::before {
+						opacity: 0.7;
+					}
+				}
+
+				&:nth-child(n + 7) {
+					display: none;
+				}
+			}
+		}
+
+		.tm-x-facet.is-all .tm-x-rows button:nth-child(n + 7) {
+			display: grid;
+		}
+
+		.tm-x-picker {
+			margin-block-start: 4px;
+
+			.form-control {
+				height: 28px;
+				font-size: var(--tm-text-sm);
+				border-radius: var(--tm-radius-sm);
+			}
+
+			.control-label,
+			.help-box {
+				display: none;
+			}
+		}
+
+		.tm-x-more,
+		.tm-x-pick,
+		.tm-x-add {
+			display: inline-flex;
+			align-items: center;
+			gap: 4px;
+			margin-block-start: 4px;
+			padding: 3px 6px;
+			color: var(--tm-action-primary-fg);
+			font-size: var(--tm-text-xs);
+			border-radius: var(--tm-radius-sm);
+
+			&:hover {
+				background: var(--tm-surface-hover);
+			}
+		}
+
+		.tm-x-add {
+			margin-block-start: 10px;
+		}
+
+		.tm-x-wait {
+			display: block;
+			block-size: 12px;
+			inline-size: 60%;
+			border-radius: var(--tm-radius-full);
+			background: var(--tm-surface-sunken);
+		}
+
+		.tm-x-facet.is-empty:not([hidden]) {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: space-between;
+			gap: var(--tm-space-1) var(--tm-space-2);
+
+			h4,
+			.tm-x-pick {
+				margin-block: 0;
+			}
+
+			.tm-x-rows {
+				display: none;
+			}
+
+			.tm-x-picker {
+				inline-size: 100%;
+			}
+		}
+
+		.tm-x-total {
+			margin-block-start: 16px;
+			padding: 10px 12px;
+			border-radius: var(--tm-radius-md);
+			background: var(--tm-surface-sunken);
+			color: var(--tm-text-2);
+			font-size: var(--tm-text-xs);
+
+			b {
+				display: block;
+				font-size: var(--tm-text-lg, 16px);
+				color: var(--tm-text);
+				font-variant-numeric: tabular-nums;
+			}
+		}
+
+		/* folded: a rail with the header only */
+		&.is-rail {
+			.tm-explore-body {
+				display: none;
+			}
+
+			.tm-explore-head span {
+				writing-mode: vertical-rl;
+				font-size: var(--tm-text-xs);
+				color: var(--tm-text-3);
+			}
+
+			.tm-explore-head {
+				flex-direction: column;
+				gap: 8px;
+			}
+
+			.tm-explore-fold {
+				transform: none;
+			}
+		}
+	}
+
+	/* the column itself shrinks with the rail */
+	.layout-side-section:has(.tm-explore.is-rail) {
+		flex: 0 0 44px !important;
+		max-inline-size: 44px !important;
+		padding-inline: 4px;
+	}
+}

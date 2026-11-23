@@ -1,0 +1,595 @@
+/* Calendar view.
+ * Native source: frappe/public/js/lib/fullcalendar/fullcalendar.min.js
+ *                (FullCalendar **v3.10.2** — see its banner),
+ *                frappe/public/scss/desk/calendar.scss,
+ *                frappe/public/js/frappe/views/calendar/calendar.js
+ *
+ * Read the version first: the stub this file replaces styled `.fc-col-header-cell`,
+ * `.fc-daygrid-day` and `.fc-toolbar-title`, which are FullCalendar **v5+**
+ * class names. None of them exist in v3, so none of those rules ever matched
+ * and the calendar rendered as stock Frappe. v3 names are `.fc-day-header`,
+ * `.fc-day`, `.fc-day-top`, `.fc-day-number`, and the toolbar title is a bare
+ * `<h2>` inside `.fc-left`.
+ *
+ * Four native facts drive this file:
+ *  1. The toolbar is `left: "prev,title,next"` (calendar.js:261). v3 lays
+ *     `.fc-left` / `.fc-right` out with floats, and Frappe then gives the
+ *     title `height: 28px` and the buttons fixed widths — a combination that
+ *     wraps the title onto its own line between the two arrows (visible in
+ *     RTL). Both bars become flex rows here, which makes the layout
+ *     direction-independent and drops the float arithmetic entirely.
+ *  2. calendar.js set_css() rewrites FC's buttons to `.btn.btn-default` and
+ *     wraps the three view buttons in a `.btn-group` — so the view switch is
+ *     styled as an ordinary segmented control, not with FC's own classes.
+ *  3. set_css() also wraps `.fc-day-number` in a `<div class="fc-day">` ONCE,
+ *     at make(). Navigating a month re-renders the cells and the wrapper is
+ *     gone, so every day-number rule must match wrapped and unwrapped alike.
+ *  4. prepare_colors() (calendar.js:417) puts `backgroundColor` and
+ *     `textColor` INLINE on each event. Event colour is therefore the
+ *     doctype's to decide; this file styles shape, density and the leading
+ *     dot, and takes the dot from `currentColor` so it follows that choice.
+ *
+ * Frappe's own calendar.scss uses `!important` on the cell borders, the day
+ * header padding and the active view button. Overriding those needs
+ * `!important` in turn; each one below says so.
+ *
+ * Scoped to the list kill-switch: Calendar is a List View (calendar.js:7). */
+
+#{$tm-on}[data-tm-list="on"] {
+	/* ---- Frame ------------------------------------------------------------ */
+	.fc {
+		padding: var(--tm-space-3);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface);
+		color: var(--tm-text);
+		font-size: var(--tm-text-sm);
+	}
+
+	.fc-view-container {
+		margin-inline: 0; /* native pulls it 1px each way to hide a seam */
+	}
+
+	/* ---- Toolbar (fact 1) -------------------------------------------------- */
+	.fc .fc-toolbar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--tm-space-3);
+		flex-wrap: wrap;
+		margin: 0;
+		padding-block-end: var(--tm-space-3);
+
+		> * > * {
+			margin: 0; /* v3 ships margin-left: .75em on every toolbar child */
+		}
+
+		/* v3 groups consecutive header entries in an ANONYMOUS <div> inside
+		 * .fc-left / .fc-right — prev, the <h2> and next are that div's
+		 * children, not the bar's. Making only the bar a flex row therefore
+		 * changes nothing: the buttons and the title stay floated blocks in a
+		 * 128px box and the title drops onto its own line between the arrows.
+		 * The group div has to be a flex row too, which is what `> *` is. */
+		.fc-left,
+		.fc-center,
+		.fc-right,
+		.fc-left > *,
+		.fc-center > *,
+		.fc-right > * {
+			display: flex;
+			align-items: center;
+			gap: var(--tm-space-2);
+			min-inline-size: 0;
+		}
+
+		.fc-center:empty {
+			display: none;
+		}
+
+		/* a float-clearing div has no job inside a flex row */
+		.fc-clear {
+			display: none;
+		}
+
+		h2 {
+			order: 0;
+			margin: 0;
+			block-size: auto;
+			color: var(--tm-text);
+			font-size: var(--tm-text-lg);
+			font-weight: var(--tm-weight-semibold);
+			line-height: var(--tm-leading-dense);
+			white-space: nowrap;
+		}
+
+		/* Month back / forward: square, quiet, beside the title. */
+		.fc-prev-button,
+		.fc-next-button {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			inline-size: var(--tm-control-h);
+			min-inline-size: var(--tm-control-h);
+			block-size: var(--tm-control-h);
+			padding: 0;
+			border: 1px solid var(--tm-border-strong);
+			border-radius: var(--tm-radius-sm);
+			background-color: var(--tm-surface);
+			color: var(--tm-text-2);
+
+			&:hover {
+				border-color: var(--tm-action-primary);
+				background-color: var(--tm-surface-selected);
+				color: var(--tm-action-primary-fg);
+			}
+		}
+
+		.fc-today-button {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--tm-space-1);
+			block-size: var(--tm-control-h);
+			inline-size: auto;
+			padding-inline: var(--tm-space-3);
+			font-size: var(--tm-text-sm);
+
+			&[disabled] {
+				opacity: 0.5;
+			}
+		}
+
+		/* ---- View switch as a segmented control (fact 2) ------------------ */
+		.btn-group {
+			display: inline-flex;
+			gap: 2px;
+			padding: 2px;
+			border-radius: var(--tm-radius-sm);
+			background-color: var(--tm-surface-sunken);
+			box-shadow: inset 0 0 0 1px var(--tm-border);
+
+			> .btn {
+				inline-size: auto;
+				min-inline-size: 64px;
+				block-size: calc(var(--tm-control-h) - 4px);
+				padding-inline: var(--tm-space-3);
+				border: none;
+				border-radius: calc(var(--tm-radius-sm) - 1px);
+				background-color: transparent;
+				box-shadow: none;
+				color: var(--tm-text-2);
+				font-size: var(--tm-text-sm);
+				font-weight: var(--tm-weight-medium);
+
+				&:hover {
+					background-color: var(--tm-surface-hover);
+					color: var(--tm-text);
+				}
+
+				/* set_css() adds .active; FC keeps .fc-state-active, which
+				 * Frappe paints gray-500 with !important. */
+				&.active,
+				&.fc-state-active {
+					background-color: var(--tm-surface) !important;
+					box-shadow: var(--tm-shadow-xs);
+					color: var(--tm-text) !important;
+				}
+			}
+		}
+	}
+
+	/* ---- Grid -------------------------------------------------------------- */
+	/* Frappe sets these to --gray-300 !important. */
+	.fc-unthemed {
+		padding: 0;
+		color: var(--tm-text);
+
+		td,
+		th,
+		thead,
+		tbody,
+		hr,
+		.fc-row,
+		.fc-popover,
+		.fc-divider {
+			border-color: var(--tm-border) !important;
+		}
+
+		/* Native tints Sunday with --highlight-color, whatever the weekend
+		 * is. The weekend is a setting now: see "Weekend" below. */
+		td.fc-sun {
+			background: transparent;
+		}
+	}
+
+	/* ---- Weekend ------------------------------------------------------------
+	 * Theme Settings > Calendar (or the calendar's own Calendar Layout):
+	 * core/calendar.js writes the days on the calendar as
+	 * data-tm-weekend="5 6" (0 = Sunday), and FullCalendar v3 classes every
+	 * day cell and header with its weekday (.fc-sun ... .fc-sat). A fine
+	 * hatch, not a fill: the grey fill is already "another month". */
+	@each $i, $day in (0: sun, 1: mon, 2: tue, 3: wed, 4: thu, 5: fri, 6: sat) {
+		[data-tm-weekend~="#{$i}"] {
+			.fc-bg td.fc-day.fc-#{$day} {
+				background-image: repeating-linear-gradient(
+					135deg,
+					transparent 0 6px,
+					color-mix(in srgb, var(--tm-border) 70%, transparent) 6px 7px
+				);
+			}
+
+			th.fc-day-header.fc-#{$day} {
+				color: var(--tm-text-3);
+				opacity: 0.8;
+			}
+		}
+	}
+
+	.fc-head-container {
+		border: none !important;
+	}
+
+	/* Day names. text-transform is a no-op on Arabic, so it is safe in both
+	 * locales; the tracking is dropped for RTL, where it separates the joins. */
+	.fc th.fc-day-header {
+		padding: var(--tm-space-2) var(--tm-space-1) !important;
+		border: none !important;
+		color: var(--tm-text-3);
+		font-size: var(--tm-text-xs);
+		font-weight: var(--tm-weight-medium);
+		letter-spacing: 0.04em;
+		text-align: center;
+	}
+
+	/* ---- Day cells (fact 3) ------------------------------------------------ */
+	/* `.fc-day-top` is a <td> in the month view's content skeleton. Giving it
+	 * `display: flex` takes it out of the table and the whole week row
+	 * collapses into a column of bare date numbers — do not set display here.
+	 * Alignment is `text-align`, which a table cell honours. */
+	.fc .fc-day-top {
+		padding: var(--tm-space-1) var(--tm-space-2) 0 !important;
+		text-align: start;
+
+		/* set_css()'s wrapper, when it is there */
+		> .fc-day {
+			margin: 0;
+		}
+
+		.fc-day-number {
+			float: none !important; /* native forces float: left !important */
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-inline-size: 22px;
+			block-size: 22px;
+			border-radius: var(--tm-radius-full);
+			color: var(--tm-text-2);
+			font-size: var(--tm-text-xs);
+			font-weight: var(--tm-weight-medium);
+			font-variant-numeric: tabular-nums;
+		}
+
+		.fc-week-number {
+			color: var(--tm-text-3);
+			font-size: var(--tm-text-xs);
+		}
+	}
+
+	/* Days outside the shown month recede but stay readable. */
+	.fc .fc-other-month .fc-day-number {
+		color: var(--tm-text-3);
+		opacity: 1;
+	}
+
+	.fc-unthemed td.fc-other-month {
+		background-color: var(--tm-surface-sunken);
+	}
+
+	/* Today: the only accent on the grid. */
+	.fc-unthemed .fc-today {
+		background-color: transparent !important;
+
+		.fc-day-number {
+			background-color: var(--tm-action-primary);
+			color: var(--tm-action-primary-text);
+		}
+	}
+
+	.fc-unthemed .fc-day-grid {
+		border-block-end: none;
+	}
+
+	/* Drag-select over empty slots. */
+	.fc-highlight {
+		background: var(--tm-surface-selected) !important;
+		opacity: 1;
+	}
+
+	/* ---- Events (fact 4) ---------------------------------------------------- */
+	.fc-event {
+		border: none;
+		border-radius: var(--tm-radius-sm);
+		font-size: var(--tm-text-xs);
+		line-height: 1.45;
+		cursor: pointer;
+
+		&:hover {
+			filter: brightness(0.97);
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--tm-action-primary);
+			outline-offset: 1px;
+		}
+	}
+
+	.fc-day-grid-event {
+		margin: 1px var(--tm-space-1) 0 !important;
+		padding: 2px var(--tm-space-2) !important;
+		border: none !important;
+	}
+
+	/* A leading dot in the event's own text colour: the chip reads as a chip
+	 * even where two neighbouring statuses tint to nearly the same wash. */
+	.fc-day-grid-event .fc-content {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		gap: var(--tm-space-1);
+		padding: 0;
+		min-inline-size: 0;
+
+		&::before {
+			content: "";
+			flex: none;
+			inline-size: 6px;
+			block-size: 6px;
+			border-radius: var(--tm-radius-full);
+			background-color: currentColor;
+		}
+
+		.fc-time {
+			flex: none;
+			margin: 0;
+			font-weight: var(--tm-weight-medium);
+			font-variant-numeric: tabular-nums;
+			opacity: 0.75;
+		}
+
+		.fc-title {
+			min-inline-size: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			font-weight: var(--tm-weight-medium);
+		}
+	}
+
+	/* Week / day views: the block keeps the bar, not the dot. */
+	.fc-time-grid-event {
+		border: none !important;
+		border-inline-start: 3px solid currentColor;
+		padding: 2px var(--tm-space-1);
+
+		.fc-content {
+			padding: 0;
+			gap: 0;
+		}
+	}
+
+	.fc-more,
+	.fc-more-cell a {
+		color: var(--tm-text-link);
+		font-size: var(--tm-text-xs);
+		font-weight: var(--tm-weight-medium);
+	}
+
+	/* The "+n more" overlay. */
+	.fc-popover {
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface-raised);
+		box-shadow: var(--tm-shadow-md);
+
+		.fc-header {
+			padding: var(--tm-space-2) var(--tm-space-3);
+			border-block-end: 1px solid var(--tm-border);
+			background-color: var(--tm-surface-sunken);
+			color: var(--tm-text);
+			font-size: var(--tm-text-sm);
+			font-weight: var(--tm-weight-medium);
+		}
+	}
+
+	/* ---- Time grid ---------------------------------------------------------- */
+	.fc .fc-axis {
+		inline-size: 56px !important;
+		color: var(--tm-text-3) !important;
+		font-size: var(--tm-text-xs);
+		font-variant-numeric: tabular-nums;
+		text-align: center;
+	}
+
+	.fc-time-grid .fc-slats td {
+		block-size: 2.4em !important;
+	}
+
+	.fc-time-grid .fc-slats .fc-minor td {
+		border-block-start-style: none !important;
+	}
+
+	.fc-now-indicator {
+		border-color: var(--tm-action-danger) !important;
+	}
+
+	/* ---- Footnote (weekend toggle) ------------------------------------------ */
+	.frappe-list .footnote-area {
+		margin-block-start: var(--tm-space-3);
+		border: none;
+		color: var(--tm-text-3);
+		font-size: var(--tm-text-xs);
+
+		.btn-weekend {
+			block-size: var(--tm-control-h-sm);
+			margin-inline-start: var(--tm-space-2);
+			font-size: var(--tm-text-xs);
+		}
+	}
+}
+
+/* ---- Calendar Layout: the lines under an event's title ------------------
+ * Drawn by core/calendar.js from the calendar's Calendar Layout. Scoped to
+ * the master switch only: a layout is content the calendar was configured
+ * to show, so it stays readable with the list restyle off. The event's
+ * colours are inline (prepare_colors / the layout's Color), so everything
+ * here takes currentColor. */
+#{$tm-on} {
+	/* Colour by Status uses Frappe's pill colours (--bg-*), which in dark
+	 * mode are saturated fills meant for a pill, not a card */
+	.fc {
+		--tm-cal-status-mix: 100%;
+	}
+
+	&[data-theme="dark"] .fc {
+		--tm-cal-status-mix: 45%;
+	}
+
+	/* Card: the title on its own line, each field under it, a bar at the
+	 * start edge instead of the dot. */
+	.fc-event.tm-cal-card .fc-content {
+		display: flex;
+		flex-direction: column;
+		align-items: stretch;
+		gap: 2px;
+		min-inline-size: 0;
+		white-space: normal;
+
+		&::before {
+			content: none;
+		}
+	}
+
+	.fc-day-grid-event.tm-cal-card {
+		padding: 4px var(--tm-space-2) 5px !important;
+		border-inline-start: 3px solid currentColor !important;
+	}
+
+	/* .fc-event.tm-cal-card: the list-scoped event rules above are
+	 * (0,5,1) with the theme's attributes; this has to meet them */
+	.fc-event.tm-cal-card .tm-cal-head {
+		display: flex;
+		align-items: baseline;
+		gap: var(--tm-space-1);
+		min-inline-size: 0;
+
+		.fc-time {
+			flex: none;
+		}
+
+		.fc-title {
+			min-inline-size: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			font-weight: var(--tm-weight-semibold);
+		}
+	}
+
+	.tm-cal-lines {
+		display: flex;
+		flex-direction: column;
+		gap: 1px;
+		min-inline-size: 0;
+	}
+
+	.tm-cal-line {
+		display: flex;
+		align-items: center;
+		gap: var(--tm-space-1);
+		min-inline-size: 0;
+		white-space: nowrap;
+		line-height: 1.4;
+		opacity: 0.88;
+
+		&.is-bold {
+			font-weight: var(--tm-weight-semibold);
+			opacity: 1;
+		}
+	}
+
+	.tm-cal-label {
+		flex: none;
+		opacity: 0.72;
+	}
+
+	.tm-cal-value {
+		min-inline-size: 0;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		font-variant-numeric: tabular-nums;
+		unicode-bidi: isolate;
+	}
+
+	.tm-cal-bar {
+		flex: 1 1 auto;
+		min-inline-size: 24px;
+		max-inline-size: 96px;
+		block-size: 4px;
+		border-radius: var(--tm-radius-full);
+		background-color: color-mix(in srgb, currentColor 22%, transparent);
+		overflow: hidden;
+
+		> i {
+			display: block;
+			block-size: 100%;
+			border-radius: inherit;
+			background-color: currentColor;
+		}
+	}
+
+	.tm-cal-line[data-display="badge"] .tm-cal-value {
+		padding-inline: 6px;
+		border-radius: var(--tm-radius-full);
+		background-color: color-mix(in srgb, currentColor 14%, transparent);
+	}
+
+	/* Single line: the fields after the title, for busy months. The title
+	 * keeps its room; the fields give way first. */
+	.fc-event.tm-cal-oneline .fc-content {
+		.fc-title {
+			flex: 0 1 auto;
+			min-inline-size: 3em;
+		}
+	}
+
+	.tm-cal-inline {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--tm-space-1);
+		flex: 0 100 auto;
+		min-inline-size: 0;
+		overflow: hidden;
+		white-space: nowrap;
+		opacity: 0.85;
+
+		.tm-cal-line {
+			display: inline-flex;
+			opacity: 1;
+		}
+
+		.tm-cal-sep {
+			opacity: 0.5;
+		}
+	}
+
+	/* Week and day views: the block is as tall as its time; what does not
+	 * fit is cut, not spilled over the next slot. */
+	.fc-time-grid-event.tm-cal-card .fc-content {
+		overflow: hidden;
+	}
+}
+
+/* The day-name tracking helps Latin abbreviations and hurts Arabic, whose
+ * letters join. Direction is the only reliable signal available here. */
+#{$tm-on}[dir="rtl"][data-tm-list="on"] .fc th.fc-day-header {
+	letter-spacing: 0;
+}

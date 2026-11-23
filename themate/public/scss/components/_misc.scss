@@ -1,0 +1,456 @@
+/* Cross-cutting surfaces that do not warrant their own file:
+ * tree view, print preview, avatars, tags. Kanban, Calendar and Gantt each
+ * have their own file — they are surfaces, not leftovers.
+ * Each names the native source it targets. */
+
+#{$tm-on} {
+	/* ---- Tree view — scss/desk/tree.scss -------------------------------------- */
+	.tree {
+		font-size: var(--tm-text-sm);
+
+		.tree-link {
+			border-radius: var(--tm-radius-sm);
+			color: var(--tm-text);
+
+			&:hover {
+				background-color: var(--tm-surface-hover);
+			}
+
+			&.active,
+			&.selected {
+				background-color: var(--tm-surface-selected);
+				color: var(--tm-action-primary-fg);
+			}
+		}
+
+		.tree-node .icon {
+			color: var(--tm-text-3);
+		}
+	}
+
+	/* ---- Avatars — scss/desk/avatar.scss -------------------------------------- */
+	.avatar .avatar-frame {
+		border-radius: var(--tm-radius-full);
+		background-color: var(--tm-surface-sunken);
+		color: var(--tm-text-2);
+		font-weight: var(--tm-weight-medium);
+	}
+
+	/* ---- Tags — scss/desk/tags.scss ------------------------------------------- */
+	.tag-pill {
+		border-radius: var(--tm-radius-xs);
+		background-color: var(--tm-surface-sunken);
+		border: 1px solid var(--tm-border);
+		color: var(--tm-text-2);
+		font-size: var(--tm-text-xs);
+		padding: 0 var(--tm-space-1);
+	}
+
+	/* ---- Print preview — scss/desk/print_preview.scss -------------------------
+	 * Print output must stay legible: the theme's screen surfaces are dropped and
+	 * the page returns to black on white, per the coverage requirement that print
+	 * remains usable. */
+	@media print {
+		body {
+			background-color: #ffffff;
+			color: #000000;
+		}
+
+		.page-head,
+		.navbar,
+		.modern-sidebar,
+		.layout-side-section,
+		.page-actions {
+			display: none !important; /* documented: chrome must not print */
+		}
+
+		.layout-main-section {
+			border: none;
+			padding: 0;
+			box-shadow: none;
+		}
+	}
+
+	/* ---- Full search results — scss/desk/global_search.scss -------------------- */
+	.search-dialog {
+		/* The themed .form-control padding put the icon on the first letter. */
+		.search-header {
+			.search-input {
+				padding-inline-start: 32px;
+				padding-inline-end: 72px; /* minimize and close sit over the input */
+			}
+
+			.search-icon {
+				inset-inline-start: var(--tm-space-5, 24px);
+				color: var(--tm-text-3);
+			}
+		}
+
+		/* One surface: the dialog is already the panel. */
+		.layout-main-section {
+			border: 0;
+			box-shadow: none;
+			background: transparent;
+			padding: 0;
+		}
+
+		/* Native hides the sidebar here (.modal .hidden-xs) but the results keep its
+		 * col-md-9 width and sit in the middle with blank space either side. */
+		.results-area {
+			flex: 1 1 100%;
+			max-inline-size: 100%;
+		}
+
+		.search-results {
+			.results-summary {
+				.result-title {
+					font-size: var(--tm-text-sm);
+					font-weight: var(--tm-weight-semibold);
+					color: var(--tm-text);
+				}
+
+				.result {
+					margin-inline: calc(var(--tm-space-2) * -1); /* text lines up with its title */
+					border-radius: var(--tm-radius-sm);
+					padding-inline: var(--tm-space-2);
+
+					&:hover {
+						background-color: var(--tm-surface-hover);
+					}
+
+					mark {
+						background-color: transparent;
+						color: var(--tm-action-primary-fg);
+						font-weight: var(--tm-weight-semibold);
+					}
+				}
+
+				.list-more,
+				.section-more {
+					color: var(--tm-action-primary-fg);
+				}
+			}
+		}
+	}
+
+}
+
+/* ---- Desk 404 / 403 (js/core/not_found.js) ---------------------------- */
+#{$tm-on} {
+	.tm-error-page {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-block-size: calc(100vh - var(--navbar-height, 60px) - 80px);
+		padding: var(--tm-space-6) var(--tm-space-4);
+	}
+
+	.tm-error-card {
+		inline-size: min(520px, 100%);
+		background-color: var(--tm-surface);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-lg);
+		padding: 40px var(--tm-space-6) var(--tm-space-6);
+		text-align: center;
+		box-shadow: var(--tm-shadow-sm);
+	}
+
+	.tm-error-code {
+		font-size: 88px;
+		font-weight: var(--tm-weight-bold);
+		line-height: 1;
+		letter-spacing: -0.04em;
+		color: var(--tm-brand-500);
+		font-variant-numeric: tabular-nums;
+
+		span {
+			color: var(--tm-brand-100);
+		}
+	}
+
+	.tm-error-title {
+		font-size: var(--tm-text-xl);
+		font-weight: var(--tm-weight-semibold);
+		margin: var(--tm-space-4) 0 var(--tm-space-2);
+		color: var(--tm-text);
+	}
+
+	.tm-error-text {
+		color: var(--tm-text-2);
+		margin: 0 auto;
+		max-inline-size: 40ch;
+	}
+
+	.tm-error-route {
+		display: inline-block;
+		margin-block-start: var(--tm-space-3);
+		padding: 2px 8px;
+		border-radius: var(--tm-radius-sm);
+		background-color: var(--tm-surface-sunken);
+		color: var(--tm-text-2);
+		font-size: var(--tm-text-xs);
+		direction: ltr;
+		unicode-bidi: isolate;
+		max-inline-size: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		vertical-align: bottom;
+	}
+
+	.tm-error-actions {
+		display: flex;
+		justify-content: center;
+		flex-wrap: wrap;
+		gap: var(--tm-space-2);
+		margin-block-start: var(--tm-space-6);
+
+		kbd {
+			font-size: 10px;
+			margin-inline-start: 4px;
+			padding: 0 5px;
+			border: 1px solid var(--tm-border);
+			border-radius: 3px;
+			background-color: var(--tm-surface-sunken);
+			color: var(--tm-text-3);
+		}
+	}
+}
+
+/* ---- Skeletons (while data is on its way) -------------------------------
+ * One shimmer, three shapes. Used by the module dashboard (tabs.js), smart
+ * widgets, chart cards and the sidebar. Reduced motion: a flat block. */
+#{$tm-on} {
+	.tm-skeleton {
+		display: flex;
+		flex-direction: column;
+		gap: var(--tm-space-3);
+	}
+
+	.tm-skeleton-row {
+		display: grid;
+		grid-auto-flow: column;
+		grid-auto-columns: minmax(0, 1fr);
+		gap: var(--tm-space-3);
+	}
+
+	.tm-skeleton-card,
+	.tm-skeleton-chart,
+	.tm-skeleton-line {
+		display: block;
+		border-radius: var(--tm-radius-md);
+		background: linear-gradient(90deg, var(--tm-surface-sunken) 25%, var(--tm-surface-hover) 50%, var(--tm-surface-sunken) 75%);
+		background-size: 200% 100%;
+		animation: tm-shimmer 1.2s linear infinite;
+	}
+
+	.tm-skeleton-card { block-size: 96px; }
+	.tm-skeleton-chart { block-size: 260px; }
+	.tm-skeleton-line { block-size: 12px; border-radius: var(--tm-radius-full); }
+	.tm-skeleton-line.is-short { inline-size: 40%; }
+	.tm-skeleton-line.is-tall { block-size: 28px; inline-size: 55%; }
+
+	@keyframes tm-shimmer {
+		from { background-position: 200% 0; }
+		to { background-position: -200% 0; }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.tm-skeleton-card, .tm-skeleton-chart, .tm-skeleton-line { animation: none; }
+	}
+
+	/* ---- Form shell (js/core/form_skeleton.js) --------------------------
+	 * Drawn into the form page while the document is being fetched. The page
+	 * is switched to BEFORE the answer arrives, so everything already in it
+	 * belongs to the record the person just left: the outline covers the body
+	 * and the head's title and buttons are held invisible — invisible, not
+	 * removed, so the page does not change height underneath the outline. */
+	[data-tm-form-loading] {
+		.layout-main-section > *:not(.tm-form-skeleton) {
+			display: none;
+		}
+
+		.layout-side-section,
+		.page-head .title-area,
+		.page-head .page-actions {
+			visibility: hidden;
+		}
+	}
+
+	.tm-form-skeleton {
+		display: flex;
+		flex-direction: column;
+		gap: var(--tm-space-4);
+		/* a bare .page-container on the first record of a doctype: form.js
+		 * setup() has not built .layout-main-section yet */
+		padding-block: var(--tm-space-4);
+	}
+
+	.tm-form-skeleton-head .tm-skeleton-line.is-tall {
+		inline-size: 280px;
+		max-inline-size: 60%;
+	}
+
+	.tm-form-skeleton-section {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: var(--tm-space-4) var(--tm-space-5);
+		padding: var(--tm-space-4);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface);
+	}
+
+	.tm-skeleton-field {
+		display: flex;
+		flex-direction: column;
+		gap: var(--tm-space-2);
+
+		.tm-skeleton-line {
+			block-size: 10px;
+		}
+
+		.tm-skeleton-line.is-short {
+			inline-size: 35%;
+		}
+	}
+}
+
+/* ---- The like heart (favourite) -----------------------------------------
+ * Native: frappe/public/js/frappe/list/list_view.js:2227 builds
+ * <span class="like-action [liked liked-by|not-liked]"> around
+ * frappe.utils.icon("es-solid-heart", "sm", "like-icon"), and
+ * common/icons.scss:22,44 colours it by pushing --icon-stroke INTO the
+ * symbol. That works for Frappe's own es-solid-heart, whose path is
+ * fill="var(--icon-stroke)".
+ *
+ * The Themate symbol is drawn differently: fill="currentColor" on a <g>
+ * inside the symbol. A `fill` declared on the <use> cannot override that —
+ * a presentation attribute on the referenced content is a specified value in
+ * the shadow tree, and inheritance only fills in what is NOT specified. So
+ * once core/icons.js swapped #es-solid-heart for #icon-tm-heart, Frappe's
+ * red never reached the shape and a favourited row looked exactly like an
+ * unfavourited one: both the muted colour the row inherits.
+ *
+ * Fixed by colouring the ELEMENT, which currentColor then resolves against,
+ * so it works whichever sprite answered; --icon-stroke is still set for the
+ * Frappe symbol when this sprite has no heart. Empty until it is a
+ * favourite, solid when it is — the state has to be readable at a glance
+ * down a column of rows, not a shade apart. */
+#{$tm-on} {
+	.like-action {
+		cursor: pointer;
+		color: var(--tm-text-3);
+		transition: color var(--tm-dur-fast) var(--tm-ease);
+
+		/* Themate symbol: .tm-fill is the solid body, .tm-line the outline.
+		 * Dropping the fill leaves the outline, which is the "not yet" state.
+		 * Overrides the duotone tint base/_base.scss gives every .tm-icon. */
+		.tm-icon {
+			fill-opacity: 0;
+		}
+
+		/* Frappe's symbol, when this sprite has no heart to swap in. */
+		use.like-icon {
+			--icon-stroke: transparent;
+		}
+
+		&:hover,
+		&:focus-visible {
+			color: var(--tm-red-500);
+		}
+
+		&.liked,
+		&.liked-by {
+			color: var(--tm-red-600);
+
+			.tm-icon {
+				fill-opacity: 1;
+			}
+
+			use.like-icon {
+				--icon-stroke: currentColor;
+			}
+		}
+	}
+
+	/* The sidebar's "Liked by me" filter toggle is the same heart and reads
+	 * the same way: off is an outline, on is the filled red. */
+	.list-liked-by-me {
+		.tm-icon {
+			fill-opacity: 0;
+		}
+
+		&.active,
+		&[aria-pressed="true"] {
+			color: var(--tm-red-600);
+
+			.tm-icon {
+				fill-opacity: 1;
+			}
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.like-action {
+			transition: none;
+		}
+	}
+}
+
+/* ---- Veil (language switch: from the click until the reloaded page) -----
+ * Covers the desk, blocks input, names what is happening. Removed only by
+ * the reload itself (or an error in the call). */
+#{$tm-on} {
+	.tm-veil {
+		position: fixed;
+		inset: 0;
+		z-index: 1060; /* above Frappe's modals (1050) and the freeze (1040) */
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background: color-mix(in srgb, var(--tm-surface-app) 78%, transparent);
+		backdrop-filter: blur(6px);
+		animation: tm-veil-in var(--tm-dur) var(--tm-ease);
+	}
+
+	.tm-veiled {
+		overflow: hidden;
+	}
+
+	.tm-veil-card {
+		display: flex;
+		align-items: center;
+		gap: var(--tm-space-3);
+		padding: var(--tm-space-4) var(--tm-space-5);
+		border-radius: var(--tm-radius-lg);
+		background: var(--tm-surface);
+		border: 1px solid var(--tm-border);
+		box-shadow: var(--tm-shadow-lg, 0 12px 32px rgba(0, 0, 0, 0.16));
+		color: var(--tm-text);
+		font-weight: var(--tm-weight-medium);
+	}
+
+	.tm-veil-spinner {
+		inline-size: 20px;
+		block-size: 20px;
+		border-radius: 50%;
+		border: 2px solid var(--tm-border-strong);
+		border-inline-start-color: var(--tm-action-primary);
+		animation: tm-veil-spin 0.8s linear infinite;
+	}
+
+	@keyframes tm-veil-in {
+		from { opacity: 0; }
+		to { opacity: 1; }
+	}
+
+	@keyframes tm-veil-spin {
+		to { transform: rotate(360deg); }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.tm-veil { animation: none; }
+		.tm-veil-spinner { animation-duration: 1.6s; }
+	}
+}

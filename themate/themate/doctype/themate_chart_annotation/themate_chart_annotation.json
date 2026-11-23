@@ -1,0 +1,91 @@
+{
+ "actions": [],
+ "autoname": "hash",
+ "creation": "2026-09-18 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "date",
+  "label",
+  "chart",
+  "color",
+  "note"
+ ],
+ "fields": [
+  {
+   "fieldname": "date",
+   "fieldtype": "Date",
+   "label": "Date",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1
+  },
+  {
+   "fieldname": "label",
+   "fieldtype": "Data",
+   "label": "Label",
+   "reqd": 1,
+   "in_list_view": 1,
+   "description": "Short: what happened that day \u2014 a price change, a campaign, a new branch."
+  },
+  {
+   "fieldname": "chart",
+   "fieldtype": "Link",
+   "label": "Chart",
+   "options": "Dashboard Chart",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "Blank: the event is drawn on every time-series chart (a company-wide event). Set: on this chart only."
+  },
+  {
+   "fieldname": "color",
+   "fieldtype": "Color",
+   "label": "Colour"
+  },
+  {
+   "fieldname": "note",
+   "fieldtype": "Small Text",
+   "label": "Note",
+   "description": "Shown when the line is hovered."
+  }
+ ],
+ "modified": "2026-09-18 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Themate",
+ "name": "Themate Chart Annotation",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "report": 1
+  },
+  {
+   "role": "Dashboard Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "report": 1
+  },
+  {
+   "role": "Desk User",
+   "read": 1,
+   "create": 1,
+   "write": 1,
+   "delete": 1,
+   "if_owner": 1
+  }
+ ],
+ "sort_field": "date",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "label",
+ "track_changes": 1,
+ "description": "A mark on a date, drawn on the charts: the event that explains a spike or a dip, kept for everyone who looks later."
+}

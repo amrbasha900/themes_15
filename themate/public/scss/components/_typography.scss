@@ -1,0 +1,55 @@
+/* Text styles — the customizer's per-element typography.
+ *
+ * core/bootstrap.js applyTextStyles() writes, per element key, four inline
+ * custom properties on <html> when the user (or the site default) has set
+ * something: --tm-ts-<key>-size / -weight / -style / -color. Nothing is
+ * written for an untouched element, so every rule below falls back to the
+ * contract token through var()'s second argument. Keys:
+ *
+ *   title     page title                       section   section / card titles
+ *   subtitle  doc name, "Workspace", count     tab       form tabs
+ *   label     field labels                     body      body text
+ *   menu      sidebar items
+ *
+ * This file is imported after the components so it has the last word on
+ * these properties at equal specificity. */
+
+@mixin ts($key, $size, $weight, $color) {
+	font-size: var(--tm-ts-#{$key}-size, #{$size});
+	font-weight: var(--tm-ts-#{$key}-weight, #{$weight});
+	font-style: var(--tm-ts-#{$key}-style, normal);
+	color: var(--tm-ts-#{$key}-color, #{$color});
+}
+
+#{$tm-on} {
+	/* Most elements read the variables in their own component rules
+	 * (_page, _form-page, _list, _forms, _workspace, _modern-sidebar); the
+	 * few below have no dedicated rule elsewhere. */
+	.widget.links-widget-box .widget-head .widget-label .widget-title,
+	.widget.dashboard-widget-box .widget-head .widget-title,
+	.widget.onboarding-widget-box .widget-head .widget-title {
+		@include ts(section, var(--tm-text-md), var(--tm-weight-semibold), var(--tm-text));
+	}
+
+	.tm-overview-field .tm-overview-label,
+	.grid-heading-row .static-area,
+	.list-row-head .level-item {
+		@include ts(label, var(--tm-text-sm), var(--tm-weight-regular), var(--tm-text-2));
+	}
+
+	body {
+		font-weight: var(--tm-ts-body-weight, var(--tm-weight-regular));
+		font-style: var(--tm-ts-body-style, normal);
+		color: var(--tm-ts-body-color, var(--tm-text));
+	}
+
+	/* Body size is the base font size (--tm-font-scale); a per-element
+	 * override here scales the ramp instead of fighting it. */
+	&[style*="--tm-ts-body-size"] {
+		--tm-font-scale: calc(var(--tm-ts-body-size) / 14px);
+	}
+
+	.modern-sidebar:not(.collapsed) .modern-sidebar-item:not(.active) a .sidebar-item-label {
+		color: var(--tm-ts-menu-color, inherit);
+	}
+}

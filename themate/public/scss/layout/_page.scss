@@ -1,0 +1,346 @@
+/* Page shell: head, title, actions, main section.
+ * Native source: frappe/public/scss/desk/page.scss
+ *
+ * The previous file forced `.container { width/max-width: 100% !important }`
+ * under `body.full-width`, paired with JS that set the fullwidth preference on
+ * every boot. Both are gone — the user's own Frappe fullwidth preference is
+ * respected again (FRAPPE_UI_MAP.md §5 finding 7). */
+
+/* Full width is the theme, not a preference.
+ *
+ * Frappe caps `.container` at 1290px (desk/variables.scss $container-max-widths)
+ * and offers "Toggle Full Width", which sets `body.full-width .container
+ * { width: 90% }`. Two problems with leaving that as a choice: the 90% is
+ * measured against what is left beside a sidebar that is already taking
+ * --tm-sidebar-w, so "full width" came out NARROWER than the default cap on
+ * every common laptop; and a desk whose width changes per user is a desk no
+ * layout here can be verified against. The cap is dropped for everyone and
+ * the menu entry that changed it is hidden below.
+ *
+ * Bootstrap's own 15px gutters and .main-section's sidebar margin still apply,
+ * so this is edge-to-edge content, not edge-to-edge text. */
+@media (min-width: 768px) {
+	#{$tm-on} .container {
+		width: 100%;
+		max-width: 100%;
+	}
+}
+
+/* Except the setup wizard's card (desk/slides.scss .slides-wrapper, also a
+ * .container): a form of a few fields, centred at Frappe's own width. */
+#{$tm-on} .container.slides-wrapper {
+	max-width: 520px;
+}
+
+/* The navbar template renders this entry as a bare
+ * `<button class="btn-reset dropdown-item" onclick="return <action>">`
+ * (ui/toolbar/navbar.html:127) — no class, no data attribute, so the action
+ * string from hooks.py:518 is the only hook there is. Hidden rather than
+ * removed from Navbar Item, so nothing is written to the database and the
+ * master kill-switch brings it straight back. */
+#{$tm-on} #toolbar-user button[onclick*="toggle_full_width"] {
+	display: none;
+}
+
+#{$tm-on} {
+	/* The title row sits ON the ground (design): no white band, no rule.
+	 * It keeps the ground colour rather than transparency because Frappe
+	 * makes it sticky under the navbar — content must not show through. */
+	.page-head {
+		background-color: var(--tm-surface-app);
+		border-block-end: 0;
+
+		.page-title {
+			.title-text {
+				font-size: var(--tm-ts-title-size, var(--tm-text-xl));
+				font-weight: var(--tm-ts-title-weight, var(--tm-weight-semibold));
+				font-style: var(--tm-ts-title-style, normal);
+				color: var(--tm-ts-title-color, var(--tm-text));
+				line-height: var(--tm-leading-dense);
+			}
+
+			.sidebar-toggle-btn {
+				color: var(--tm-text-2);
+
+				&:hover {
+					color: var(--tm-text);
+				}
+			}
+		}
+	}
+
+	/* Every workspace (core/page_head.js adds .tm-ws-card; Home also has
+	 * .tm-home for its greeting): the head is a card of its own, and the
+	 * sections sit straight on the ground so their cards read as cards.
+	 * Without this they were white cards on a white slab. */
+	.tm-ws-card {
+		/* The greeting leaves with the page: the window scrolls here, not the
+		 * column desktop.scss makes its own scroller, and the head is not sticky. */
+		.layout-main .layout-main-section-wrapper {
+			block-size: auto;
+			overflow: visible;
+		}
+
+		.page-head {
+			position: static;
+			margin-block-end: var(--tm-space-3);
+		}
+
+		.page-head .page-head-content {
+			block-size: auto;
+			min-block-size: 96px;
+			margin-block-start: var(--tm-space-2);
+			margin-inline: 0;
+			padding: var(--tm-space-2) var(--tm-space-4);
+			border: 1px solid var(--tm-border);
+			border-radius: var(--tm-radius-xl);
+			/* The image is core/art.js. Cover keeps the waves' shape; they sit in the
+			 * end corner, so that is the corner kept when the card is narrow. */
+			background-color: var(--tm-surface);
+			background-repeat: no-repeat;
+			background-position: right bottom;
+			background-size: cover;
+			box-shadow: var(--tm-shadow-sm);
+		}
+
+		.page-head .page-title {
+			flex: 1 1 auto; /* sized by the greeting, not by Bootstrap's col-* */
+			max-inline-size: none;
+			min-inline-size: 0;
+		}
+
+		.page-head .page-title .title-text {
+			font-size: calc(var(--tm-ts-title-size, var(--tm-text-xl)) * 1.15);
+			/* desk/page.scss caps titles at 25vw: "Good morning,…" on a tablet */
+			max-inline-size: none;
+		}
+
+		.layout-main-section {
+			padding: 0;
+			border: 0;
+			background: none;
+			box-shadow: none;
+		}
+
+		/* the workspace's icon as a large tile, the reference's head */
+		.page-head .tm-page-icon {
+			inline-size: 52px;
+			block-size: 52px;
+			border: 0;
+			border-radius: var(--tm-radius-lg);
+			background-color: var(--tm-brand-50);
+			color: var(--tm-action-primary-fg);
+			box-shadow: var(--tm-shadow-sm);
+
+			.icon {
+				inline-size: 26px;
+				block-size: 26px;
+			}
+		}
+
+		.page-head .sub-heading {
+			font-size: var(--tm-text-md);
+			color: var(--tm-text-2);
+		}
+
+		/* what the workspace holds (js/workspace/dashboards.js chips) */
+		.tm-ws-chips {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--tm-space-2);
+			margin-block-start: var(--tm-space-1);
+
+			&:empty {
+				display: none;
+			}
+		}
+
+		.tm-ws-chip {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--tm-space-2);
+			block-size: 26px;
+			padding-inline: var(--tm-space-2);
+			border-radius: var(--tm-radius-md);
+			background-color: color-mix(in srgb, var(--tm-surface-sunken) 80%, transparent);
+			color: var(--tm-text-2);
+			font-size: var(--tm-text-sm);
+			font-weight: var(--tm-weight-medium);
+			white-space: nowrap;
+
+			svg.icon {
+				inline-size: 14px;
+				block-size: 14px;
+				color: var(--tm-action-primary-fg);
+			}
+		}
+	}
+
+	.page-actions {
+		gap: var(--tm-space-2);
+		display: flex;
+		align-items: center;
+	}
+
+	/* Main content sits on the app ground as a distinct panel. */
+	.layout-main-section {
+		background-color: var(--tm-surface);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		box-shadow: var(--tm-shadow-sm);
+		padding: var(--tm-space-4);
+	}
+
+	.layout-main-section.frappe-card {
+		box-shadow: none;
+		border: 1px solid var(--tm-border);
+	}
+
+	.layout-side-section {
+		font-size: var(--tm-text-sm);
+		color: var(--tm-text-2);
+	}
+
+	/* Breadcrumbs — native: scss/desk/breadcrumb.scss. Parents are secondary
+	 * text (not the faint metadata tone — they are links), the current page
+	 * is full text. */
+	#navbar-breadcrumbs,
+	.breadcrumb-container {
+		font-size: var(--tm-text-sm);
+		flex-wrap: nowrap;
+		min-inline-size: 0;
+		overflow: hidden;
+
+		li {
+			white-space: nowrap;
+		}
+
+		li a {
+			color: var(--tm-text-2);
+
+			&:hover {
+				color: var(--tm-text-link);
+			}
+		}
+
+		/* Frappe draws its arrow before EVERY crumb, the first included — a
+		 * "›" hanging off the burger with nothing before it */
+		li:first-child a::before {
+			display: none;
+		}
+
+		li.active a,
+		li:last-child a {
+			color: var(--tm-text);
+			font-weight: var(--tm-weight-medium);
+		}
+	}
+
+	/* Icon box before the title: the workspace icon of the doctype's module,
+	 * placed by core/page_head.js on List and Form pages. */
+	.page-head .page-title {
+		display: flex;
+		align-items: center;
+		gap: var(--tm-space-3);
+		min-inline-size: 0;
+	}
+
+	.page-head .tm-page-icon {
+		flex: none;
+		inline-size: 44px;
+		block-size: 44px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface); /* a white tile on the ground */
+		color: var(--tm-text-2);
+
+		.icon {
+			inline-size: 24px;
+			block-size: 24px;
+		}
+	}
+
+	/* Title and buttons on ONE line. Frappe's head is a fixed 60px box
+	 * (desk/page.scss:110) holding a Bootstrap .row, which wraps: buttons that
+	 * do not fit beside the title dropped to a second line drawn over the tab
+	 * bar and the document panel. The row no longer wraps; the title gives up
+	 * width first, down to a floor, and core/page_fit.js moves buttons into
+	 * the ⋯ menu when that is still not enough. */
+	.page-head .page-head-content {
+		flex-wrap: nowrap;
+	}
+
+	/* The title column is as wide as its content, not Bootstrap's fixed
+	 * col-md-4 third: "Sales Invoice  0 records" was cut to "Sales Inv…"
+	 * beside buttons that used half the space they were given. */
+	.page-head .page-title {
+		flex: 0 1 auto;
+		max-inline-size: none;
+		min-inline-size: min(240px, 50%);
+
+		/* long names end in an ellipsis instead of holding the column open */
+		.title-area,
+		.title-area > div,
+		.title-area > div > .flex {
+			min-inline-size: 0;
+		}
+	}
+
+	/* core/page_fit.js, step 1: the custom buttons leave the head for the ⋯
+	 * menu, where Frappe keeps a copy of each as a `.hidden-xl` item — the
+	 * swap Frappe itself makes under 992px. `.hidden-xl` and `.hidden-md`
+	 * are `display: none !important` in Frappe (desk/global.scss:140-160),
+	 * so only !important undoes them. */
+	.page-head.tm-head-compact {
+		.custom-actions {
+			display: none !important;
+		}
+
+		.menu-btn-group.hidden-xl {
+			display: block !important;
+		}
+
+		/* the <li> and its link both carry the class */
+		.menu-btn-group .dropdown-menu > li.hidden-xl {
+			display: list-item !important;
+		}
+
+		.menu-btn-group .dropdown-menu > li > .dropdown-item.hidden-xl {
+			display: block !important;
+		}
+	}
+
+	/* Step 2: the print / previous / next icons, which Frappe drops under
+	 * 768px (Print stays in the ⋯ menu). */
+	.page-head.tm-head-tight .page-icon-group {
+		display: none !important;
+	}
+
+	/* The workspace page before show() has named it: Frappe's placeholder
+	 * "Workspace" is held invisible, its line kept (core/page_head.js). */
+	.tm-title-pending .page-head .title-text {
+		visibility: hidden;
+	}
+
+	/* The document name under a title (page.js set_title_sub). */
+	.page-head .sub-heading {
+		font-size: var(--tm-ts-subtitle-size, var(--tm-text-sm));
+		font-weight: var(--tm-ts-subtitle-weight, var(--tm-weight-regular));
+		font-style: var(--tm-ts-subtitle-style, normal);
+		color: var(--tm-ts-subtitle-color, var(--tm-text-2));
+		margin-block-start: 2px;
+	}
+
+	/* Frappe's generic card surface used across dashboards and views. */
+	.frappe-card,
+	.widget {
+		border-radius: var(--tm-radius-md);
+		border: 1px solid var(--tm-border);
+		box-shadow: none;
+		background-color: var(--tm-surface);
+	}
+
+}

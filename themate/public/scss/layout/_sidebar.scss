@@ -1,0 +1,87 @@
+/* Sidebar.
+ *
+ * OWNERSHIP — read FRAPPE_UI_MAP.md §6 before adding rules here.
+ *
+ * The custom sidebar (`.modern-sidebar`) is owned entirely by
+ * layout/_modern-sidebar.scss, the LAST import of themate.bundle.scss (it was
+ * public/css/modern_sidebar.css loaded as a separate <link>; bundling it is
+ * what made it content-hashed). Styling `.modern-sidebar` from here would mean
+ * two files competing for the same element, with the loser needing !important
+ * to win — exactly the pattern the brief rejects. Instead, its own `--sidebar-*` variables
+ * have been re-pointed at the shared `--tm-*` tokens at their source, so the
+ * sidebar tracks the palette, density and radius with one owner and no
+ * override war.
+ *
+ * The legacy sidebar is retained rather than replaced: it is the only working
+ * sidebar (its intended successors are still stubs), and rewriting 755 lines
+ * of mount/route/collapse behaviour that cannot be exercised in a browser here
+ * would trade a working sidebar for an unverifiable one.
+ *
+ * What remains below is the NATIVE Frappe sidebar, which is a different
+ * element and can appear alongside the custom one.
+ * Native source: frappe/public/scss/desk/sidebar.scss */
+
+#{$tm-on}[data-tm-sidebar="on"] {
+	/* Workspace list in the native Desk sidebar. */
+	.desk-sidebar {
+		.desk-sidebar-item {
+			border-radius: var(--tm-radius-sm);
+			min-block-size: var(--tm-control-h);
+			font-size: var(--tm-text-sm);
+			color: var(--tm-text-2);
+			transition: background-color var(--tm-dur-fast) var(--tm-ease);
+
+			&:hover {
+				background-color: var(--tm-surface-hover);
+				color: var(--tm-text);
+			}
+
+			&.selected {
+				background-color: var(--tm-surface-selected);
+				color: var(--tm-action-primary-fg);
+				font-weight: var(--tm-weight-medium);
+			}
+
+			.sidebar-item-icon svg {
+				inline-size: 16px;
+				block-size: 16px;
+			}
+		}
+
+		.standard-sidebar-label {
+			font-size: var(--tm-text-xs);
+			font-weight: var(--tm-weight-medium);
+			color: var(--tm-text-3);
+			text-transform: uppercase;
+			letter-spacing: 0.02em;
+		}
+	}
+
+	/* Generic side section used by List and Form views. */
+	.layout-side-section {
+		.sidebar-menu {
+			margin-block-end: var(--tm-space-4);
+		}
+
+		.sidebar-label {
+			font-size: var(--tm-text-xs);
+			font-weight: var(--tm-weight-medium);
+			color: var(--tm-text-3);
+			text-transform: uppercase;
+			letter-spacing: 0.02em;
+			margin-block-end: var(--tm-space-1);
+		}
+	}
+
+	/* Mobile overlay variant. Frappe puts .overlay-sidebar on the List and
+	 * Form side sections at EVERY width and only turns it into a fixed drawer
+	 * under 992px (desk/sidebar.scss:231). Painting it unconditionally gave
+	 * the desktop filter column a floating white slab with no border that
+	 * stopped mid-page. Scope the surface to the drawer, where it is needed. */
+	@media (max-width: 991px) {
+		.overlay-sidebar {
+			background-color: var(--tm-surface);
+			border-inline-end: 1px solid var(--tm-border);
+		}
+	}
+}

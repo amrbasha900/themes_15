@@ -1,0 +1,98 @@
+/* RTL corrections.
+ *
+ * Two facts decide what belongs here — both verified against the bench, and
+ * both the opposite of what this file used to assume:
+ *
+ * 1. Frappe's RTL build runs rtlcss over EVERY stylesheet bundle
+ *    (frappe/esbuild/esbuild.js:233 `build_style_files({rtl_style})`), the
+ *    theme's included. Native `margin-left`, `padding-right`, `text-align:
+ *    left`, `direction: ltr` … are all mirrored in `rtl_*.bundle.css`, which
+ *    is what an RTL user loads. There is nothing to "correct"; a physical
+ *    correction written here is mirrored too and cancels itself out.
+ *    Logical properties are never touched by rtlcss and need no help.
+ *
+ * 2. The direction signal is `<html dir="rtl">` (frappe/www/app.html:2).
+ *    `body.frappe-rtl` is not set by Frappe 15's client — it survives only
+ *    as three orphaned selectors in its SCSS. And `dir` sits on <html>, so a
+ *    descendant selector (`html [dir=rtl]`) never matches: the scope must be
+ *    the compound `html[dir="rtl"]`.
+ *
+ * What remains is the one thing mirroring cannot do: keep runs that MUST be
+ * left-to-right — numbers, dates, document IDs — left-to-right inside an RTL
+ * box. rtlcss would flip those `direction: ltr` declarations along with
+ * everything else, so they are marked with the loud rtl:ignore comment (the
+ * `!` form). The `!` keeps the comment through Sass; rtlcss accepts either
+ * form (directive-parser.js:4). */
+
+#{$tm-on}[dir="rtl"] {
+	/* ---- Numerals and identifiers ---------------------------------------- */
+	/* A negative amount in an RTL box renders as "1,234.56-": the leading
+	 * minus is a neutral, so it takes the paragraph direction. Forcing the
+	 * control LTR keeps the sign in front; `text-align: end` keeps the figures
+	 * on the column's edge, which in RTL is the left. */
+	.frappe-control[data-fieldtype="Currency"] input.form-control,
+	.frappe-control[data-fieldtype="Float"] input.form-control,
+	.frappe-control[data-fieldtype="Int"] input.form-control,
+	.frappe-control[data-fieldtype="Percent"] input.form-control,
+	.frappe-control[data-fieldtype="Date"] input.form-control,
+	.frappe-control[data-fieldtype="Datetime"] input.form-control,
+	.frappe-control[data-fieldtype="Time"] input.form-control {
+		/*! rtl:ignore */
+		direction: ltr;
+		text-align: end;
+	}
+
+	/* Document names / link values in lists and grids. `plaintext` lets each
+	 * value pick its own direction from its first strong character, so
+	 * "شركة النور" and "ACC-SINV-2026-00001" both read correctly. */
+	.list-subject a[data-name],
+	.dt-cell__content[data-col-index="1"] {
+		unicode-bidi: plaintext;
+	}
+
+	/* An LTR box keeps the start of a Latin value when it overflows: "Antibiotics…",
+	 * not "…ics & Antimicrobials". `plaintext` still reads Arabic right-to-left, and
+	 * `right` keeps both on the column's edge, where `end` would follow each line. */
+	.list-subject a[data-name],
+	.list-row-col a.filterable:not([data-filter^="name,"]) {
+		display: block;
+		/*! rtl:ignore */
+		direction: ltr;
+		/*! rtl:ignore */
+		text-align: right;
+	}
+
+	/* The ID column. `plaintext` keeps the ID readable, but the cell is still
+	 * an RTL box, so text-overflow trims the START ("…INV-2026-00005") — the
+	 * one part that tells documents apart is the part that gets cut. Make the
+	 * cell an LTR box: the ellipsis moves to the end, and `text-align: end`
+	 * keeps it on the column's edge. list_view.js emits
+	 * data-filter="name,=,…" for exactly this column. */
+	.list-row-col a.filterable[data-filter^="name,"] {
+		display: block;
+		/*! rtl:ignore */
+		direction: ltr;
+		unicode-bidi: isolate;
+		text-align: end;
+	}
+
+	/* ---- Form controls ---------------------------------------------------- */
+	/* base_input.js:19 writes an inline `padding-right: 0px` on every control
+	 * label. Inline styles cannot be overridden from a stylesheet without
+	 * !important, and the value is 0 in both directions, so it is harmless —
+	 * recorded here so nobody adds a rule trying to fight it. */
+	.control-label {
+		text-align: start;
+	}
+
+	.dropdown-menu {
+		text-align: start;
+	}
+
+	/* Chevrons and disclosure arrows point the other way. rtlcss mirrors
+	 * translate/rotate/skew but not scale, so this survives the build. */
+	.octicon-chevron-right,
+	.tree-node .icon-chevron-right {
+		transform: scaleX(-1);
+	}
+}

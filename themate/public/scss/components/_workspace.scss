@@ -1,0 +1,2363 @@
+/* Workspace widgets: number cards, shortcuts, links, onboarding.
+ * Native source: frappe/public/js/frappe/widgets/*.js,
+ *                frappe/public/scss/desk/desktop.scss
+ *
+ * Rewritten from the previous revision, which was 836 lines carrying 283
+ * !important declarations and twelve literal hex values
+ * (FRAPPE_UI_MAP.md §5 findings 8 and 9).
+ *
+ * Three rules now hold:
+ *  1. No !important. themate.bundle.css loads after desk.bundle.css
+ *     (frappe/www/app.py:48), so ordinary specificity already wins. Where a
+ *     native rule genuinely outranks these, the fix is a more precise
+ *     selector, not more force.
+ *  2. No literal colours. The six decorative tones are tokens
+ *     (--tm-tone-*-bg/fg) defined in tokens/_palette.scss and _dark.scss.
+ *  3. SVG fill/stroke is set only inside the icon chip this theme injects.
+ *     The previous revision reset fill and stroke on every matching svg, which
+ *     the brief warns against: icons have different geometry and a blanket
+ *     reset breaks the ones that rely on fill. */
+
+#{$tm-on} {
+	/* ---- Duotone icon helpers -------------------------------------------------
+	 * Scoped to the injected chips only — never to `svg.icon` at large. */
+	.tm-card-icon,
+	.tm-shortcut-icon {
+		svg.icon.tm-duotone {
+			.duotone-outline {
+				stroke: currentColor;
+				fill: none;
+				stroke-width: 2px;
+				stroke-linecap: round;
+				stroke-linejoin: round;
+			}
+
+			.duotone-fill {
+				fill: currentColor;
+				stroke: none;
+				opacity: 0.18;
+				transition: opacity var(--tm-dur) var(--tm-ease);
+			}
+		}
+
+		[data-theme="dark"] & svg.icon.tm-duotone .duotone-fill {
+			opacity: 0.3;
+		}
+	}
+
+	/* ---- Shared chip ---------------------------------------------------------- */
+	.tm-card-icon,
+	.tm-shortcut-icon {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-brand-50);
+		color: var(--tm-brand-500);
+		flex: 0 0 auto;
+
+		@each $tone in "blue", "green", "purple", "orange", "teal", "pink" {
+			&[data-tm-tone="#{$tone}"] {
+				background-color: var(--tm-tone-#{$tone}-bg);
+				color: var(--tm-tone-#{$tone}-fg);
+			}
+		}
+	}
+
+	.tm-card-icon {
+		inline-size: 40px;
+		block-size: 40px;
+		margin-inline-start: auto;
+		order: 2;
+
+		svg.icon {
+			inline-size: 20px;
+			block-size: 20px;
+		}
+	}
+
+	.tm-shortcut-icon {
+		inline-size: 36px;
+		block-size: 36px;
+		margin-inline-end: var(--tm-space-2);
+		border-radius: var(--tm-radius-md);
+
+		svg.icon {
+			inline-size: 18px;
+			block-size: 18px;
+			color: inherit;
+			/* Chips always show the duotone tint, whatever the icon-style
+			 * preference: the tint is what makes a 36px chip read as one. */
+			fill-opacity: 0.22;
+		}
+	}
+
+	/* ---- Number card ----------------------------------------------------------- */
+	.widget.number-widget-box {
+		background-color: var(--tm-surface);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		box-shadow: none;
+		padding: var(--tm-space-3) var(--tm-space-4);
+		transition: border-color var(--tm-dur) var(--tm-ease);
+
+		&:hover {
+			border-color: var(--tm-border-strong);
+		}
+
+		.widget-head {
+			display: flex;
+			align-items: center;
+			gap: var(--tm-space-2);
+			margin-block-end: var(--tm-space-1);
+			border: none;
+		}
+
+		.widget-label .widget-title,
+		.widget-label .number-label {
+			color: var(--tm-text-2);
+			font-size: var(--tm-text-xs);
+			font-weight: var(--tm-weight-medium);
+			letter-spacing: 0;
+			text-transform: none;
+		}
+
+		.widget-content .number,
+		.number-card-loading {
+			color: var(--tm-text);
+			font-size: var(--tm-text-2xl);
+			font-weight: var(--tm-weight-semibold);
+			line-height: 1.2;
+			font-variant-numeric: tabular-nums;
+		}
+
+		.card-stats,
+		.widget-subtitle {
+			color: var(--tm-text-3);
+			font-size: var(--tm-text-xs);
+		}
+
+		/* Percentage change keeps its semantic colour. */
+		.card-stats .indicator-pill {
+			font-size: var(--tm-text-xs);
+		}
+	}
+
+	/* ---- Shortcut -------------------------------------------------------------- */
+	.widget.shortcut-widget-box {
+		background-color: var(--tm-surface);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-xl);
+		box-shadow: var(--tm-shadow-sm);
+		padding: var(--tm-space-3);
+		/* the shadow stays put: animating one repaints on every frame */
+		transition: border-color var(--tm-dur) var(--tm-ease),
+			background-color var(--tm-dur) var(--tm-ease),
+			transform var(--tm-dur) var(--tm-ease);
+
+		&:hover {
+			border-color: var(--tm-action-primary);
+			background-color: var(--tm-surface-hover);
+			transform: translateY(-1px);
+		}
+
+		.widget-label {
+			display: flex;
+			align-items: center;
+			min-inline-size: 0;
+		}
+
+		.widget-label .widget-title {
+			color: var(--tm-text);
+			font-size: var(--tm-text-sm);
+			font-weight: var(--tm-weight-regular);
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.widget-subtitle,
+		.shortcut-stat {
+			color: var(--tm-text-3);
+			font-size: var(--tm-text-xs);
+		}
+
+		/* Design tile: the count pill sits under the title and the arrow in
+		 * the corner. Frappe re-renders the pill inside .widget-control on
+		 * every count fetch (shortcut_widget.js:106), so the control is not
+		 * moved — it wraps under the label and the arrow is pinned. A fixed
+		 * minimum height keeps tiles with and without a count identical. */
+		position: relative;
+		min-block-size: 84px;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+
+		.widget-head {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: 0 var(--tm-space-2);
+			padding-inline-end: var(--tm-space-6);
+			/* a column-flex item defaults to min-width:auto and grows to its
+			 * nowrap text; pin it to the tile so the title ellipsizes instead */
+			inline-size: 100%;
+			min-inline-size: 0;
+		}
+
+		.widget-label {
+			flex: 1 1 auto;
+			min-inline-size: 0;
+		}
+
+		.widget-label .widget-title {
+			font-size: var(--tm-text-md);
+			font-weight: var(--tm-weight-medium);
+			min-inline-size: 0;
+			overflow: hidden;
+			white-space: normal;
+
+			/* Two lines before clipping: "Purchase Receipt" wraps instead of
+			 * becoming "Purchase Rec…" in a 6-per-row tile. */
+			.ellipsis {
+				white-space: normal;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+				line-height: var(--tm-leading-dense);
+			}
+		}
+
+		.widget-control {
+			flex-basis: 100%;
+			display: flex;
+			align-items: center;
+			min-block-size: 0;
+			padding-inline-start: calc(36px + var(--tm-space-2)); /* under the title, past the chip */
+			margin-block-start: var(--tm-space-1);
+
+			> svg {
+				position: absolute;
+				inset-inline-end: var(--tm-space-3);
+				inset-block-start: var(--tm-space-3);
+				color: var(--tm-text-3);
+			}
+
+			.indicator-pill {
+				font-size: var(--tm-text-xs);
+			}
+
+			&:empty,
+			&:not(:has(.indicator-pill)) {
+				margin-block-start: 0;
+			}
+		}
+	}
+
+	/* ---- Links card -------------------------------------------------------------- */
+	.widget.links-widget-box {
+		background-color: var(--tm-surface);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-xl);
+		box-shadow: var(--tm-shadow-sm);
+		padding: var(--tm-space-4);
+
+		.widget-head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			border-block-end: 1px solid var(--tm-border);
+			padding-block-end: var(--tm-space-2);
+			margin-block-end: var(--tm-space-3);
+
+			.widget-label {
+				display: flex;
+				align-items: center;
+				gap: var(--tm-space-3);
+				min-inline-size: 0;
+			}
+
+			.widget-label .widget-title {
+				display: flex;
+				align-items: center;
+				gap: var(--tm-space-2);
+				font-size: var(--tm-text-md);
+				font-weight: var(--tm-weight-semibold);
+				color: var(--tm-text);
+
+				svg.icon {
+					inline-size: 16px;
+					block-size: 16px;
+					color: var(--tm-text-3);
+				}
+			}
+		}
+
+		.widget-body .link-item + .link-item {
+			border-block-start: 1px solid var(--tm-border);
+		}
+
+		.link-item {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: var(--tm-space-2);
+			border-radius: 0;
+			padding: var(--tm-space-2) var(--tm-space-2);
+			margin-inline: calc(var(--tm-space-2) * -1);
+			font-size: var(--tm-text-sm);
+			color: var(--tm-text);
+
+			&:hover {
+				background-color: var(--tm-surface-hover);
+				color: var(--tm-action-primary-fg);
+			}
+
+			.link-content {
+				display: flex;
+				align-items: center;
+				gap: var(--tm-space-2);
+				min-inline-size: 0;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			/* Icon injected per-link by workspace/icon_fields.js. */
+			.link-item-custom-icon {
+				inline-size: 14px;
+				block-size: 14px;
+				flex: 0 0 auto;
+				color: var(--tm-text-3);
+			}
+		}
+	}
+
+	/* ---- Onboarding ---------------------------------------------------------------
+	 * The illustration is chosen from data-onboarding-name, which
+	 * js/workspace/icon_fields.js writes from the widget's own onboarding_name.
+	 * Substring matching is intentional: module names vary between installs. */
+	.widget.onboarding-widget-box {
+		background-color: var(--tm-surface);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		box-shadow: none;
+		padding: 0;
+		overflow: hidden;
+
+		.widget-head {
+			padding: var(--tm-space-3) var(--tm-space-4);
+			border-block-end: 1px solid var(--tm-border);
+
+			.widget-title {
+				font-size: var(--tm-text-sm);
+				font-weight: var(--tm-weight-semibold);
+				color: var(--tm-text);
+			}
+		}
+
+		.onboarding-steps-wrapper {
+			padding: var(--tm-space-3) var(--tm-space-4);
+		}
+
+		.onboarding-step {
+			font-size: var(--tm-text-sm);
+			color: var(--tm-text-2);
+			border-radius: var(--tm-radius-sm);
+			padding: var(--tm-space-1) var(--tm-space-2);
+
+			&:hover {
+				background-color: var(--tm-surface-hover);
+			}
+
+			&.complete {
+				color: var(--tm-text-3);
+			}
+
+			&.active {
+				color: var(--tm-action-primary-fg);
+				font-weight: var(--tm-weight-medium);
+			}
+		}
+
+		/* At a third of the row (design) the two-column native layout has no
+		 * room: stack the steps over the active step's text and action, and
+		 * drop the illustration. */
+		.widget-body {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.onboarding-steps-wrapper,
+		.onboarding-step-preview {
+			inline-size: 100%;
+			max-inline-size: none;
+			flex: none;
+		}
+
+		.onboarding-step {
+			display: flex;
+			align-items: center;
+			gap: var(--tm-space-2);
+			padding: var(--tm-space-2) var(--tm-space-3);
+			margin-block-end: 2px;
+
+			.step-title {
+				display: flex;
+				align-items: center;
+				gap: var(--tm-space-2);
+				min-inline-size: 0;
+			}
+
+			&.active {
+				background-color: var(--tm-brand-50);
+				color: var(--tm-brand-600);
+			}
+
+			.step-skip {
+				margin-inline-start: auto;
+				color: var(--tm-text-link);
+				font-size: var(--tm-text-xs);
+			}
+		}
+
+		.onboarding-step-preview {
+			padding: var(--tm-space-2) var(--tm-space-4) var(--tm-space-4);
+
+			&::before {
+				display: none;
+			}
+
+			.onboarding-step-body h1,
+			.onboarding-step-body h2,
+			.onboarding-step-body h3,
+			.onboarding-step-body h4 {
+				font-size: var(--tm-text-md);
+				font-weight: var(--tm-weight-semibold);
+				margin: 0 0 var(--tm-space-2);
+			}
+
+			.onboarding-step-body,
+			.onboarding-step-body p {
+				font-size: var(--tm-text-sm);
+				color: var(--tm-text-2);
+			}
+
+			.onboarding-step-footer .btn {
+				background-color: var(--tm-action-primary);
+				border-color: var(--tm-action-primary);
+				color: var(--tm-text-inverse);
+			}
+		}
+
+		.onboarding-step-preview::before {
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
+			background-image: url("/assets/themate/images/onboarding-illustration.png");
+		}
+
+		&[data-onboarding-name*="buying"] .onboarding-step-preview::before,
+		&[data-onboarding-name*="purchase"] .onboarding-step-preview::before,
+		&[data-onboarding-name*="procure"] .onboarding-step-preview::before {
+			background-image: url("/assets/themate/images/onboarding-buying.png");
+		}
+
+		&[data-onboarding-name*="accounting"] .onboarding-step-preview::before,
+		&[data-onboarding-name*="accounts"] .onboarding-step-preview::before,
+		&[data-onboarding-name*="finance"] .onboarding-step-preview::before,
+		&[data-onboarding-name*="billing"] .onboarding-step-preview::before {
+			background-image: url("/assets/themate/images/onboarding-accounts.png");
+		}
+
+		&[data-onboarding-name*="hr"] .onboarding-step-preview::before,
+		&[data-onboarding-name*="employee"] .onboarding-step-preview::before,
+		&[data-onboarding-name*="payroll"] .onboarding-step-preview::before,
+		&[data-onboarding-name*="human-resource"] .onboarding-step-preview::before,
+		&[data-onboarding-name*="health"] .onboarding-step-preview::before {
+			background-image: url("/assets/themate/images/onboarding-hr.png");
+		}
+
+		&[data-onboarding-name*="crm"] .onboarding-step-preview::before,
+		&[data-onboarding-name*="selling"] .onboarding-step-preview::before,
+		&[data-onboarding-name*="sales"] .onboarding-step-preview::before {
+			background-image: url("/assets/themate/images/onboarding-sales.png");
+		}
+	}
+
+	/* ---- Workspace shell --------------------------------------------------------- */
+	/* Frappe renders a workspace as editor.js blocks in a wrapping flex row
+	 * (.codex-editor__redactor). The design orders them shortcuts first, then
+	 * the chart beside the onboarding card, then the link groups. `order` on
+	 * the blocks does that without touching workspace content; the selectors
+	 * key on what each block contains. Spacers are dropped — gaps do it. */
+	.layout-main-section .codex-editor {
+		.widget-group-head .widget-group-title,
+		.ce-block h4 {
+			font-size: var(--tm-ts-section-size, var(--tm-text-lg));
+			font-weight: var(--tm-ts-section-weight, var(--tm-weight-semibold));
+			font-style: var(--tm-ts-section-style, normal);
+			color: var(--tm-ts-section-color, var(--tm-text));
+			margin: var(--tm-space-2) 0 var(--tm-space-2);
+		}
+
+		/* A 12-column grid. Each block type takes a fixed span, so a row of
+		 * ten shortcuts (Accounting) simply wraps to a second row and the
+		 * chart + set-up pair start a fresh row instead of sliding in beside
+		 * the leftover tiles and stretching them (wrapping flex did that). */
+		.codex-editor__redactor {
+			display: grid;
+			grid-template-columns: repeat(12, minmax(0, 1fr));
+			gap: var(--tm-space-3);
+			align-items: stretch; /* grid stretches per ROW: tiles on a row match heights */
+		}
+
+		.ce-block {
+			margin: 0;
+			grid-column: span 6;
+			min-inline-size: 0;
+			inline-size: auto !important;
+			max-inline-size: none !important;
+		}
+
+		.ce-block:has(.widget.spacer) {
+			display: none;
+		}
+
+		/* Keep the order stored by Frappe; these selectors only size the
+		 * existing blocks and never move or hide workspace content. */
+		.ce-block:has(.ce-header):has(+ .ce-block .number-widget-box),
+		.ce-block:has(.ce-header):has(+ .ce-block .tm-widget-box),
+		.ce-block:has(.number-widget-box),
+		.ce-block:has(.tm-widget-box) {
+		}
+
+		.ce-block:has(.ce-header):has(+ .ce-block .dashboard-widget-box),
+		.ce-block:has(.ce-header):has(+ .ce-block .chart-widget-box),
+		.ce-block:has(.dashboard-widget-box),
+		.ce-block:has(.chart-widget-box) {
+			grid-column: span 8;
+		}
+
+		.ce-block:has(.onboarding-widget-box) {
+			grid-column: span 4;
+		}
+
+		.ce-block:has(.onboarding-widget-box[style*="display: none"]),
+		.ce-block:has(.widget[style*="display: none"]:only-child) {
+			display: none;
+		}
+
+		/* A chart with no (visible) set-up card takes the full row. Checked
+		 * on the container: the set-up block usually PRECEDES the chart in
+		 * the DOM, so a sibling combinator would not see it. */
+		&:not(:has(.onboarding-widget-box:not([style*="display: none"]))) .ce-block:has(.dashboard-widget-box),
+		&:not(:has(.onboarding-widget-box:not([style*="display: none"]))) .ce-block:has(.chart-widget-box) {
+			grid-column: span 12;
+		}
+
+		.ce-block:has(.ce-header):has(+ .ce-block .shortcut-widget-box),
+		.ce-block:has(.shortcut-widget-box) {
+		}
+
+		.ce-block:has(.shortcut-widget-box) {
+			grid-column: span 2;
+		}
+
+		.ce-block:has(.ce-header):has(+ .ce-block .links-widget-box),
+		.ce-block:has(.links-widget-box) {
+		}
+
+		/* 3 — link groups three to a row, number cards four, headers full */
+		.ce-block:has(.links-widget-box) {
+			grid-column: span 4;
+		}
+
+		.ce-block:has(.number-widget-box) {
+			grid-column: span 3;
+		}
+
+		.ce-block:has(.ce-header),
+		.ce-block:has(.paragraph),
+		.ce-block:has(.quick-list-widget-box) {
+			grid-column: span 12;
+		}
+
+		@media (max-width: 1199px) {
+			.ce-block:has(.shortcut-widget-box) { grid-column: span 3; }
+			.ce-block:has(.dashboard-widget-box),
+			.ce-block:has(.chart-widget-box),
+			.ce-block:has(.onboarding-widget-box) { grid-column: span 12; }
+			.ce-block:has(.links-widget-box) { grid-column: span 6; }
+			.ce-block:has(.number-widget-box) { grid-column: span 4; }
+		}
+
+		@media (max-width: 991px) {
+			.ce-block:has(.number-widget-box) { grid-column: span 6; }
+		}
+
+		@media (max-width: 767px) {
+			.ce-block,
+			.ce-block:has(.shortcut-widget-box),
+			.ce-block:has(.links-widget-box),
+			.ce-block:has(.number-widget-box) { grid-column: span 12; }
+		}
+
+		.ce-block .ce-block__content {
+			max-inline-size: none;
+			block-size: 100%;
+		}
+
+		.ce-block .ce-block__content > .widget {
+			block-size: 100%;
+		}
+
+		/* Set-up card (EDIT MODE ONLY — see the finished-workspace rules
+		 * below): beside a chart it is a third of the row and stacked; on a
+		 * workspace without a chart it takes the row in Frappe's own
+		 * two-column layout (steps | preview) instead of a third of empty. */
+		&:not(:has(.dashboard-widget-box)):not(:has(.chart-widget-box)) .ce-block:has(.onboarding-widget-box) {
+			grid-column: span 12;
+		}
+
+		&:not(:has(.dashboard-widget-box)):not(:has(.chart-widget-box)) .onboarding-widget-box {
+			.widget-body {
+				flex-direction: row;
+			}
+
+			.onboarding-steps-wrapper {
+				inline-size: 34%;
+				flex: 0 0 34%;
+			}
+
+			.onboarding-step-preview {
+				inline-size: 66%;
+				flex: 1 1 auto;
+				padding-block-start: var(--tm-space-4);
+			}
+		}
+	}
+
+	/* A dashboard drawn from its Themate Layout at /app/dashboard-view
+	 * (js/workspace/tabs.js renderLayout). */
+	.tm-ws-dashboard {
+		&[hidden] {
+			display: none;
+		}
+
+		/* the stand-in while the module's dashboards load, and the loader
+		 * of the dashboard itself (tabs.js dashSkeleton: one outline) */
+		.tm-skeleton-dashboard {
+			padding-block: var(--tm-space-3);
+		}
+
+		.tm-ws-dashboard-state {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			min-block-size: 200px;
+			border: 1px dashed var(--tm-border);
+			border-radius: var(--tm-radius-md);
+			color: var(--tm-text-3);
+			font-size: var(--tm-text-sm);
+		}
+
+		.widget-group + .widget-group {
+			margin-block-start: var(--tm-space-3);
+		}
+
+		.widget-group-body {
+			column-gap: var(--tm-space-3);
+			row-gap: var(--tm-space-3);
+		}
+
+		/* ---- narrated layout (Dashboard > Themate Layout) ----------------- */
+		.tm-dash-intro {
+			max-inline-size: 72ch;
+			margin: var(--tm-space-1) 0 var(--tm-space-4);
+			font-size: var(--tm-text-sm);
+			line-height: 1.6;
+			color: var(--tm-text-2);
+		}
+
+		/* the segment bar: Link pickers + Mine, above the grid */
+		/* a row of quiet pickers, as the reference: no box around them */
+		.tm-dash-segments {
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: var(--tm-space-2);
+			margin-block-end: var(--tm-space-4);
+
+			.tm-dash-segments-label {
+				display: none;
+				align-items: center;
+				gap: 4px;
+				font-size: var(--tm-text-xs);
+				font-weight: var(--tm-weight-medium);
+				text-transform: uppercase;
+				letter-spacing: 0.04em;
+				color: var(--tm-text-3);
+				margin-inline-end: var(--tm-space-1);
+
+				svg.icon {
+					inline-size: 12px;
+					block-size: 12px;
+				}
+			}
+
+			.tm-dash-segments-fields {
+				display: flex;
+				align-items: center;
+				flex-wrap: wrap;
+				gap: var(--tm-space-2);
+				flex: 1 1 auto;
+			}
+
+			.tm-dash-segment {
+				inline-size: 180px;
+				max-inline-size: 100%;
+
+				.frappe-control {
+					margin: 0;
+				}
+
+				.form-group {
+					margin: 0;
+				}
+
+				input.input-with-feedback {
+					block-size: 32px;
+					border: 1px solid var(--tm-border);
+					border-radius: var(--tm-radius-md);
+					background-color: var(--tm-surface);
+					font-size: var(--tm-text-sm);
+					font-weight: var(--tm-weight-medium);
+				}
+
+				&.is-set input.input-with-feedback {
+					border-color: var(--tm-action-primary);
+					background-color: var(--tm-brand-50);
+				}
+			}
+
+			.tm-dash-mine {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
+				block-size: 32px;
+				padding-inline: var(--tm-space-3);
+				border-radius: var(--tm-radius-md);
+				font-weight: var(--tm-weight-medium);
+				border: 1px solid var(--tm-border);
+				background-color: var(--tm-surface);
+				color: var(--tm-text-2);
+
+				&[aria-pressed="true"] {
+					border-color: var(--tm-action-primary);
+					background-color: var(--tm-brand-50);
+					color: var(--tm-brand-600);
+				}
+
+				svg.icon {
+					inline-size: 12px;
+					block-size: 12px;
+				}
+			}
+
+			.tm-dash-mine.is-locked {
+				cursor: default;
+				border-color: var(--tm-action-primary);
+				background-color: var(--tm-brand-50);
+				color: var(--tm-brand-600);
+			}
+
+			.tm-dash-segments-clear {
+				color: var(--tm-text-3);
+				background: transparent;
+				border: 0;
+
+				&:hover {
+					color: var(--tm-action-primary-fg);
+				}
+			}
+		}
+
+		/* insights: the hero line and the list under it */
+		.tm-dash-insights {
+			display: flex;
+			flex-direction: column;
+			gap: var(--tm-space-2);
+			margin-block-end: var(--tm-space-4);
+
+			&[hidden] {
+				display: none;
+			}
+		}
+
+		.tm-dash-hero {
+			display: flex;
+			align-items: center;
+			gap: var(--tm-space-3);
+			padding: var(--tm-space-3) var(--tm-space-4);
+			border-radius: var(--tm-radius-md);
+			border: 1px solid var(--tm-border);
+			border-inline-start: 4px solid var(--tm-brand-500);
+			background-color: var(--tm-surface);
+			font-size: var(--tm-text-md);
+			font-weight: var(--tm-weight-medium);
+			color: var(--tm-text);
+			cursor: pointer;
+			transition: border-color var(--tm-dur) var(--tm-ease), box-shadow var(--tm-dur) var(--tm-ease);
+
+			&:hover,
+			&:focus-visible {
+				border-color: var(--tm-border-strong);
+				box-shadow: var(--tm-shadow-sm);
+			}
+
+			.tm-dash-hero-icon {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				inline-size: 32px;
+				block-size: 32px;
+				border-radius: var(--tm-radius-full);
+				background-color: var(--tm-brand-50);
+				color: var(--tm-brand-600);
+				flex: none;
+
+				svg.icon {
+					inline-size: 16px;
+					block-size: 16px;
+				}
+			}
+
+			.tm-dash-hero-text {
+				flex: 1 1 auto;
+				line-height: 1.4;
+			}
+
+			.tm-dash-hero-go {
+				color: var(--tm-text-3);
+				flex: none;
+			}
+
+			&.is-bad { border-inline-start-color: var(--tm-danger-text); .tm-dash-hero-icon { background-color: var(--tm-danger-bg); color: var(--tm-danger-text); } }
+			&.is-warn { border-inline-start-color: var(--tm-warning-text); .tm-dash-hero-icon { background-color: var(--tm-warning-bg); color: var(--tm-warning-text); } }
+			&.is-good { border-inline-start-color: var(--tm-success-text); .tm-dash-hero-icon { background-color: var(--tm-success-bg); color: var(--tm-success-text); } }
+		}
+
+		.tm-dash-insight-list {
+			list-style: none;
+			margin: 0;
+			padding: 0;
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			gap: var(--tm-space-2) var(--tm-space-4);
+
+			li {
+				display: flex;
+				align-items: flex-start;
+				gap: var(--tm-space-2);
+				font-size: var(--tm-text-sm);
+				color: var(--tm-text-2);
+				line-height: 1.45;
+				cursor: pointer;
+
+				i {
+					flex: none;
+					inline-size: 8px;
+					block-size: 8px;
+					margin-block-start: 6px;
+					border-radius: var(--tm-radius-full);
+					background-color: var(--tm-text-3);
+				}
+
+				&.is-bad i { background-color: var(--tm-danger-text); }
+				&.is-warn i { background-color: var(--tm-warning-text); }
+				&.is-good i { background-color: var(--tm-success-text); }
+
+				&:hover span,
+				&:focus-visible span {
+					color: var(--tm-action-primary-fg);
+				}
+
+			}
+		}
+
+		/* thumbs on an insight */
+		.tm-dash-votes {
+			display: inline-flex;
+			gap: 2px;
+			margin-inline-start: auto;
+			flex: none;
+			opacity: 0;
+			transition: opacity var(--tm-dur-fast) var(--tm-ease);
+
+			small {
+				font-size: 10px;
+				color: var(--tm-text-3);
+				white-space: nowrap;
+			}
+		}
+
+		.tm-dash-hero:hover .tm-dash-votes,
+		.tm-dash-insight-list li:hover .tm-dash-votes,
+		.tm-dash-votes:focus-within,
+		.tm-dash-votes:has(small) {
+			opacity: 1;
+		}
+
+		.tm-dash-vote {
+			padding: 2px 4px;
+			border: 0;
+			background: transparent;
+			color: var(--tm-text-3);
+			border-radius: var(--tm-radius-sm);
+
+			svg.icon {
+				inline-size: 12px;
+				block-size: 12px;
+			}
+
+			&:hover {
+				color: var(--tm-action-primary-fg);
+				background-color: var(--tm-surface-sunken);
+			}
+		}
+
+		.is-muted {
+			opacity: 0.55;
+		}
+
+		/* the card an insight points at, lit for a moment */
+		.widget.tm-dash-lit {
+			box-shadow: 0 0 0 3px var(--tm-brand-100);
+			border-color: var(--tm-action-primary) !important;
+			transition: box-shadow var(--tm-dur) var(--tm-ease);
+		}
+
+		.tm-dash-grid {
+			display: grid;
+			grid-template-columns: repeat(12, minmax(0, 1fr));
+			gap: var(--tm-space-3);
+			align-items: stretch;
+		}
+
+		.tm-dash-heading {
+			grid-column: 1 / -1;
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+			margin-block-start: var(--tm-space-3);
+			padding-block-start: var(--tm-space-3);
+			border-block-start: 1px solid var(--tm-border);
+
+			&:first-child {
+				margin-block-start: 0;
+				padding-block-start: 0;
+				border-block-start: 0;
+			}
+
+			h3 {
+				display: flex;
+				align-items: center;
+				gap: var(--tm-space-2);
+				margin: 0;
+				font-size: var(--tm-text-md);
+				font-weight: var(--tm-weight-semibold);
+				color: var(--tm-text);
+				line-height: 1.3;
+			}
+
+			.tm-dash-heading-n {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				inline-size: 22px;
+				block-size: 22px;
+				border-radius: var(--tm-radius-full);
+				background-color: var(--tm-brand-50);
+				color: var(--tm-brand-600);
+				font-size: var(--tm-text-xs);
+				font-weight: var(--tm-weight-semibold);
+				font-variant-numeric: tabular-nums;
+				flex: none;
+			}
+
+			p {
+				margin: 0;
+				padding-inline-start: calc(22px + var(--tm-space-2));
+				font-size: var(--tm-text-sm);
+				color: var(--tm-text-3);
+				line-height: 1.5;
+				max-inline-size: 80ch;
+			}
+		}
+
+		.tm-dash-cell {
+			grid-column: span 4;
+			display: flex;
+
+			/* not built yet (tabs.js builds a card as it nears the screen): the
+			 * room it will take, so the cards below stay below the fold */
+			&:not(.is-built) {
+				min-block-size: 160px;
+				border-radius: var(--tm-radius-lg);
+				background-color: var(--tm-surface-sunken);
+			}
+
+			&.tm-dash-chart:not(.is-built) {
+				min-block-size: 320px;
+			}
+
+			&[data-w="Half"] { grid-column: span 6; }
+			&[data-w="Two Thirds"] { grid-column: span 8; }
+			&[data-w="Full"] { grid-column: 1 / -1; }
+			flex-direction: column;
+			min-inline-size: 0;
+
+			> .widget {
+				flex: 1 1 auto;
+				min-block-size: 100%;
+			}
+
+			/* the chart card takes the cell whatever Frappe's own width class says */
+			> .widget.full-width,
+			> .widget.dashboard-widget-box {
+				inline-size: 100%;
+				max-inline-size: 100%;
+			}
+
+			/* a number card is short by nature: it does not stretch to a chart's row */
+			&.tm-dash-number-card {
+				align-self: start;
+
+				> .widget {
+					min-block-size: 0;
+				}
+			}
+		}
+
+		@media (max-width: 1199px) {
+			.tm-dash-cell {
+				grid-column: span 6;
+
+				&[data-w="Half"] { grid-column: span 6; }
+				&[data-w="Two Thirds"],
+				&[data-w="Full"] { grid-column: 1 / -1; }
+			}
+		}
+
+		@media (max-width: 767px) {
+			.tm-dash-cell {
+				grid-column: 1 / -1;
+			}
+		}
+	}
+
+	.tm-ws-edit {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--tm-space-1);
+
+		&[hidden] {
+			display: none;
+		}
+
+		svg.icon {
+			inline-size: 14px;
+			block-size: 14px;
+		}
+	}
+
+	/* Page-head tools: the Edit button of a private workspace. */
+	.page-head .tm-ws-tools {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--tm-space-2);
+
+		&[hidden] {
+			display: none;
+		}
+	}
+
+	.tm-ws-tour {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--tm-space-1);
+		white-space: nowrap;
+
+		&[hidden] {
+			display: none;
+		}
+
+		svg.icon {
+			inline-size: 14px;
+			block-size: 14px;
+		}
+
+		.tm-ws-tour-count {
+			font-size: var(--tm-text-xs);
+			font-variant-numeric: tabular-nums;
+			color: var(--tm-text-3);
+			background-color: var(--tm-surface-sunken);
+			border-radius: var(--tm-radius-full);
+			padding: 0 6px;
+			line-height: 18px;
+			margin-inline-start: 2px;
+		}
+	}
+
+	@media (max-width: 767px) {
+		.tm-ws-tour-label {
+			display: none;
+		}
+	}
+
+	/* Tour dialog: the set-up card moved in from the workspace, laid out
+	 * steps | active step like Frappe's own wide version. */
+	.tm-tour-dialog {
+		.modal-body {
+			padding: 0;
+		}
+
+		.widget.onboarding-widget-box {
+			border: 0;
+			border-radius: 0;
+			box-shadow: none;
+			background: none;
+
+			.widget-head {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: var(--tm-space-3);
+				padding: var(--tm-space-3) var(--tm-space-5);
+
+				.widget-title {
+					display: none; /* the dialog title carries it */
+				}
+
+				.widget-subtitle {
+					font-size: var(--tm-text-sm);
+					color: var(--tm-text-2);
+				}
+			}
+
+			.widget-body {
+				flex-direction: row;
+				min-block-size: 340px;
+			}
+
+			.onboarding-steps-wrapper {
+				flex: 0 0 40%;
+				inline-size: 40%;
+				padding: var(--tm-space-4);
+				border-inline-end: 1px solid var(--tm-border);
+				background-color: var(--tm-surface-sunken);
+			}
+
+			.onboarding-step-preview {
+				flex: 1 1 auto;
+				inline-size: 60%;
+				padding: var(--tm-space-5);
+			}
+		}
+
+		@media (max-width: 767px) {
+			.widget.onboarding-widget-box .widget-body {
+				flex-direction: column;
+			}
+
+			.widget.onboarding-widget-box .onboarding-steps-wrapper,
+			.widget.onboarding-widget-box .onboarding-step-preview {
+				flex: none;
+				inline-size: 100%;
+				border-inline-end: 0;
+			}
+		}
+	}
+
+	/* ---- Accent picker in the Theme Switcher dialog -------------------------------
+	 * Markup is built by js/core/theme_switcher.js. */
+	.tm-accent-section {
+		border-block-start: 1px solid var(--tm-border);
+		padding-block-start: var(--tm-space-4);
+		margin-block-start: var(--tm-space-4);
+
+		.theme-title {
+			font-size: var(--tm-text-sm);
+			font-weight: var(--tm-weight-semibold);
+			color: var(--tm-text);
+			margin-block-end: var(--tm-space-3);
+		}
+
+		.tm-accent-grid {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--tm-space-2);
+			margin-block-end: var(--tm-space-3);
+		}
+
+		.tm-accent-dot {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			inline-size: 28px;
+			block-size: 28px;
+			padding: 0;
+			border: 1px solid transparent;
+			border-radius: var(--tm-radius-full);
+			background: none;
+			cursor: pointer;
+			transition: border-color var(--tm-dur-fast) var(--tm-ease);
+
+			&:hover {
+				border-color: var(--tm-border-strong);
+			}
+
+			/* Selection is a ring, not a tick glyph — the previous revision
+			 * injected a "✓" character, which is not translatable and sat on top
+			 * of the swatch colour with poor contrast. */
+			&.selected {
+				border-color: var(--tm-action-primary);
+			}
+
+			&:focus-visible {
+				box-shadow: var(--tm-ring);
+			}
+
+			.tm-accent-swatch {
+				inline-size: 18px;
+				block-size: 18px;
+				border-radius: var(--tm-radius-full);
+				box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12);
+			}
+		}
+	}
+
+}
+
+/* ---- TV mode: the dashboard full screen, no chrome ---------------------- */
+html[data-tm-tv] {
+	.modern-sidebar,
+	.navbar,
+	.page-head .page-actions,
+	.page-head .page-icon-group,
+	.tm-ws-actions,
+	.tm-dash-segments,
+	.form-tabs-list,
+	.tm-ws-dashboard-state,
+	.tm-sw-actions,
+	.tm-sw-explain {
+		display: none !important;
+	}
+
+	.main-section,
+	.page-container,
+	.container,
+	.page-body,
+	.layout-main-section-wrapper,
+	.layout-main-section {
+		max-inline-size: none !important;
+		margin: 0 !important;
+		padding-inline: var(--tm-space-4) !important;
+	}
+
+	body {
+		padding-inline-start: 0 !important;
+	}
+
+	.page-head {
+		position: static !important;
+		box-shadow: none !important;
+	}
+
+	.tm-dash-grid {
+		gap: var(--tm-space-4);
+	}
+
+	.widget.tm-widget-box .tm-sw-value {
+		font-size: calc(var(--tm-text-2xl) * 1.15);
+	}
+}
+
+.tm-tv-bar {
+	.tm-tv-exit {
+		position: fixed;
+		z-index: 1050;
+		inset-block-start: 12px;
+		inset-inline-end: 12px;
+		inline-size: 32px;
+		block-size: 32px;
+		border-radius: var(--tm-radius-full);
+		border: 1px solid var(--tm-border);
+		background-color: var(--tm-surface);
+		color: var(--tm-text-2);
+		opacity: 0.35;
+		transition: opacity var(--tm-dur) var(--tm-ease);
+
+		&:hover {
+			opacity: 1;
+		}
+
+		svg.icon {
+			inline-size: 14px;
+			block-size: 14px;
+		}
+	}
+}
+
+/* ---- Records: search, compact shortcuts, link panels ----------------------
+ * The brief for this surface: a workspace's shortcuts and links are a list of
+ * places to go, so the card carries a name and a count and nothing else. What
+ * this undoes, and why:
+ *
+ *  - the arrow. shortcut_widget.js:67 appends an "arrow-up-right" to every
+ *    shortcut, and links_widget does the same per row. That glyph means "this
+ *    leaves the app" everywhere else in the Desk, and none of these do.
+ *  - the tinted icon tile. A grid of forty coloured chips is a grid of forty
+ *    things asking to be looked at first.
+ *  - the height. Tiles were 84px tall to hold a count pill under the title;
+ *    the count goes on the title's line instead and the tile is 68px, so the
+ *    same screen shows a third more of them.
+ *
+ * Everything below reads the theme's tokens, so a brand colour, a radius
+ * preset, a density and dark mode all still apply. */
+#{$tm-on} {
+	/* ---- shortcut tiles -------------------------------------------------- */
+	.widget.shortcut-widget-box {
+		min-block-size: 68px;
+		padding: var(--tm-space-3);
+
+		/* The arrow that says "external". These are not. */
+		.widget-control > svg.icon { display: none; }
+
+		.widget-head {
+			display: flex;
+			align-items: center;
+			gap: var(--tm-space-2);
+			min-inline-size: 0;
+		}
+
+		.widget-label {
+			flex: 1 1 auto;
+			gap: var(--tm-space-2);
+		}
+
+		.widget-label .widget-title {
+			font-size: var(--tm-text-sm);
+			font-weight: var(--tm-weight-medium);
+			/* Long names wrap to a second line rather than being cut: the tile
+			 * grows, which is what `min-block-size` leaves room for. */
+			white-space: normal;
+			overflow: visible;
+			display: -webkit-box;
+			-webkit-line-clamp: 2;
+			-webkit-box-orient: vertical;
+			overflow: hidden;
+			line-height: var(--tm-leading-dense);
+		}
+
+		/* The count keeps the title's line and a fixed end alignment, so a
+		 * row of tiles reads down the numbers as a column. */
+		.widget-control {
+			flex: none;
+			margin: 0;
+			padding: 0;
+			display: flex;
+			align-items: center;
+
+			/* A plain number: a box drew the eye to it even when it was 0. */
+			.indicator-pill {
+				background-color: transparent;
+				border: 0;
+				color: var(--tm-text-3);
+				font-size: var(--tm-text-sm);
+				font-weight: var(--tm-weight-regular);
+				font-variant-numeric: tabular-nums;
+				padding: 0;
+				line-height: 19px;
+			}
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--tm-action-primary);
+			outline-offset: 1px;
+		}
+	}
+
+	/* ---- link panels ------------------------------------------------------ */
+	.widget.links-widget-box {
+		padding: var(--tm-space-3) var(--tm-space-4) var(--tm-space-2);
+
+		.widget-head {
+			padding-block-end: var(--tm-space-2);
+			margin-block-end: var(--tm-space-1);
+		}
+
+		/* "7 items" — the rows the reader can see, and it follows the search
+		 * (js/workspace/records.js), so it never claims more than is shown. */
+		.tm-ws-count {
+			padding: 2px var(--tm-space-2);
+			border-radius: var(--tm-radius-full);
+			background-color: var(--tm-surface-sunken);
+			color: var(--tm-text-2);
+			font-size: var(--tm-text-xs);
+			white-space: nowrap;
+
+			&[hidden] { display: none; }
+		}
+
+		.widget-body .link-item + .link-item { border-block-start: 0; }
+
+		.link-item {
+			min-block-size: 36px;
+			padding-block: var(--tm-space-1);
+			border-radius: var(--tm-radius-sm);
+
+			&[hidden] { display: none; }
+
+			/* The chevron at the end of the row. Drawn from two borders, which
+			 * makes it one element instead of an icon fetch — but it means the
+			 * borders and the rotation have to agree, and only one of them is
+			 * something rtlcss understands. The borders are therefore pinned
+			 * PHYSICAL and ignored by the RTL build, and the direction is set
+			 * by the rotation alone (see the [dir="rtl"] rule below). */
+			&::after {
+				content: "";
+				flex: none;
+				inline-size: 6px;
+				block-size: 6px;
+				margin-inline-end: 2px;
+				/*! rtl:ignore */
+				border-top: 1.5px solid currentColor;
+				/*! rtl:ignore */
+				border-right: 1.5px solid currentColor;
+				transform: rotate(45deg);
+				opacity: 0.45;
+			}
+
+			&:hover::after { opacity: 1; }
+
+			/* the per-row "external" arrow */
+			.link-content > svg.icon { display: none; }
+
+			&:focus-visible {
+				outline: 2px solid var(--tm-action-primary);
+				outline-offset: -2px;
+			}
+		}
+	}
+
+	/* A hidden block must not leave its grid cell behind. */
+	.ce-block[hidden] { display: none !important; }
+}
+
+/* Same two borders, turned the other way: the chevron follows reading
+ * direction, so in RTL it points at the start edge. */
+#{$tm-on}[dir="rtl"] .widget.links-widget-box .link-item::after {
+	/* rtlcss would negate this to 135deg, which points the chevron down. */
+	/*! rtl:ignore */
+	transform: rotate(-135deg);
+}
+
+/* ---- Shortcut tiles: four to a row, in a band of their own ----------------
+ * Two things were wrong with letting auto-placement have its way.
+ *
+ * FOUR TO A ROW. The tiles were three to a row below 1600px (span 4 of
+ * twelve). Four is the floor from 1200px up. Below that the ladder still
+ * steps down: a 220px tile does not shorten a name, it breaks it, and the
+ * measurement that set the earlier number still holds — at 1440 a four-column
+ * tile is ~276px, which leaves ~140px for the name once the icon, the count
+ * and the quick-create button have taken theirs. Names up to about 24
+ * characters fit on one line there, longer ones wrap to the second line the
+ * clamp allows, and a name past ~30 characters is cut. On a 1600px+ desk,
+ * where these tiles are ~316px and wider, that does not arise.
+ *
+ * A BAND OF ITS OWN. A shortcut and a link PANEL are not the same kind of
+ * object and must not share a row, but auto-placement fills a row with
+ * whatever fits: two shortcuts left six columns free and the first panel slid
+ * in beside them. The first block of each band is pinned to column 1, which
+ * starts a fresh row. `:nth-child(1 of S)` is what makes that possible in CSS
+ * alone, and S carries `:not([hidden])` so the Records search hiding the
+ * first shortcut simply moves the pin to the next one. The kinds are the ones
+ * tabs.js writes (data-tm-kind), the same classification `order` above uses,
+ * so the pin cannot drift from the band it is pinning.
+ *
+ * The span is a variable because the pin restates it: `grid-column: 1 / span
+ * N` and `grid-column: span N` must not be able to disagree at a breakpoint. */
+#{$tm-on} .layout-main-section .codex-editor .codex-editor__redactor {
+	.ce-block:has(.shortcut-widget-box) { --tm-span: 3; } /* four to a row */
+	.ce-block:has(.links-widget-box) { --tm-span: 4; }
+
+	@media (max-width: 1199px) {
+		.ce-block:has(.shortcut-widget-box) { --tm-span: 4; }
+		.ce-block:has(.links-widget-box) { --tm-span: 6; }
+	}
+
+	@media (max-width: 991px) {
+		.ce-block:has(.shortcut-widget-box) { --tm-span: 6; }
+		.ce-block:has(.links-widget-box) { --tm-span: 12; }
+	}
+
+	@media (max-width: 767px) {
+		.ce-block:has(.shortcut-widget-box) { --tm-span: 12; }
+	}
+
+	.ce-block:has(.shortcut-widget-box),
+	.ce-block:has(.links-widget-box) {
+		grid-column: span var(--tm-span);
+	}
+
+	/* The row break. A band that is entirely hidden pins nothing, because the
+	 * selector only ever matches a block that is still in the flow. */
+	.ce-block:nth-child(1 of .ce-block[data-tm-kind="shortcut"]:not([hidden])),
+	.ce-block:nth-child(1 of .ce-block[data-tm-kind="links"]:not([hidden])) {
+		grid-column: 1 / span var(--tm-span);
+	}
+
+	/* The grid gap plus the block's own padding left 30px between rows of tiles,
+	 * so they read as scattered boxes. Inline padding stays: it lines the tiles'
+	 * edges up with the panels below. */
+	.ce-block:has(.shortcut-widget-box) .ce-block__content {
+		padding-block: 2px;
+	}
+}
+
+/* ---- The count on its title's line --------------------------------------
+ * The tile used to be a column — title, then the count pill under it — which
+ * is where the 84px height came from. Row instead: the name takes the space
+ * it needs and the count sits at the end, so a row of tiles reads down the
+ * numbers as a column. */
+#{$tm-on} .widget.shortcut-widget-box {
+	flex-direction: row;
+	align-items: center;
+	min-block-size: 60px;
+
+	.widget-head {
+		inline-size: 100%;
+		display: flex;
+		align-items: center;
+		gap: var(--tm-space-2);
+		flex-wrap: nowrap;
+	}
+
+	.widget-label .widget-title {
+		white-space: normal;
+		-webkit-line-clamp: 2;
+	}
+
+	.widget-control {
+		position: static;
+		inset: auto;
+		margin: 0;
+		padding: 0;
+		flex: none;
+	}
+
+	/* `no-indicator-dot` is Frappe saying this pill is a count, not a status;
+	 * _indicators.scss draws a dot on it anyway so a status reads the same in
+	 * a list and on a form. On a count it is noise. */
+	.widget-control .indicator-pill.no-indicator-dot::before {
+		display: none;
+	}
+}
+
+/* The permissions note under the Records blocks (js/workspace/records.js). */
+#{$tm-on} .desk-page > .tm-ws-note {
+	display: flex;
+	align-items: center;
+	gap: var(--tm-space-2);
+	margin-block-start: var(--tm-space-4);
+	padding-block-start: var(--tm-space-3);
+	border-block-start: 1px solid var(--tm-border);
+	color: var(--tm-text-3);
+	font-size: var(--tm-text-xs);
+
+	svg.icon { inline-size: 13px; block-size: 13px; flex: none; }
+
+	&[hidden] { display: none; }
+}
+
+/* ---- Quick create on a shortcut (js/workspace/records.js) -----------------
+ * Present only where the destination is creatable and the reader may create
+ * it. Quiet until the tile is pointed at, and — per the brief — reachable
+ * without a pointer: focus inside the tile reveals it, and on a device with
+ * no hover it is simply always there. */
+#{$tm-on} .widget.shortcut-widget-box {
+	/* shortcut_widget.js re-renders .widget-control on every count fetch, so
+	 * the button's DOM position is not ours to rely on; order puts it after
+	 * the count whatever the markup says. */
+	.widget-control { display: flex; align-items: center; }
+	.widget-control .indicator-pill { order: 1; }
+
+	/* In the tile's top corner, out of the row, so showing it moves nothing. */
+	.tm-ws-new {
+		position: absolute;
+		inset-block-start: 6px;
+		inset-inline-end: 6px;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		inline-size: 20px;
+		/* desktop.scss sets width:auto on hover, on every child of the control */
+		min-inline-size: 20px;
+		block-size: 20px;
+		padding: 0;
+		border: 1px solid var(--tm-border-strong);
+		border-radius: var(--tm-radius-sm);
+		background-color: var(--tm-surface);
+		color: var(--tm-text-2);
+		opacity: 0;
+		transition: opacity var(--tm-dur-fast) var(--tm-ease),
+			background-color var(--tm-dur-fast) var(--tm-ease);
+
+		svg.icon { inline-size: 12px; block-size: 12px; }
+
+		&:hover {
+			background-color: var(--tm-action-primary);
+			border-color: var(--tm-action-primary);
+			color: var(--tm-action-primary-text);
+		}
+
+		&:focus-visible {
+			opacity: 1;
+			outline: 2px solid var(--tm-action-primary);
+			outline-offset: 1px;
+		}
+	}
+
+	&:hover .tm-ws-new,
+	&:focus-within .tm-ws-new {
+		opacity: 1;
+	}
+}
+
+@media (hover: none) {
+	#{$tm-on} .widget.shortcut-widget-box .tm-ws-new { opacity: 1; }
+}
+
+/* ---- Records: the scale the design reference actually uses ----------------
+ * A pass over what was still a size down from the reference. Everything here
+ * is the same set of tokens as before — the correction is which step of each
+ * ramp this surface takes, not new values:
+ *
+ *   tile name      13px regular  ->  14px medium      (--tm-text-md)
+ *   tile icon      17px, text-3  ->  21px, text-2
+ *   tile height    68px          ->  76px, 16px padding
+ *   panel title    14px semibold ->  16px semibold    (--tm-text-lg)
+ *   panel icon     17px, text-3  ->  21px, text-2
+ *   row text       13px          ->  14px             (--tm-text-md)
+ *   row height     36px          ->  40px, with the hairline back between them
+ *   grid gap       8px           ->  16px
+ *
+ * The 13px step is the theme's DENSE size — list rows, table cells, controls
+ * packed tight. A workspace is the opposite surface: a small number of large
+ * targets, read at a glance and clicked once. It was taking the dense ramp
+ * because it inherited from the card styles around it. */
+#{$tm-on} .layout-main-section .codex-editor .codex-editor__redactor {
+	gap: var(--tm-space-4);
+}
+
+#{$tm-on} .widget.shortcut-widget-box {
+	min-block-size: 76px;
+	padding: var(--tm-space-4);
+
+	/* The 32px reserve at the end of the head goes back to the name.
+	 * The first design pinned an "external" arrow in the tile's corner and
+	 * gave the head `padding-inline-end: var(--tm-space-6)` so the title could
+	 * not run under it. The tile is a row now and that arrow is hidden
+	 * (`.widget-control > svg.icon`), but the reserve stayed — 32px of nothing
+	 * in every tile, which on a four-to-a-row 276px tile is a quarter of what
+	 * the name had left. Measured: the name's box goes from 81px to 113px, and
+	 * "Sales Invoice" stops wrapping. */
+	.widget-head {
+		gap: var(--tm-space-3);
+		padding-inline-end: 0;
+	}
+
+	.tm-shortcut-icon {
+		inline-size: 40px;
+		block-size: 40px;
+		min-inline-size: 40px;
+		margin-inline-end: 0;
+
+		svg.icon { inline-size: 22px; block-size: 22px; }
+	}
+
+	.widget-label .widget-title {
+		font-size: var(--tm-text-md);
+		font-weight: var(--tm-weight-semibold);
+		color: var(--tm-text);
+		/* Re-stated here, after the size change: a longer name on a narrower
+		 * line needs the two-line clamp, and a later block that touched only
+		 * font-size is enough to leave "Chart of Accou…" on one. */
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		white-space: normal;
+		word-break: normal;
+		overflow-wrap: normal;
+		line-height: var(--tm-leading-dense);
+	}
+
+	/* The label is what gives, not the count. */
+	.widget-label { min-inline-size: 0; }
+
+	.widget-control .indicator-pill {
+		block-size: 22px;
+		padding: 0 var(--tm-space-2);
+		font-size: var(--tm-text-sm);
+		line-height: 21px;
+	}
+}
+
+#{$tm-on} .widget.links-widget-box {
+	padding: var(--tm-space-4);
+
+	/* A band the full width of the card: the negative margins cancel its
+	 * padding, the radius follows its corners inside the 1px border. */
+	.widget-head {
+		gap: var(--tm-space-3);
+		margin: calc(-1 * var(--tm-space-4)) calc(-1 * var(--tm-space-4)) 0;
+		padding: var(--tm-space-2) var(--tm-space-4);
+		border-start-start-radius: calc(var(--tm-radius-xl) - 1px);
+		border-start-end-radius: calc(var(--tm-radius-xl) - 1px);
+
+		@each $tone in "blue", "green", "purple", "orange", "teal", "pink" {
+			/* Fades out, so four hues in a row stay quiet. */
+			&[data-tm-tone="#{$tone}"] {
+				background-image: linear-gradient(to right, var(--tm-tone-#{$tone}-bg), var(--tm-surface));
+			}
+		}
+	}
+
+	/* The surface, not the tone: on the band a toned chip would vanish. */
+	.widget-head .tm-shortcut-icon {
+		inline-size: 32px;
+		block-size: 32px;
+		min-inline-size: 32px;
+		margin-inline-end: 0;
+		background-color: var(--tm-surface);
+
+		svg.icon { inline-size: 18px; block-size: 18px; }
+	}
+
+	.widget-head .widget-label .widget-title {
+		font-size: var(--tm-text-lg);
+		font-weight: var(--tm-weight-semibold);
+	}
+
+	.tm-ws-count { font-size: var(--tm-text-sm); }
+
+	/* The hairline between rows comes back: without it a panel of seven links
+	 * is one block of text, and the reference rules every row. */
+	.widget-body .link-item + .link-item {
+		border-block-start: 1px solid var(--tm-border);
+	}
+
+	.widget-body { padding-block-start: var(--tm-space-1); }
+
+	.link-item {
+		min-block-size: 40px;
+		margin-block: 0;
+		padding-block: var(--tm-space-2);
+		border-radius: 0;
+		font-size: var(--tm-text-md);
+
+		&::after {
+			inline-size: 7px;
+			block-size: 7px;
+		}
+	}
+}
+
+/* Section headings lead the page, so they take the page's own heading size
+ * rather than a card's. */
+#{$tm-on} .layout-main-section .codex-editor .ce-block .ce-header {
+	font-size: var(--tm-text-xl);
+	font-weight: var(--tm-weight-semibold);
+	color: var(--tm-text);
+	letter-spacing: -0.01em;
+	/* Level with the cards under it: desktop.scss pads this 7px with !important. */
+	margin-inline-start: -7px;
+}
+
+/* ---- The shortcut name gets the width ------------------------------------
+ * Two things were cutting it short. The label box never grew, so the title
+ * resolved to 63px of a 265px tile — the icon and the count pill had taken
+ * the rest and nothing told the middle to stretch. And Frappe wraps the name
+ * in `<span class="ellipsis">`, whose `text-overflow: ellipsis` truncates on
+ * the FIRST line whatever the clamp on its parent says; the clamp has to be
+ * on the span that holds the text. */
+#{$tm-on} .widget.shortcut-widget-box {
+	/* `flex: 1 1 0`, not `1 1 auto`: with an auto basis the label is sized by
+	 * its own content first and only then allowed to grow, which on a tile
+	 * whose content already overflows means it never grows at all — the name
+	 * got 63px of a 266px tile. A zero basis says "take what is left". */
+	.widget-head > .widget-label {
+		flex: 1 1 auto;
+		min-inline-size: 0;
+	}
+
+	.widget-head > .widget-control {
+		flex: 0 1 auto;
+		min-inline-size: 0;
+	}
+
+	.widget-label .widget-title {
+		flex: 1 1 0;
+		min-inline-size: 0;
+	}
+
+	.widget-label .widget-title > span.ellipsis {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		white-space: normal;
+		text-overflow: clip;
+		line-height: var(--tm-leading-dense);
+	}
+}
+
+/* ---- The way to a workspace's dashboards (js/workspace/dashboards.js) ----
+ * The strip under the head: names only, so a workspace computes no card. */
+#{$tm-on} {
+	.tm-ws-dashes {
+		display: flex;
+		align-items: center;
+		gap: var(--tm-space-3);
+		margin-block-end: var(--tm-space-3);
+		padding: var(--tm-space-2) var(--tm-space-3);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-lg);
+		background-color: var(--tm-surface);
+		box-shadow: var(--tm-shadow-xs);
+
+		&[hidden] {
+			display: none;
+		}
+	}
+
+	.tm-ws-dashes-head {
+		display: flex;
+		align-items: center;
+		gap: var(--tm-space-3);
+		flex: none;
+		padding-inline-end: var(--tm-space-4);
+		border-inline-end: 1px solid var(--tm-border);
+	}
+
+	.tm-ws-dashes-icon {
+		display: inline-flex;
+		color: var(--tm-action-primary-fg);
+
+		svg.icon {
+			inline-size: 24px;
+			block-size: 24px;
+		}
+	}
+
+	.tm-ws-dashes-text {
+		display: flex;
+		flex-direction: column;
+		line-height: 1.3;
+
+		strong {
+			font-size: var(--tm-text-md);
+			font-weight: var(--tm-weight-semibold);
+			color: var(--tm-text);
+		}
+
+		small {
+			font-size: var(--tm-text-xs);
+			color: var(--tm-text-3);
+		}
+	}
+
+	.tm-ws-dashes-list {
+		display: flex;
+		align-items: center;
+		gap: var(--tm-space-3);
+		flex: 1 1 auto;
+		min-inline-size: 0;
+		margin: 0;
+		padding: 2px; /* room for the focus ring */
+		list-style: none;
+		overflow: hidden;
+
+		li {
+			flex: none;
+
+			&[hidden] {
+				display: none;
+			}
+		}
+	}
+
+	.tm-ws-dash {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--tm-space-2);
+		block-size: 34px;
+		padding-inline: var(--tm-space-3);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface);
+		color: var(--tm-text);
+		font-size: var(--tm-text-sm);
+		font-weight: var(--tm-weight-medium);
+		white-space: nowrap;
+		text-decoration: none;
+		transition: border-color var(--tm-dur-fast) var(--tm-ease), background-color var(--tm-dur-fast) var(--tm-ease);
+
+		svg.icon {
+			inline-size: 18px;
+			block-size: 18px;
+			color: var(--tm-text-3);
+		}
+
+		&:hover {
+			border-color: var(--tm-border-strong);
+			background-color: var(--tm-surface-sunken);
+			text-decoration: none;
+			color: var(--tm-text);
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--tm-action-primary);
+			outline-offset: 1px;
+		}
+
+		/* the one last opened from here */
+		&.is-last {
+			border-color: var(--tm-action-primary);
+			background-color: var(--tm-brand-50);
+
+			svg.icon {
+				color: var(--tm-action-primary-fg);
+			}
+		}
+	}
+
+	.tm-ws-dashes-all {
+		flex: none;
+		padding-inline-start: var(--tm-space-4);
+		border-inline-start: 1px solid var(--tm-border);
+
+		&[hidden] {
+			display: none;
+		}
+
+		.tm-ws-dashes-all-btn {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--tm-space-1);
+			color: var(--tm-action-primary-fg);
+			font-weight: var(--tm-weight-medium);
+			text-decoration: none;
+		}
+
+		.dropdown-menu {
+			max-block-size: 60vh;
+			overflow-y: auto;
+		}
+	}
+
+	/* ---- on the dashboard page: back, Management | Desk, the others ---- */
+	.tm-dash-nav {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--tm-space-2);
+		margin-inline-end: var(--tm-space-2);
+	}
+
+	.tm-dash-back {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--tm-space-1);
+		color: var(--tm-action-primary-fg);
+		font-weight: var(--tm-weight-medium);
+		white-space: nowrap;
+
+		&:hover {
+			color: var(--tm-action-primary-fg);
+		}
+	}
+
+	.tm-dash-switch {
+		display: inline-flex;
+		padding: 2px;
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface-sunken);
+
+		.btn {
+			border: 1px solid transparent;
+			background: transparent;
+			color: var(--tm-text-2);
+			box-shadow: none;
+		}
+
+		.btn.is-active {
+			border-color: var(--tm-action-primary);
+			background-color: var(--tm-surface);
+			color: var(--tm-action-primary-fg);
+			font-weight: var(--tm-weight-medium);
+		}
+	}
+
+	.tm-dash-more > .btn {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--tm-space-1);
+	}
+
+	/* the intro as the page's sub-title: two lines at most */
+	.page-container[data-page-route="dashboard-view"] .page-head .sub-heading {
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		max-inline-size: 72ch;
+		white-space: normal;
+	}
+
+	@media (max-width: 767px) {
+		.tm-ws-dashes {
+			flex-wrap: wrap;
+			gap: var(--tm-space-3);
+		}
+
+		.tm-ws-dashes-head {
+			flex: 1 0 100%;
+			padding-inline-end: 0;
+			border-inline-end: 0;
+		}
+
+		/* the bar as its own row under the head (dashboards.js place) */
+		.tm-dash-nav.is-row {
+			display: flex;
+			flex-wrap: wrap;
+			margin: 0 0 var(--tm-space-3);
+
+			.tm-dash-back {
+				padding-inline: 0;
+			}
+
+			.tm-dash-more {
+				margin-inline-start: auto;
+			}
+		}
+	}
+}
+
+/* the arrows point the way the page reads */
+#{$tm-on}[dir="rtl"] {
+	.tm-ws-dashes-all-btn svg.icon,
+	.tm-dash-back svg.icon {
+		transform: scaleX(-1); /*! rtl:ignore */
+	}
+}
+
+/* ---- The dashboard panel under the strip (js/workspace/dashboards.js) ----
+ * The picked dashboard's first cards in a card of their own: a head with the
+ * tile, the name and its kind, Open dashboard and Management | Desk. */
+#{$tm-on} {
+	.tm-ws-dash-panel {
+		margin-block-end: var(--tm-space-4);
+		padding: var(--tm-space-3) var(--tm-space-4);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-lg);
+		background-color: var(--tm-surface);
+		box-shadow: var(--tm-shadow-xs);
+
+		&[hidden] {
+			display: none;
+		}
+
+		/* the cards sit on the ground inside the panel's own card */
+		.tm-ws-dash-body .widget {
+			box-shadow: none;
+		}
+
+		.tm-dash-segments {
+			margin-block-end: var(--tm-space-2);
+
+			.tm-dash-segment {
+				inline-size: 150px;
+			}
+
+			.tm-dash-segment input.input-with-feedback,
+			.tm-dash-mine {
+				block-size: 28px;
+			}
+		}
+	}
+
+	/* a workspace chart the panel draws instead: dashboards.js hideBlocks writes the rule */
+
+	.tm-ws-dash-head {
+		display: flex;
+		align-items: center;
+		gap: var(--tm-space-3);
+		margin-block-end: var(--tm-space-2);
+	}
+
+	.tm-ws-dash-tile {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		flex: none;
+		inline-size: 36px;
+		block-size: 36px;
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-brand-50);
+		color: var(--tm-action-primary-fg);
+
+		svg.icon {
+			inline-size: 18px;
+			block-size: 18px;
+		}
+	}
+
+	.tm-ws-dash-title {
+		display: flex;
+		flex-direction: column;
+		flex: 1 1 auto;
+		min-inline-size: 0;
+		line-height: 1.3;
+
+		strong {
+			font-size: var(--tm-text-lg);
+			font-weight: var(--tm-weight-semibold);
+			color: var(--tm-text);
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		small {
+			font-size: var(--tm-text-xs);
+			color: var(--tm-text-3);
+		}
+	}
+
+	.tm-ws-dash-actions {
+		display: inline-flex;
+		align-items: center;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		gap: var(--tm-space-3);
+		flex: none;
+	}
+
+	.tm-ws-dash-open {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--tm-space-1);
+		color: var(--tm-action-primary-fg);
+		font-weight: var(--tm-weight-medium);
+
+		&:hover {
+			color: var(--tm-action-primary-fg);
+		}
+	}
+
+	.tm-ws-dash-note {
+		margin: 0;
+		color: var(--tm-text-3);
+		font-size: var(--tm-text-sm);
+	}
+
+	@media (max-width: 767px) {
+		.tm-ws-dash-head {
+			flex-wrap: wrap;
+		}
+
+		.tm-ws-dash-actions {
+			flex: 1 0 100%;
+			justify-content: space-between;
+		}
+	}
+}
+
+#{$tm-on}[dir="rtl"] .tm-ws-dash-open svg.icon {
+	transform: scaleX(-1); /*! rtl:ignore */
+}
+
+/* ---- Shortcut tile (2026-11-03): the name over its count, a chevron at the
+ * end — the reference's tile. The count used to share the name's line and
+ * took the width a long name needed. Grid areas over Frappe's own markup:
+ * .widget-label and .widget-control step aside (display: contents) so the
+ * icon, the name, the count and the chevron are placed directly. */
+#{$tm-on} .widget.shortcut-widget-box {
+	.widget-head {
+		display: grid;
+		grid-template-columns: 40px minmax(0, 1fr) auto;
+		grid-template-rows: auto auto;
+		column-gap: var(--tm-space-3);
+		row-gap: 2px;
+		align-items: center;
+
+		&::after {
+			content: "";
+			grid-column: 3;
+			grid-row: 1 / span 2;
+			inline-size: 8px;
+			block-size: 8px;
+			margin-inline: var(--tm-space-1);
+			/*! rtl:ignore */
+			border-top: 1.5px solid currentColor;
+			/*! rtl:ignore */
+			border-right: 1.5px solid currentColor;
+			/*! rtl:ignore */
+			transform: rotate(45deg);
+			color: var(--tm-text-3);
+		}
+	}
+
+	.widget-label,
+	.widget-control {
+		display: contents;
+	}
+
+	.tm-shortcut-icon {
+		grid-column: 1;
+		grid-row: 1 / span 2;
+	}
+
+	.widget-label .widget-title {
+		grid-column: 2;
+		grid-row: 1 / span 2;
+		-webkit-line-clamp: 1;
+	}
+
+	.widget-subtitle {
+		display: none;
+	}
+
+	/* with a count, the name takes the top line and the count the one under it */
+	.widget-head:has(.indicator-pill) .widget-title {
+		grid-row: 1;
+		align-self: end;
+	}
+
+	.widget-control .indicator-pill {
+		grid-column: 2;
+		grid-row: 2;
+		justify-self: start;
+		align-self: start;
+		max-inline-size: 100%;
+		margin: 0;
+		padding: 0;
+		color: var(--tm-text-3);
+		font-size: var(--tm-text-sm);
+	}
+
+	&:hover .widget-head::after {
+		color: var(--tm-text);
+	}
+}
+
+#{$tm-on}[dir="rtl"] .widget.shortcut-widget-box .widget-head::after {
+	/*! rtl:ignore */
+	transform: rotate(-135deg);
+}
+
+/* the kind of each dashboard on the strip: Management / Desk, or Standard
+ * for the ones ERPNext ships, set apart by a hairline */
+#{$tm-on} {
+	.tm-ws-dash-kind {
+		padding: 1px 6px;
+		border-radius: var(--tm-radius-sm);
+		background-color: var(--tm-brand-50);
+		color: var(--tm-action-primary-fg);
+		font-size: 11px;
+		font-weight: var(--tm-weight-medium);
+	}
+
+	.tm-ws-dash.is-native .tm-ws-dash-kind {
+		background-color: var(--tm-surface-sunken);
+		color: var(--tm-text-3);
+	}
+
+	.tm-ws-dash-sep {
+		align-self: stretch;
+		inline-size: 1px;
+		margin-block: var(--tm-space-1);
+		background-color: var(--tm-border);
+	}
+}
+
+/* A link's number (workspace/records.js countLinks), as on a shortcut: at
+ * the row's end, before its chevron, quiet; a zero quieter still. */
+#{$tm-on} .widget.links-widget-box .link-item {
+	.link-content {
+		flex: 1 1 auto;
+		min-inline-size: 0;
+	}
+
+	.tm-link-count {
+		flex: none;
+		margin-inline: var(--tm-space-2);
+		color: var(--tm-text-3);
+		font-size: var(--tm-text-sm);
+		font-variant-numeric: tabular-nums;
+		white-space: nowrap;
+
+		&.is-zero {
+			opacity: 0.6;
+		}
+	}
+}
+
+/* Between workspaces (dashboards.js onRoute): the previous strip and panel
+ * fade until this workspace's answer is in, rather than standing for it. */
+#{$tm-on} {
+	.tm-ws-dashes,
+	.tm-ws-dash-panel {
+		transition: opacity var(--tm-dur-fast) var(--tm-ease);
+
+		&.is-pending {
+			opacity: 0.45;
+			pointer-events: none;
+		}
+	}
+
+	/* The panel's chart while it loads: as tall as its empty note, so it only
+	 * ever grows (when a chart arrives). Frappe's 240px "Loading..." shrank to
+	 * the note a moment later, and everything under it jumped. */
+	.tm-ws-dash-panel .id-sum-chart {
+		.chart-loading-state {
+			min-block-size: 0; /* _charts.scss gives every loader 160px, and a minimum beats a maximum */
+			max-block-size: 64px;
+		}
+
+		> .widget.dashboard-widget-box {
+			min-block-size: 0;
+		}
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	#{$tm-on} .tm-ws-dashes,
+	#{$tm-on} .tm-ws-dash-panel {
+		transition: none;
+	}
+}
+
+/* the strip's pills while the list is on its way (dashboards.js prepare) */
+#{$tm-on} .tm-ws-dash-skel {
+	display: block;
+	inline-size: 132px;
+	block-size: 34px;
+	border-radius: var(--tm-radius-md);
+}

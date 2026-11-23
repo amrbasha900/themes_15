@@ -1,0 +1,283 @@
+/* Top navigation bar.
+ * Native source: frappe/public/scss/desk/navbar.scss
+ * Native height is already 48px (common/css_variables.scss:26), which matches
+ * the contract; the bridge points --navbar-height at --tm-navbar-h so the
+ * compact density can shrink it to 44px.
+ *
+ * Scoped to the navbar kill-switch (DESIGN_CONTRACT.md §5). */
+
+#{$tm-on}[data-tm-navbar="on"] {
+	.navbar {
+		block-size: var(--tm-navbar-h);
+		min-block-size: var(--tm-navbar-h);
+		background-color: var(--tm-surface);
+		border-block-end: 1px solid var(--tm-border);
+		box-shadow: none;
+		padding-inline: var(--tm-space-3);
+
+		.navbar-nav > .nav-item > .nav-link {
+			color: var(--tm-text-2);
+			border-radius: var(--tm-radius-sm);
+			padding: var(--tm-space-1) var(--tm-space-2);
+
+			&:hover {
+				background-color: var(--tm-surface-hover);
+				color: var(--tm-text);
+			}
+		}
+
+		/* Icon buttons (notifications, help, etc.) keep a square hit target
+		 * large enough to click — density must not shrink the target below
+		 * what a pointer can reliably hit. */
+		.navbar-icon-container,
+		.nav-link .es-icon,
+		.icon {
+			color: var(--tm-text-2);
+		}
+
+		.dropdown-toggle::after {
+			color: var(--tm-text-3);
+		}
+	}
+
+	/* Awesomebar / global search (desk/navbar.scss:42). */
+	.search-bar {
+		/* The magnifier is a prompt, not a control: once there is text it only
+		 * competes with the query. Native never hides it. */
+		&:has(#navbar-search:not(:placeholder-shown)) .search-icon {
+			display: none;
+		}
+
+		.awesomplete input,
+		#navbar-search {
+			block-size: var(--tm-control-h);
+			/* Native reserves 36px for the absolutely-positioned .search-icon
+			 * (desk/navbar.scss:62). The themed .form-control rule resets
+			 * padding to 0 8px at higher specificity, which put the icon on top
+			 * of the placeholder. Logical property so the RTL build keeps it. */
+			padding-inline-start: 36px;
+			border: 1px solid var(--tm-border-strong);
+			border-radius: var(--tm-radius-sm);
+			background-color: var(--tm-surface-sunken);
+			font-size: var(--tm-text-sm);
+			color: var(--tm-text);
+			transition: border-color var(--tm-dur-fast) var(--tm-ease),
+				background-color var(--tm-dur-fast) var(--tm-ease);
+
+			&::placeholder {
+				color: var(--tm-text-3);
+			}
+
+			/* room for the shortcut chip core/navbar_tools.js places at the end */
+			padding-inline-end: 72px;
+
+			&:focus {
+				background-color: var(--tm-surface);
+				border-color: var(--tm-action-primary);
+				box-shadow: var(--tm-ring);
+				outline: none;
+			}
+		}
+	}
+
+	/* Results panel (core/search.js). Wider than the box so names fit on one line,
+	 * and anchored to its end edge, since the box sits at the navbar's end. Physical
+	 * on purpose: rtlcss mirrors them, and they must beat native `left: 0`. */
+	.search-bar .awesomplete > ul {
+		left: auto;
+		right: 0;
+		inline-size: min(520px, calc(100vw - 32px));
+		max-block-size: min(70vh, 480px);
+		margin-block-start: var(--tm-space-1);
+		padding: var(--tm-space-1) var(--tm-space-1) 0;
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		box-shadow: var(--tm-shadow-lg);
+		overscroll-behavior: contain;
+		scroll-padding-block-end: 36px;
+
+		/* Sticks inside the scroller, so it costs no row of its own. */
+		&::after {
+			content: attr(data-tm-hint);
+			position: sticky;
+			inset-block-end: 0;
+			display: block;
+			margin-inline: calc(var(--tm-space-1) * -1);
+			padding: 6px var(--tm-space-3);
+			border-block-start: 1px solid var(--tm-border);
+			background-color: var(--tm-surface-raised);
+			color: var(--tm-text-3);
+			font-size: var(--tm-text-xs);
+		}
+
+		@media (hover: none) {
+			&::after { content: none; }
+			padding-block-end: var(--tm-space-1);
+		}
+
+		/* The row is the <a>, so a group title above it stays out of the highlight. */
+		> li {
+			margin: 0;
+			padding: 0;
+			border-radius: 0;
+			white-space: nowrap;
+
+			&:hover,
+			&[aria-selected="true"] {
+				background-color: transparent;
+			}
+
+			&[data-tm-group]::before {
+				content: attr(data-tm-group);
+				display: block;
+				padding: 10px var(--tm-space-2) var(--tm-space-1);
+				color: var(--tm-text-3);
+				font-size: var(--tm-text-xs);
+				font-weight: var(--tm-weight-medium);
+			}
+
+			&:first-child[data-tm-group]::before {
+				padding-block-start: var(--tm-space-1);
+			}
+
+			> a {
+				display: flex;
+				align-items: center;
+				gap: var(--tm-space-2);
+				min-block-size: 32px;
+				padding: var(--tm-space-1) var(--tm-space-2);
+				border-radius: var(--tm-radius-sm);
+				color: var(--tm-text);
+			}
+
+			&:hover > a {
+				background-color: var(--tm-surface-hover);
+			}
+
+			&[aria-selected="true"] > a {
+				background-color: var(--tm-surface-selected);
+			}
+		}
+
+		.tm-sr-icon {
+			display: inline-flex;
+			flex: none;
+			color: var(--tm-text-3);
+		}
+
+		[aria-selected="true"] .tm-sr-icon {
+			color: var(--tm-action-primary-fg);
+		}
+
+		.tm-sr-text {
+			flex: 1;
+			min-inline-size: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+
+			> br {
+				display: none;
+			}
+
+			> .text-muted {
+				margin-inline-start: var(--tm-space-2);
+			}
+		}
+	}
+
+	/* Language switcher + Theme Customizer button (core/navbar_tools.js).
+	 * Same footprint as Frappe's own notification/help items. */
+	.tm-lang-toggle,
+	.tm-customizer-toggle {
+		display: inline-flex;
+		align-items: center;
+		gap: var(--tm-space-1);
+		block-size: var(--tm-control-h);
+		padding-inline: var(--tm-space-2);
+		border-radius: var(--tm-radius-sm);
+		color: var(--tm-text-2);
+
+		.icon {
+			inline-size: 18px;
+			block-size: 18px;
+		}
+
+		&:hover,
+		&[aria-expanded="true"] {
+			background-color: var(--tm-surface-hover);
+			color: var(--tm-text);
+		}
+	}
+
+	.search-bar .tm-kbd {
+		position: absolute;
+		inset-inline-end: 8px;
+		inset-block-start: 50%;
+		transform: translateY(-50%);
+		z-index: 2;
+		padding: 1px 6px;
+		border: 1px solid var(--tm-border-strong);
+		border-radius: var(--tm-radius-xs);
+		background-color: var(--tm-surface);
+		color: var(--tm-text-3);
+		font-family: inherit;
+		font-size: var(--tm-text-xs);
+		line-height: 1.4;
+		pointer-events: none;
+	}
+
+	.search-bar:has(#navbar-search:focus) .tm-kbd,
+	.search-bar:has(#navbar-search:not(:placeholder-shown)) .tm-kbd {
+		display: none;
+	}
+
+	.tm-lang-code {
+		font-size: var(--tm-text-xs);
+		font-weight: var(--tm-weight-semibold);
+		letter-spacing: 0.04em;
+	}
+
+	.tm-lang-menu {
+		min-inline-size: 180px;
+	}
+
+	.tm-lang-option {
+		display: flex;
+		align-items: center;
+		gap: var(--tm-space-3);
+
+		&.active {
+			color: var(--tm-brand-600);
+			background-color: var(--tm-surface-selected);
+		}
+	}
+
+	.tm-lang-option-code {
+		inline-size: 28px;
+		font-size: var(--tm-text-xs);
+		font-weight: var(--tm-weight-semibold);
+		color: var(--tm-text-3);
+		letter-spacing: 0.04em;
+	}
+
+	.tm-lang-option.active .tm-lang-option-code {
+		color: inherit;
+	}
+
+	/* Avatar / user menu */
+	.navbar .avatar {
+		.avatar-frame {
+			border-radius: var(--tm-radius-full);
+			border: 1px solid var(--tm-border);
+		}
+	}
+
+	/* Notification badge keeps its semantic colour. */
+	.navbar .badge,
+	.notifications-seen .badge {
+		background-color: var(--tm-action-danger);
+		color: var(--tm-white);
+		font-size: 10px;
+		border-radius: var(--tm-radius-full);
+	}
+}

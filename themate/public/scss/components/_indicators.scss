@@ -1,0 +1,72 @@
+/* Status indicators and pills.
+ * Native source: frappe/public/scss/common/indicator.scss
+ *
+ * Frappe colours these through the --bg-<colour> / --text-on-<colour> pairs
+ * bridged in tokens/_bridge.scss, so most of the work is already done there.
+ * This file fixes only shape and density. Status colours keep their semantic
+ * meaning and are never reused decoratively (DESIGN_CONTRACT.md §1). */
+
+#{$tm-on} {
+	.indicator-pill,
+	.indicator-pill-right,
+	.indicator-pill-round {
+		border-radius: var(--tm-radius-xs);
+		font-size: var(--tm-text-xs);
+		font-weight: var(--tm-weight-regular);
+		line-height: var(--tm-leading-dense);
+		padding: 1px var(--tm-space-2);
+		white-space: nowrap;
+	}
+
+	.indicator-pill-round {
+		border-radius: var(--tm-radius-full);
+	}
+
+	/* The status dot. Native renders it via ::before at 6px. */
+	.indicator::before,
+	.indicator-pill:not(.no-indicator-dot)::before {
+		inline-size: 6px;
+		block-size: 6px;
+		margin-inline-end: var(--tm-space-1);
+	}
+
+	.indicator {
+		font-size: var(--tm-text-sm);
+		color: var(--tm-text-2);
+	}
+
+	/* Status chips: tinted ground + coloured dot + coloured text, no outline.
+	 * The colour pairs come from the bridge (--bg-<colour>/--text-on-<colour>).
+	 * The outlined version read as a button; the dot is what says "status".
+	 * Frappe hides the dot on list-view pills with .no-indicator-dot — shown
+	 * here so a status looks the same in the list and on the form. */
+	.indicator-pill {
+		border: 0;
+		padding-inline: var(--tm-space-2);
+		font-weight: var(--tm-weight-medium);
+	}
+
+	.indicator-pill.no-indicator-dot::before {
+		content: "";
+		display: inline-block;
+		inline-size: 6px;
+		block-size: 6px;
+		border-radius: 50%;
+		margin-inline-end: var(--tm-space-1);
+		background-color: currentColor;
+	}
+
+	/* Alerts (common/alert.scss) reuse the same semantic pairs. */
+	.alert {
+		border-radius: var(--tm-radius-md);
+		border: 1px solid transparent;
+		font-size: var(--tm-text-sm);
+		padding: var(--tm-space-2) var(--tm-space-3);
+
+		&.alert-info { border-color: var(--tm-brand-200); }
+		&.alert-success { border-color: var(--tm-green-600); }
+		&.alert-warning { border-color: var(--tm-gold-600); }
+		&.alert-danger { border-color: var(--tm-red-500); }
+	}
+
+}

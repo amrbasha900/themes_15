@@ -1,0 +1,355 @@
+/* Overlays that float: dropdown menus, autocomplete, date picker, popover,
+ * tooltip, toast.
+ * Native sources: scss/common/awesomeplete.scss, common/datepicker.scss,
+ *                 desk/toast.scss, desk/variables.scss (Bootstrap dropdown vars)
+ *
+ * These are the surfaces the contract allows a shadow on. Not flag-scoped:
+ * overlays appear on every surface, and a half-themed dropdown over a themed
+ * page looks worse than either alone. */
+
+#{$tm-on} {
+	.dropdown-menu {
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		box-shadow: var(--tm-shadow-md);
+		background-color: var(--tm-surface-raised);
+		padding: var(--tm-space-1);
+		font-size: var(--tm-text-sm);
+		min-inline-size: 160px;
+
+		.dropdown-item {
+			border-radius: var(--tm-radius-xs);
+			padding: var(--tm-space-1) var(--tm-space-2);
+			color: var(--tm-text);
+			font-size: var(--tm-text-sm);
+			line-height: var(--tm-leading-dense);
+
+			&:hover,
+			&:focus {
+				background-color: var(--tm-surface-hover);
+				color: var(--tm-text);
+			}
+
+			&.active,
+			&.selected {
+				background-color: var(--tm-surface-selected);
+				color: var(--tm-action-primary-fg);
+			}
+
+			&.disabled {
+				color: var(--tm-text-disabled);
+				cursor: not-allowed;
+			}
+		}
+
+		.dropdown-divider {
+			border-block-start-color: var(--tm-border);
+			margin-block: var(--tm-space-1);
+		}
+
+		.dropdown-header {
+			color: var(--tm-text-3);
+			font-size: var(--tm-text-xs);
+			font-weight: var(--tm-weight-medium);
+			text-transform: uppercase;
+			letter-spacing: 0.02em;
+			padding: var(--tm-space-1) var(--tm-space-2);
+		}
+	}
+
+	/* ---- Autocomplete (Link fields, Awesomplete) ------------------------------
+	 * Native: common/awesomeplete.scss. Frappe renders results as
+	 * .awesomplete > ul > li, with .link-option for the "create new" affordance. */
+	.awesomplete {
+		> ul {
+			border: 1px solid var(--tm-border);
+			border-radius: var(--tm-radius-md);
+			box-shadow: var(--tm-shadow-md);
+			background-color: var(--tm-surface-raised);
+			padding: var(--tm-space-1);
+			margin-block-start: var(--tm-space-1);
+
+			> li {
+				border-radius: var(--tm-radius-xs);
+				padding: var(--tm-space-1) var(--tm-space-2);
+				font-size: var(--tm-text-sm);
+				color: var(--tm-text);
+
+				&:hover,
+				&[aria-selected="true"] {
+					background-color: var(--tm-surface-hover);
+					color: var(--tm-text);
+				}
+
+				/* Awesomplete marks the matched substring with <mark>. */
+				mark {
+					background-color: transparent;
+					color: var(--tm-action-primary-fg);
+					font-weight: var(--tm-weight-semibold);
+					padding: 0;
+				}
+			}
+
+			.link-option {
+				color: var(--tm-action-primary-fg);
+				font-size: var(--tm-text-xs);
+			}
+		}
+	}
+
+	/* Multiselect list shares the overlay treatment (common/controls.scss:98-147). */
+	.multiselect-list {
+		.dropdown-menu {
+			max-block-size: 300px;
+			overflow-y: auto;
+		}
+
+		.selectable-item {
+			border-radius: var(--tm-radius-xs);
+			font-size: var(--tm-text-sm);
+
+			&:hover,
+			&.highlighted {
+				background-color: var(--tm-surface-hover);
+			}
+
+			&.selected {
+				background-color: var(--tm-surface-selected);
+			}
+		}
+	}
+
+	/* ---- Date picker ----------------------------------------------------------
+	 * Native: common/datepicker.scss (air-datepicker). */
+	.datepicker {
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		box-shadow: var(--tm-shadow-md);
+		background-color: var(--tm-surface-raised);
+		font-size: var(--tm-text-sm);
+		color: var(--tm-text);
+
+		.datepicker--cell {
+			border-radius: var(--tm-radius-xs);
+			color: var(--tm-text);
+
+			&.-current- {
+				color: var(--tm-action-primary-fg);
+				font-weight: var(--tm-weight-semibold);
+			}
+
+			&.-focus- {
+				background-color: var(--tm-surface-hover);
+				color: var(--tm-text);
+			}
+
+			&.-selected- {
+				background-color: var(--tm-action-primary);
+				color: var(--tm-action-primary-text);
+			}
+
+			&.-disabled- {
+				color: var(--tm-text-disabled);
+			}
+		}
+
+		.datepicker--day-name {
+			color: var(--tm-text-3);
+			font-size: var(--tm-text-xs);
+			font-weight: var(--tm-weight-medium);
+		}
+
+		.datepicker--nav {
+			border-block-end: 1px solid var(--tm-border);
+		}
+	}
+
+	/* ---- Popover and tooltip -------------------------------------------------- */
+	.popover {
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		box-shadow: var(--tm-shadow-md);
+		background-color: var(--tm-surface-raised);
+		font-size: var(--tm-text-sm);
+		color: var(--tm-text);
+
+		.popover-header {
+			background-color: transparent;
+			border-block-end: 1px solid var(--tm-border);
+			color: var(--tm-text);
+			font-size: var(--tm-text-sm);
+			font-weight: var(--tm-weight-medium);
+		}
+	}
+
+	.tooltip {
+		font-size: var(--tm-text-xs);
+
+		.tooltip-inner {
+			background-color: var(--tm-gray-800);
+			color: var(--tm-white);
+			border-radius: var(--tm-radius-sm);
+			padding: var(--tm-space-1) var(--tm-space-2);
+			max-inline-size: 280px;
+		}
+	}
+
+	/* ---- Toast / alert --------------------------------------------------------
+	 * Native: scss/desk/toast.scss, common/alert.scss */
+	.desk-alert,
+	.alert-body {
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		box-shadow: var(--tm-shadow-md);
+		background-color: var(--tm-surface-raised);
+		font-size: var(--tm-text-sm);
+		color: var(--tm-text);
+	}
+
+	/* centred at the bottom, stacked, apart from the tasks panel in the corner */
+	#alert-container {
+		inset-inline: 0;
+		bottom: var(--tm-space-3);
+		padding: var(--tm-space-3); /* room for the shadows, which overflow-y would clip */
+		z-index: 1070; /* above the tasks panel (1060) on a phone, where they meet */
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: var(--tm-space-3);
+		max-block-size: calc(100vh - 72px);
+		overflow-y: auto;
+		pointer-events: none;
+
+		/* past three, the older ones wait behind the pill (core/toasts.js) */
+		.desk-alert.tm-alert-folded {
+			display: none;
+		}
+	}
+
+	.tm-alert-more {
+		flex: none;
+		pointer-events: auto;
+		padding: var(--tm-space-1) var(--tm-space-3);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-full);
+		background: var(--tm-surface-raised);
+		box-shadow: var(--tm-shadow-md);
+		color: var(--tm-text-2);
+		font-size: var(--tm-text-sm);
+		font-weight: var(--tm-weight-semibold);
+		cursor: pointer;
+
+		&[hidden] {
+			display: none;
+		}
+
+		&:hover {
+			color: var(--tm-text);
+			background: var(--tm-surface-hover);
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--tm-action-primary);
+			outline-offset: 2px;
+		}
+	}
+
+	/* .alert too: _alerts.scss styles every .alert later in the bundle */
+	.alert.desk-alert {
+		--tm-alert-tone: var(--tm-info-text);
+		--tm-alert-tint: var(--tm-info-bg);
+		pointer-events: auto;
+		/* as wide as its words, within bounds */
+		inline-size: auto;
+		min-inline-size: min(240px, calc(100vw - 32px));
+		max-inline-size: min(520px, calc(100vw - 32px));
+		margin: 0;
+		padding: 0;
+		border: 1px solid var(--tm-border);
+		border-inline-start: 4px solid var(--tm-alert-tone);
+		border-radius: var(--tm-radius-lg);
+		box-shadow: var(--tm-shadow-lg);
+		font-size: var(--tm-text-md);
+		animation: tm-toast-in 0.25s ease both;
+
+		&.green { --tm-alert-tone: var(--tm-success-text); --tm-alert-tint: var(--tm-success-bg); }
+		&.red { --tm-alert-tone: var(--tm-danger-text); --tm-alert-tint: var(--tm-danger-bg); }
+		&.orange,
+		&.yellow { --tm-alert-tone: var(--tm-warning-text); --tm-alert-tint: var(--tm-warning-bg); }
+
+		&.out {
+			animation: tm-toast-out 0.25s ease both;
+		}
+
+		.alert-message-container {
+			padding: var(--tm-space-4);
+			padding-inline-end: 56px;
+		}
+
+		.alert-title-container {
+			gap: var(--tm-space-3);
+
+			> div:first-child {
+				flex: none;
+				display: inline-grid;
+				place-items: center;
+				inline-size: 36px;
+				block-size: 36px;
+				border-radius: var(--tm-radius-full);
+				background: var(--tm-alert-tint);
+				color: var(--tm-alert-tone);
+
+				.icon {
+					margin: 0;
+				}
+			}
+		}
+
+		.alert-message {
+			font-weight: var(--tm-weight-semibold);
+			color: var(--tm-text);
+		}
+
+		.alert-subtitle {
+			padding-inline-start: 48px;
+			color: var(--tm-text-2);
+
+			&:empty {
+				display: none;
+			}
+		}
+
+		.close {
+			inset-block: 0;
+			inset-inline: auto var(--tm-space-3); /* resets Frappe's physical right in RTL */
+			display: grid;
+			place-items: center;
+			margin-block: auto;
+			inline-size: 32px;
+			block-size: 32px;
+			border-radius: var(--tm-radius-sm);
+			cursor: pointer;
+
+			&:hover {
+				background: var(--tm-surface-hover);
+			}
+		}
+	}
+
+	@keyframes tm-toast-in {
+		from { opacity: 0; transform: translateY(12px); }
+		to { opacity: 1; transform: none; }
+	}
+
+	@keyframes tm-toast-out {
+		to { opacity: 0; transform: translateY(12px); }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.desk-alert,
+		.desk-alert.out {
+			animation-duration: 0.01ms;
+		}
+	}
+
+}

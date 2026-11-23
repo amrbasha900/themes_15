@@ -1,0 +1,194 @@
+/* Frappe bridge — maps Themate semantic tokens onto native CSS variables.
+ *
+ * Every variable below was verified to exist in Frappe 15.121.0; the comment on
+ * each group names the native file that defines it. Bridging is the preferred
+ * integration path: one assignment here restyles every native component that
+ * already consumes the variable, with no selector coupling.
+ *
+ * NOT guarded by a feature flag — this is the baseline both modes share.
+ * See FRAPPE_UI_MAP.md §2 and DESIGN_CONTRACT.md §5.
+ *
+ * Mode-independent by design. Each declaration maps a native variable onto a
+ * --tm-* token; tokens/_dark.scss redefines those tokens under
+ * [data-theme="dark"] on the same <html> element, so every mapping below
+ * re-resolves to its dark value without being restated.
+ *
+ * Specificity: this `:root` block is (0,1,0), equal to Frappe's `:root`,
+ * `[data-theme="light"]` and `[data-theme="dark"]` blocks — and
+ * themate.bundle.css loads after desk.bundle.css (frappe/www/app.py:48), so
+ * order decides in our favour. No !important required. */
+
+#{$tm-on} {
+	/* --- espresso/_colors.scss: neutral ramp ------------------------------ */
+	--neutral-white: var(--tm-white);
+	--neutral-black: var(--tm-black);
+	--neutral: var(--tm-white);
+	--invert-neutral: var(--tm-black);
+
+	--gray-50: var(--tm-gray-50);
+	--gray-100: var(--tm-gray-100);
+	--gray-200: var(--tm-gray-200);
+	--gray-300: var(--tm-gray-300);
+	--gray-400: var(--tm-gray-400);
+	--gray-500: var(--tm-gray-500);
+	--gray-600: var(--tm-gray-600);
+	--gray-700: var(--tm-gray-700);
+	--gray-800: var(--tm-gray-800);
+	--gray-900: var(--tm-gray-900);
+
+	/* --- espresso/_colors.scss: blue ramp = the accent -------------------- */
+	--blue-50: var(--tm-brand-50);
+	--blue-100: var(--tm-brand-100);
+	--blue-200: var(--tm-brand-200);
+	--blue-300: var(--tm-brand-300);
+	--blue-400: var(--tm-brand-400);
+	--blue-500: var(--tm-brand-500);
+	--blue-600: var(--tm-brand-600);
+	--blue-700: var(--tm-brand-700);
+	--blue-800: var(--tm-brand-800);
+	--blue-900: var(--tm-brand-900);
+
+	/* --- common/css_variables.scss:96-99 ---------------------------------- */
+	/* Native --primary-color and --btn-primary are var(--gray-900), i.e. black.
+	 * The contract introduces the accent deliberately. */
+	--primary: var(--tm-action-primary);
+	--primary-color: var(--tm-action-primary);
+	--primary-light: var(--tm-brand-50);
+	--brand-color: var(--tm-action-primary);
+	--btn-primary: var(--tm-action-primary);
+	--btn-default-bg: var(--tm-action-default-bg);
+	--btn-default-hover-bg: var(--tm-action-default-hover-bg);
+
+	/* --- common/css_variables.scss:78-92: layout surfaces ----------------- */
+	--bg-color: var(--tm-surface-app);
+	--fg-color: var(--tm-surface);
+	--navbar-bg: var(--tm-surface);
+	--card-bg: var(--tm-surface);
+	--modal-bg: var(--tm-surface-raised);
+	--toast-bg: var(--tm-surface-raised);
+	--popover-bg: var(--tm-surface-raised);
+	--subtle-accent: var(--tm-surface-hover);
+	--subtle-fg: var(--tm-surface-sunken);
+	--fg-hover-color: var(--tm-surface-hover);
+	--control-bg: var(--tm-surface);
+	--control-bg-on-gray: var(--tm-gray-100);
+	--disabled-control-bg: var(--tm-surface-disabled);
+	--input-disabled-bg: var(--tm-surface-disabled);
+	--awesomebar-focus-bg: var(--tm-surface);
+	--awesomplete-hover-bg: var(--tm-surface-hover);
+	--highlight-color: var(--tm-surface-hover);
+	--yellow-highlight-color: var(--tm-warning-bg);
+	--sidebar-select-color: var(--tm-surface-selected);
+
+	/* --- common/css_variables.scss:111-117: borders ----------------------- */
+	--border-color: var(--tm-border);
+	--dark-border-color: var(--tm-border-strong);
+	--table-border-color: var(--tm-border);
+	--btn-group-border-color: var(--tm-border-strong);
+	--border-primary: var(--tm-border-strong);
+
+	/* --- espresso/_typography.scss + common/css_variables.scss: text ------ */
+	--font-stack: var(--tm-font-stack);
+	--heading-color: var(--tm-text);
+	/* Type sizes (espresso/_typography.scss:6-25). Native components read
+	 * these directly, so mapping them is what makes the font-size preference
+	 * reach a Frappe control the theme never restyled. Sizes beyond 2xl are
+	 * headings on marketing-style pages; they get the same scale factor. */
+	--text-tiny: calc(11px * var(--tm-font-scale));
+	--text-2xs: var(--tm-text-xs);
+	--text-xs: var(--tm-text-xs);
+	--text-sm: var(--tm-text-sm);
+	--text-md: var(--tm-text-sm);
+	--text-base: var(--tm-text-md);
+	--text-lg: var(--tm-text-lg);
+	--text-xl: calc(18px * var(--tm-font-scale));
+	--text-2xl: var(--tm-text-xl);
+	--text-3xl: var(--tm-text-2xl);
+	--text-4xl: calc(26px * var(--tm-font-scale));
+	--text-5xl: calc(28px * var(--tm-font-scale));
+	--text-6xl: calc(32px * var(--tm-font-scale));
+
+	--text-color: var(--tm-text);
+	--text-neutral: var(--tm-text);
+	--text-muted: var(--tm-text-2);
+	--text-light: var(--tm-text-3);
+	--text-dark: var(--tm-text-inverse);
+	--disabled-text-color: var(--tm-text-disabled);
+	/* Native is var(--gray-50) — near-invisible on white. Fixed deliberately. */
+	--placeholder-color: var(--tm-text-3);
+
+	/* --- common/css_variables.scss:26,130,133: dimensions ----------------- */
+	--navbar-height: var(--tm-navbar-h);
+	--input-height: var(--tm-control-h);
+	--btn-height: var(--tm-control-h);
+	--checkbox-size: 16px;
+
+	/* --- espresso/_borders.scss: radius ----------------------------------- */
+	--border-radius-tiny: var(--tm-radius-xs);
+	--border-radius-sm: var(--tm-radius-sm);
+	--border-radius: var(--tm-radius-sm);
+	--border-radius-md: var(--tm-radius-md);
+	--border-radius-lg: var(--tm-radius-md);
+	--border-radius-xl: var(--tm-radius-lg);
+	--border-radius-2xl: var(--tm-radius-xl);
+	--border-radius-full: var(--tm-radius-full);
+
+	/* --- espresso/_shadows.scss ------------------------------------------- */
+	--shadow-xs: var(--tm-shadow-xs);
+	--shadow-sm: var(--tm-shadow-sm);
+	--shadow-base: var(--tm-shadow-sm);
+	--shadow-md: var(--tm-shadow-md);
+	--shadow-lg: var(--tm-shadow-lg);
+	--shadow-xl: var(--tm-shadow-xl);
+	--shadow-2xl: var(--tm-shadow-xl);
+	--modal-shadow: var(--tm-shadow-lg);
+	--card-shadow: none; /* cards get a border, not a shadow */
+	--btn-shadow: none;
+	--shadow-inset: inset 0 -1px 0 var(--tm-border);
+
+	/* --- common/css_variables.scss:7-19: spacing -------------------------- */
+	--padding-xs: var(--tm-space-1);
+	--padding-sm: var(--tm-space-2);
+	--padding-md: var(--tm-space-3);
+	--padding-lg: var(--tm-space-4);
+	--padding-xl: var(--tm-space-5);
+	--padding-2xl: var(--tm-space-6);
+	--margin-xs: var(--tm-space-1);
+	--margin-sm: var(--tm-space-2);
+	--margin-md: var(--tm-space-3);
+	--margin-lg: var(--tm-space-4);
+	--margin-xl: var(--tm-space-5);
+	--margin-2xl: var(--tm-space-6);
+
+	/* --- focus / checkbox / progress -------------------------------------- */
+	--checkbox-focus-shadow: var(--tm-ring);
+	--focus-default: var(--tm-ring);
+	--checkbox-color: var(--tm-action-primary);
+	--checkbox-gradient: linear-gradient(
+		180deg,
+		var(--tm-action-primary) 0%,
+		var(--tm-action-primary) 100%
+	);
+	--progress-bar-bg: var(--tm-action-primary);
+	--switch-bg: var(--tm-gray-200);
+	--scrollbar-thumb-color: var(--tm-gray-200);
+	--scrollbar-track-color: transparent;
+	--highlight-shadow: none;
+
+	/* --- common/css_variables.scss:33-77: semantic pairs ------------------- */
+	--bg-blue: var(--tm-brand-50);
+	--bg-light-blue: var(--tm-brand-50);
+	--bg-dark-blue: var(--tm-brand-100);
+	--text-on-blue: var(--tm-brand-600);
+	--text-on-light-blue: var(--tm-brand-600);
+	--text-on-dark-blue: var(--tm-brand-700);
+
+	--alert-bg-info: var(--tm-info-bg);
+	--alert-text-info: var(--tm-info-text);
+	--alert-bg-success: var(--tm-success-bg);
+	--alert-text-success: var(--tm-success-text);
+	--alert-bg-warning: var(--tm-warning-bg);
+	--alert-text-warning: var(--tm-warning-text);
+	--alert-bg-danger: var(--tm-danger-bg);
+	--alert-text-danger: var(--tm-danger-text);
+}

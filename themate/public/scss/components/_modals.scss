@@ -1,0 +1,330 @@
+/* Modals, Quick Entry and confirmation dialogs.
+ * Native source: frappe/public/scss/common/modal.scss
+ *
+ * Replaces the previous file, which existed only to undo the global `p`
+ * restyling that tokens/_semantic.scss used to apply (FRAPPE_UI_MAP.md §5
+ * finding 9). That global rule is gone, so this file now does real work. */
+
+#{$tm-on} {
+	.modal {
+		/* Default width only. Frappe sizes dialogs with modal-sm / modal-lg /
+		 * modal-xl (ui/dialog.js:35) — those must keep Bootstrap's widths, or
+		 * a "large" dialog gets squeezed into 640px. */
+		.modal-dialog:not(.modal-sm):not(.modal-lg):not(.modal-xl) {
+			max-inline-size: 640px;
+		}
+
+		/* msgprint / confirm: the class is on .modal-dialog itself
+		 * (ui/messages.js msgprint, dialog.js "msgprint-dialog") */
+		.modal-dialog.msgprint-dialog:not(.modal-sm):not(.modal-lg):not(.modal-xl),
+		.modal-dialog:not(.modal-sm):not(.modal-lg):not(.modal-xl):has(> .modal-content .frappe-confirm-message) {
+			max-inline-size: 480px;
+		}
+
+		/* a gentler entrance than Bootstrap's 50px drop */
+		&.fade .modal-dialog {
+			transform: translateY(12px) scale(0.98);
+			transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+		}
+
+		&.show .modal-dialog {
+			transform: none;
+		}
+
+		.modal-content {
+			border: 1px solid var(--tm-border);
+			border-radius: var(--tm-radius-xl);
+			box-shadow: var(--tm-shadow-xl);
+			background-color: var(--tm-surface-raised);
+			overflow: visible;
+		}
+
+		.modal-header {
+			border-block-end: 0;
+			padding: var(--tm-space-5) var(--tm-space-5) var(--tm-space-3);
+			align-items: center;
+			gap: var(--tm-space-3);
+			border-start-start-radius: inherit;
+			border-start-end-radius: inherit;
+
+			.title-section {
+				align-items: center;
+				gap: var(--tm-space-2);
+				min-inline-size: 0;
+			}
+
+			.modal-title {
+				font-size: var(--tm-text-lg);
+				font-weight: var(--tm-weight-semibold);
+				color: var(--tm-text);
+				line-height: var(--tm-leading-dense);
+				overflow-wrap: anywhere;
+			}
+
+			/* the status dot before a title becomes a soft ring */
+			.indicator {
+				margin: 0;
+
+				&::before {
+					inline-size: 10px;
+					block-size: 10px;
+					margin: 0;
+					box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 16%, transparent);
+				}
+			}
+
+			.modal-actions {
+				display: flex;
+				align-items: center;
+				gap: var(--tm-space-1);
+				margin-inline-start: auto;
+			}
+
+			.btn-modal-close,
+			.btn-modal-minimize {
+				display: inline-grid;
+				place-items: center;
+				inline-size: 32px;
+				block-size: 32px;
+				padding: 0;
+				color: var(--tm-text-3);
+				border-radius: var(--tm-radius-md);
+
+				&.hide {
+					display: none;
+				}
+
+				&:hover {
+					background-color: var(--tm-surface-hover);
+					color: var(--tm-text);
+				}
+
+				&:focus-visible {
+					outline: 2px solid var(--tm-action-primary);
+					outline-offset: 1px;
+					box-shadow: none;
+				}
+			}
+		}
+
+		.modal-body {
+			padding: var(--tm-space-2) var(--tm-space-5) var(--tm-space-5);
+			font-size: var(--tm-text-sm);
+			color: var(--tm-text);
+			/* No overflow clipping here (native has none): an autocomplete or
+			 * date picker opened inside a dialog must be able to extend past
+			 * the body. Long dialogs scroll with the modal itself, as in
+			 * Frappe. */
+			max-block-size: none;
+			overflow: visible;
+		}
+
+		.modal-footer {
+			border-block-start: 1px solid var(--tm-border);
+			background-color: var(--tm-surface-app);
+			padding: var(--tm-space-3) var(--tm-space-5);
+			gap: var(--tm-space-2);
+			border-end-start-radius: inherit;
+			border-end-end-radius: inherit;
+
+			> * {
+				margin: 0;
+			}
+
+			.standard-actions {
+				display: flex;
+				gap: var(--tm-space-2);
+				margin-inline-start: auto;
+			}
+
+			.btn {
+				min-block-size: 34px;
+				padding-inline: var(--tm-space-4);
+				border-radius: var(--tm-radius-md);
+				font-weight: var(--tm-weight-medium);
+			}
+		}
+
+		/* Phones: a sheet from the bottom edge, thumbs near the buttons.
+		 * Bootstrap's .modal-dialog already has pointer-events: none (only
+		 * .modal-content takes clicks), so the empty space above the sheet
+		 * still closes it as the backdrop does. */
+		@media (max-width: 575.98px) {
+			.modal-dialog,
+			.modal-dialog.msgprint-dialog,
+			.modal-dialog:not(.modal-sm):not(.modal-lg):not(.modal-xl) {
+				display: flex;
+				flex-direction: column;
+				justify-content: flex-end;
+				min-block-size: 100%;
+				max-inline-size: none;
+				margin: 0;
+			}
+
+			&.fade .modal-dialog {
+				transform: translateY(32px);
+			}
+
+			&.show .modal-dialog {
+				transform: none;
+			}
+
+			.modal-content {
+				border-inline: 0;
+				border-block-end: 0;
+				border-end-start-radius: 0;
+				border-end-end-radius: 0;
+			}
+
+			.modal-header {
+				position: relative;
+				padding-block-start: var(--tm-space-6);
+
+				/* the grab bar of a sheet */
+				&::before {
+					content: "";
+					position: absolute;
+					inset-block-start: 10px;
+					inset-inline-start: 50%;
+					inline-size: 36px;
+					block-size: 4px;
+					margin-inline-start: -18px;
+					border-radius: var(--tm-radius-full);
+					background: var(--tm-border-strong);
+				}
+			}
+
+			.modal-body {
+				padding-inline: var(--tm-space-4);
+			}
+
+			.modal-footer {
+				padding: var(--tm-space-3) var(--tm-space-4) calc(var(--tm-space-3) + env(safe-area-inset-bottom, 0px));
+
+				.standard-actions {
+					flex: 1 1 100%;
+					margin: 0;
+
+					.btn:not(.hide) {
+						flex: 1 1 0;
+						min-block-size: 42px;
+					}
+				}
+			}
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			&.fade .modal-dialog {
+				transition: none;
+				transform: none;
+			}
+		}
+	}
+
+	.modal-backdrop.show {
+		background-color: color-mix(in srgb, var(--tm-gray-900, #0f172a) 70%, transparent);
+		opacity: 0.55;
+	}
+
+	@supports (backdrop-filter: blur(2px)) {
+		.modal-backdrop.show {
+			opacity: 1;
+			background-color: color-mix(in srgb, var(--tm-gray-900, #0f172a) 35%, transparent);
+			backdrop-filter: blur(3px);
+		}
+	}
+
+	/* Frappe's freeze layer (desk/global.scss:521): a grey sheet at 0.8
+	 * opacity over EVERYTHING, sidebar included (z-index 1055). assets.js
+	 * :110 raises it for every lazy bundle frappe.require() loads, and a
+	 * bundle lands in 50-300ms — so a workspace load washed the whole desk
+	 * grey and back three or four times (startup, build events, the
+	 * onboarding video, the chart engine). The layer is still added at once
+	 * and still blocks clicks; it only becomes VISIBLE once the wait is
+	 * long enough to be worth saying so. A freeze with a message
+	 * (freeze_message) is the same wait and gets the same delay.
+	 * The grid row editor's backdrop (grid_row.js:1426, .grid-form) is part
+	 * of that editor opening, not a wait, and keeps its timing. */
+	#freeze:not(.grid-form) {
+		transition: opacity 0.15s linear 0.4s;
+
+		&.in {
+			background: color-mix(in srgb, var(--tm-surface-app) 75%, transparent);
+			backdrop-filter: blur(6px);
+			opacity: 1;
+		}
+
+		.freeze-message-container {
+			inset: 0;
+			position: absolute;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: transparent;
+			padding: var(--tm-space-4);
+			z-index: 1;
+		}
+
+		.freeze-message {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--tm-space-3);
+			padding: var(--tm-space-4) var(--tm-space-5);
+			border-radius: var(--tm-radius-lg);
+			background: var(--tm-surface);
+			border: 1px solid var(--tm-border);
+			box-shadow: var(--tm-shadow-lg, 0 12px 32px rgba(0, 0, 0, 0.16));
+			color: var(--tm-text);
+			font-weight: var(--tm-weight-medium);
+
+			&::before {
+				content: "";
+				display: inline-block;
+				inline-size: 20px;
+				block-size: 20px;
+				min-inline-size: 20px;
+				border-radius: 50%;
+				border: 2px solid var(--tm-border-strong);
+				border-inline-start-color: var(--tm-action-primary);
+				animation: tm-freeze-spin 0.8s linear infinite;
+			}
+
+			p.lead {
+				margin: 0;
+				font-size: var(--tm-text-sm);
+				line-height: var(--tm-leading);
+				color: var(--tm-text);
+				font-weight: inherit;
+
+				&:empty {
+					display: none;
+				}
+			}
+		}
+	}
+
+	@keyframes tm-freeze-spin {
+		to { transform: rotate(360deg); }
+	}
+
+	/* msgprint / confirmation dialogs are narrower and text-led. */
+	.msgprint-dialog {
+		.msgprint {
+			font-size: var(--tm-text-sm);
+			line-height: var(--tm-leading);
+			color: var(--tm-text);
+		}
+	}
+
+	/* Minimised dialog chrome (common/modal.scss:157). */
+	.modal-minimize {
+		border-radius: var(--tm-radius-md) var(--tm-radius-md) 0 0;
+		box-shadow: var(--tm-shadow-lg);
+	}
+
+	/* A dialog stacks above sticky form tabs and list headers. Frappe's own
+	 * z-index for .modal is 1050 (Bootstrap); the form tab bar is z-index 5
+	 * (desk/form.scss:422) and the list header is sticky. Nothing here raises
+	 * z-index — it is recorded so future rules do not lower it. */
+
+}

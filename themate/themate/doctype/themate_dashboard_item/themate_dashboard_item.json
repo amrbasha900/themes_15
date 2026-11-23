@@ -1,0 +1,82 @@
+{
+ "actions": [],
+ "creation": "2026-09-17 12:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "item_type",
+  "heading",
+  "chart",
+  "number_card",
+  "width",
+  "note"
+ ],
+ "fields": [
+  {
+   "fieldname": "item_type",
+   "fieldtype": "Select",
+   "label": "Type",
+   "options": "Heading\nChart\nNumber Card",
+   "default": "Chart",
+   "reqd": 1,
+   "in_list_view": 1,
+   "columns": 2
+  },
+  {
+   "fieldname": "heading",
+   "fieldtype": "Data",
+   "label": "Heading",
+   "depends_on": "eval:doc.item_type==\"Heading\"",
+   "mandatory_depends_on": "eval:doc.item_type==\"Heading\"",
+   "in_list_view": 1,
+   "columns": 3,
+   "description": "A section title: the question this row of cards answers."
+  },
+  {
+   "fieldname": "chart",
+   "fieldtype": "Link",
+   "label": "Chart",
+   "options": "Dashboard Chart",
+   "depends_on": "eval:doc.item_type==\"Chart\"",
+   "mandatory_depends_on": "eval:doc.item_type==\"Chart\"",
+   "in_list_view": 1,
+   "columns": 2
+  },
+  {
+   "fieldname": "number_card",
+   "fieldtype": "Link",
+   "label": "Number Card",
+   "options": "Number Card",
+   "depends_on": "eval:doc.item_type==\"Number Card\"",
+   "mandatory_depends_on": "eval:doc.item_type==\"Number Card\""
+  },
+  {
+   "fieldname": "width",
+   "fieldtype": "Select",
+   "label": "Width",
+   "options": "Third\nHalf\nTwo Thirds\nFull",
+   "default": "Third",
+   "in_list_view": 1,
+   "columns": 1,
+   "description": "Of the row. Headings always take the full row."
+  },
+  {
+   "fieldname": "note",
+   "fieldtype": "Small Text",
+   "label": "Note",
+   "depends_on": "eval:doc.item_type==\"Heading\"",
+   "description": "One line under the heading: how to read the cards that follow."
+  }
+ ],
+ "istable": 1,
+ "modified": "2026-09-17 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Themate",
+ "name": "Themate Dashboard Item",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

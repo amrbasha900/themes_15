@@ -1,0 +1,66 @@
+<title>Workspace Index — INNOMATE</title>
+<style>
+:root{--bg:#f4f5f8;--sf:#fff;--ln:#e3e6ec;--ln2:#cfd4dd;--tx:#1b2030;--t2:#5b6475;--t3:#8a92a3;--ac:#2f6fed;--acs:#e8efff;--r:8px;color-scheme:light}
+:root:not([data-theme=light]){@media (prefers-color-scheme:dark){--bg:#0e1117;--sf:#161a23;--ln:#262c38;--ln2:#343b49;--tx:#e6e9ef;--t2:#a3abbb;--t3:#6f778a;--acs:#1b2a4d}}
+:root[data-theme=dark]{--bg:#0e1117;--sf:#161a23;--ln:#262c38;--ln2:#343b49;--tx:#e6e9ef;--t2:#a3abbb;--t3:#6f778a;--acs:#1b2a4d}
+body{margin:0;background:var(--bg);color:var(--tx);font:13px/1.45 Inter,system-ui,sans-serif;padding:16px}
+.note{max-width:1180px;margin:0 auto 12px;color:var(--t2)}.note b{color:var(--tx)}
+.app{max-width:1180px;margin:0 auto;background:var(--sf);border:1px solid var(--ln);border-radius:14px;overflow:hidden}
+.head{display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:1px solid var(--ln)}
+.head h2{font-size:18px;margin:0}.head small{color:var(--t2)}.sp{flex:1}
+.tabs{display:inline-flex;border:1px solid var(--ln2);border-radius:8px;overflow:hidden}.tabs span{padding:5px 12px;color:var(--t2)}.tabs .on{background:var(--acs);color:var(--ac);font-weight:600}
+.body{padding:16px 22px 24px}
+.find{display:flex;align-items:center;gap:8px;border:1px solid var(--ln2);border-radius:20px;padding:6px 14px;color:var(--t3);max-width:360px;margin-bottom:16px}
+h3{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);margin:18px 0 8px;font-weight:600}
+.tiles{display:flex;flex-wrap:wrap;gap:6px}
+.tile{display:inline-flex;align-items:center;gap:8px;padding:7px 12px 7px 9px;border:1px solid var(--ln);border-radius:8px;background:var(--sf)}
+.tile i{width:18px;height:18px;border-radius:5px;background:var(--acs);display:inline-block}
+.tile span{color:var(--t3);font-variant-numeric:tabular-nums}.tile.hot span{color:#c25a00;font-weight:600}
+.recent{display:flex;gap:6px;flex-wrap:wrap}
+.recent div{display:grid;gap:1px;padding:6px 10px;border-radius:8px;background:var(--bg);min-width:150px}
+.recent b{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px}.recent small{color:var(--t3)}
+.dir{columns:3;column-gap:28px}
+.grp{break-inside:avoid;margin-bottom:18px}
+.grp h4{font-size:13px;margin:0 0 4px;font-weight:600}
+.grp a{display:flex;align-items:center;gap:6px;padding:3px 0;color:var(--t2);text-decoration:none}
+.grp a:hover{color:var(--ac)}
+.grp a.rep::before{content:"";width:9px;height:9px;border:1.5px solid var(--t3);border-radius:2px;border-bottom-width:4px;box-sizing:border-box}
+.grp a.set{color:var(--t3)}
+.legend{max-width:1180px;margin:14px auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;font-size:12.5px;color:var(--t2)}
+.legend div{background:var(--sf);border:1px solid var(--ln);border-radius:10px;padding:10px 12px}.legend b{color:var(--tx);display:block;margin-bottom:3px}
+@media (max-width:900px){.dir{columns:2}}@media (max-width:600px){.dir{columns:1}}
+</style>
+<p class="note"><b>Mockup</b> — تاب Records في Accounting كفهرس موديول: اختصارات كـ tiles، «الأخيرة»، بحث داخل الموديول، والمجموعات دليل 3 أعمدة بدون كروت. الأرقام توضيحية.</p>
+<div class="app">
+  <div class="head"><h2>Accounting</h2><small>Good evening, Administrator · Friday 18-09-2026</small><span class="sp"></span><span class="tabs"><span>▦ Dashboard</span><span class="on">☰ Records</span></span><span class="tiles"><span class="tile" style="padding:5px 12px">⋯</span></span></div>
+  <div class="body">
+    <div class="find">🔍 Find in Accounting… <span style="margin-inline-start:auto;font-size:11px;border:1px solid var(--ln2);border-radius:4px;padding:0 5px">/</span></div>
+    <h3>Shortcuts</h3>
+    <div class="tiles">
+      <span class="tile"><i></i>Chart of Accounts</span><span class="tile hot"><i></i>Sales Invoice <span>10 unpaid</span></span><span class="tile hot"><i></i>Purchase Invoice <span>6 unpaid</span></span><span class="tile"><i></i>Journal Entry</span><span class="tile"><i></i>Payment Entry <span>5</span></span><span class="tile"><i></i>Accounts Receivable</span><span class="tile"><i></i>General Ledger</span><span class="tile"><i></i>Trial Balance</span>
+    </div>
+    <h3>Recent</h3>
+    <div class="recent">
+      <div><b>ACC-SINV-2026-00012</b><small>Sales Invoice · 2 h</small></div><div><b>Grant Plastics Ltd.</b><small>Customer · today</small></div><div><b>ACC-PAY-2026-00005</b><small>Payment Entry · yesterday</small></div><div><b>Accounts Receivable</b><small>Report · yesterday</small></div><div><b>Zetix Group (Demo)</b><small>Company · 2 d</small></div>
+    </div>
+    <h3>Reports &amp; Masters</h3>
+    <div class="dir">
+      <div class="grp"><h4>Accounting Masters</h4><a>Company</a><a>Chart of Accounts</a><a>Fiscal Year</a><a>Accounting Dimension</a><a>Finance Book</a><a>Accounting Period</a><a class="set">Accounts Settings</a></div>
+      <div class="grp"><h4>Payments</h4><a>Payment Entry</a><a>Journal Entry</a><a>Journal Entry Template</a><a>Terms and Conditions</a><a>Mode of Payment</a><a>Payment Term</a><a>Payment Request</a></div>
+      <div class="grp"><h4>Tax Masters</h4><a>Sales Taxes and Charges Template</a><a>Purchase Taxes and Charges Template</a><a>Item Tax Template</a><a>Tax Category</a><a>Tax Rule</a><a>Tax Withholding Category</a></div>
+      <div class="grp"><h4>Receivables</h4><a>Sales Invoice</a><a>Customer</a><a>Payment Entry</a><a class="rep">Accounts Receivable</a><a class="rep">Accounts Receivable Summary</a><a class="rep">Sales Register</a><a class="rep">Item-wise Sales Register</a></div>
+      <div class="grp"><h4>Payables</h4><a>Purchase Invoice</a><a>Supplier</a><a class="rep">Accounts Payable</a><a class="rep">Accounts Payable Summary</a><a class="rep">Purchase Register</a></div>
+      <div class="grp"><h4>Financial Statements</h4><a class="rep">Trial Balance</a><a class="rep">Profit and Loss Statement</a><a class="rep">Balance Sheet</a><a class="rep">Cash Flow</a><a class="rep">Consolidated Financial Statement</a></div>
+      <div class="grp"><h4>General Ledger</h4><a class="rep">General Ledger</a><a class="rep">Customer Ledger Summary</a><a class="rep">Supplier Ledger Summary</a><a class="rep">Trial Balance for Party</a></div>
+      <div class="grp"><h4>Banking</h4><a>Bank</a><a>Bank Account</a><a>Bank Reconciliation Tool</a><a class="rep">Bank Reconciliation Statement</a><a class="rep">Bank Clearance Summary</a></div>
+      <div class="grp"><h4>Multi Currency</h4><a>Currency</a><a>Currency Exchange</a><a>Exchange Rate Revaluation</a></div>
+      <div class="grp"><h4>Settings</h4><a class="set">Payment Gateway Account</a><a class="set">Accounts Settings</a><a class="set">Payment Terms Template</a></div>
+    </div>
+  </div>
+</div>
+<div class="legend">
+  <div><b>1 · Tiles</b>44px بدل 110، العدد باهت وبيظهر بس لما يكون له معنى (unpaid)؛ اختصار Dashboard اتشال.</div>
+  <div><b>2 · Recent</b>آخر 6 سجلات فتحتها في الموديول من boot.user.recent — رجوع للشغل بضغطة.</div>
+  <div><b>3 · Find</b>بيفلتر الاختصارات والروابط live، Enter يفتح أول نتيجة، «/» يركّز عليه.</div>
+  <div><b>4 · Directory</b>3 أعمدة masonry، بدون كروت ولا أسهم ولا أيقونات مكررة؛ التقارير بعلامة، الإعدادات باهتة.</div>
+</div>

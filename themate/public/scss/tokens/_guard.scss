@@ -1,0 +1,22 @@
+// Master rollback guard.
+//
+// html[data-tm-enabled="off"] turns the ENTIRE theme off — tokens, the Frappe
+// variable bridge and every component rule — leaving stock Frappe behind.
+//
+// Why a master switch and not per-area rollback: Frappe defines --primary,
+// --bg-color, --border-color and the rest on :root and consumes them globally
+// (common/css_variables.scss). There is no way to hand the List View back its
+// native colours while the Form keeps themed ones, because both read the same
+// variables. Per-area flags therefore remove an area's STRUCTURE (padding,
+// borders, heights); only this master switch restores Frappe's own palette.
+//
+// Specificity: html:not([data-tm-enabled="off"]) is (0,1,1), which still beats
+// Frappe's :root and [data-theme="light"] at (0,1,0), so nothing here needs
+// !important. Set by core/bootstrap.js from Theme Settings.
+//
+// Applied by interpolating $tm-on as the top-level selector of every file that
+// paints. Silent // comments are used throughout this file on purpose: Sass
+// evaluates interpolation inside CSS comments too, so documenting the usage in
+// a /* */ block would break the build.
+
+$tm-on: 'html:not([data-tm-enabled="off"])';

@@ -1,0 +1,118 @@
+{
+ "actions": [],
+ "autoname": "field:department_name",
+ "creation": "2026-11-06 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "department_name",
+  "enabled",
+  "column_break_look",
+  "icon",
+  "color",
+  "sequence",
+  "access_section",
+  "roles",
+  "workspaces_section",
+  "workspaces",
+  "default_workspace"
+ ],
+ "fields": [
+  {
+   "fieldname": "department_name",
+   "fieldtype": "Data",
+   "label": "Department",
+   "reqd": 1,
+   "unique": 1,
+   "in_list_view": 1,
+   "description": "Its title in the sidebar, e.g. Human Resources or Supply Chain."
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "1",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "column_break_look",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "icon",
+   "fieldtype": "Icon",
+   "label": "Icon"
+  },
+  {
+   "fieldname": "color",
+   "fieldtype": "Color",
+   "label": "Colour"
+  },
+  {
+   "fieldname": "sequence",
+   "fieldtype": "Int",
+   "label": "Switcher Order",
+   "default": "0",
+   "in_list_view": 1,
+   "description": "Lower comes first in the department switcher."
+  },
+  {
+   "fieldname": "access_section",
+   "fieldtype": "Section Break",
+   "label": "Who sees it",
+   "description": "People with any of these roles get this department. No roles: everyone. A department never grants access: it only shows the workspaces a person may already open."
+  },
+  {
+   "fieldname": "roles",
+   "fieldtype": "Table",
+   "label": "Roles",
+   "options": "Has Role"
+  },
+  {
+   "fieldname": "workspaces_section",
+   "fieldtype": "Section Break",
+   "label": "Workspaces",
+   "description": "The department's workspaces, in sidebar order. A workspace's child workspaces come with it."
+  },
+  {
+   "fieldname": "workspaces",
+   "fieldtype": "Table",
+   "label": "Workspaces",
+   "options": "Themate Department Workspace",
+   "reqd": 1
+  },
+  {
+   "fieldname": "default_workspace",
+   "fieldtype": "Link",
+   "label": "Opens on",
+   "options": "Workspace",
+   "description": "The workspace that opens when someone switches to this department. Blank: the first one above."
+  }
+ ],
+ "links": [],
+ "modified": "2026-11-06 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Themate",
+ "name": "Themate Department",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "report": 1,
+   "export": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  }
+ ],
+ "sort_field": "sequence",
+ "sort_order": "ASC",
+ "states": [],
+ "title_field": "department_name",
+ "track_changes": 1
+}

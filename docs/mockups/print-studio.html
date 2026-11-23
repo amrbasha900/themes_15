@@ -1,0 +1,100 @@
+<title>Print Studio — INNOMATE</title>
+<style>
+:root{--bg:#eef0f4;--desk:#dfe2e8;--sf:#fff;--ln:#e1e4ea;--ln2:#cbd0d9;--tx:#1b2030;--t2:#5b6475;--t3:#8a92a3;--ac:#2f6fed;--acs:#e8efff;--ok:#1a9a5a;--oks:#e4f6ec;--r:8px;--paper:#fff;--ink:#111;--ink2:#555;--rule:#ddd;--band:#f3f5f8;color-scheme:light}
+:root:not([data-theme=light]){@media (prefers-color-scheme:dark){--bg:#0e1117;--desk:#161a23;--sf:#1b2029;--ln:#2a3140;--ln2:#39415a;--tx:#e6e9ef;--t2:#a3abbb;--t3:#6f778a;--acs:#1b2a4d;--oks:#123526}}
+:root[data-theme=dark]{--bg:#0e1117;--desk:#161a23;--sf:#1b2029;--ln:#2a3140;--ln2:#39415a;--tx:#e6e9ef;--t2:#a3abbb;--t3:#6f778a;--acs:#1b2a4d;--oks:#123526}
+body{margin:0;background:var(--bg);color:var(--tx);font:13px/1.45 Inter,system-ui,sans-serif;padding:16px}
+.note{max-width:1240px;margin:0 auto 12px;color:var(--t2)}.note b{color:var(--tx)}
+.app{max-width:1240px;margin:0 auto;background:var(--sf);border:1px solid var(--ln);border-radius:14px;overflow:hidden;min-height:760px;display:grid;grid-template-rows:auto 1fr}
+.head{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--ln)}
+.head h2{font-size:17px;margin:0 12px 0 0}
+.crumb{color:var(--t3)}.sp{flex:1}
+.btn{border:1px solid var(--ln2);background:var(--sf);color:var(--tx);border-radius:var(--r);padding:6px 11px;font:inherit;font-size:12.5px;display:inline-flex;gap:6px;align-items:center}
+.btn.p{background:var(--ac);border-color:var(--ac);color:#fff}.btn.g{border:0;background:none;color:var(--t2)}
+.body{display:grid;grid-template-columns:1fr 280px;min-height:0}
+.desk{background:var(--desk);padding:14px 22px 24px;display:grid;grid-template-rows:auto auto 1fr;gap:12px;min-width:0}
+.ctx{display:flex;align-items:center;gap:14px;background:var(--sf);border:1px solid var(--ln);border-radius:10px;padding:8px 12px;font-size:12.5px}
+.ctx b{font-size:13.5px}.ctx .st{background:var(--oks);color:var(--ok);border-radius:4px;padding:1px 8px;font-size:11.5px}.ctx span{color:var(--t2)}.ctx .amt{margin-inline-start:auto;font-weight:600;font-variant-numeric:tabular-nums}
+.zoom{display:flex;align-items:center;gap:6px;justify-content:center;color:var(--t2);font-size:12px}
+.zoom span{padding:3px 9px;border:1px solid var(--ln2);border-radius:12px;background:var(--sf)}.zoom .on{background:var(--acs);border-color:var(--ac);color:var(--ac)}.zoom i{font-style:normal;color:var(--t3);margin:0 6px}
+.paperwrap{display:flex;justify-content:center;align-items:flex-start;overflow:hidden}
+.paper{width:560px;background:var(--paper);color:var(--ink);box-shadow:0 12px 30px rgba(0,0,0,.18),0 0 0 1px rgba(0,0,0,.05);padding:34px 38px;direction:rtl;font-size:11.5px;line-height:1.5;position:relative;min-height:600px}
+.paper .lh{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:14px}
+.paper .lh b{font-size:15px}.paper .lh small{display:block;color:var(--ink2);font-size:10px}
+.paper .logo{width:34px;height:22px;border-radius:5px;background:linear-gradient(90deg,#2f6fed,#7aa2ff)}
+.paper h1{font-size:17px;margin:0}.paper .no{color:var(--ink2);font-size:11px;direction:ltr;display:inline-block}
+.stamp{position:absolute;top:120px;left:38px;border:1.5px solid var(--ok);color:var(--ok);border-radius:4px;padding:1px 8px;font-size:10px;letter-spacing:.08em;transform:rotate(-6deg);opacity:.85;direction:ltr}
+.meta{display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;margin:14px 0 16px;font-size:11px}
+.meta div{display:flex;justify-content:space-between;border-bottom:1px dotted var(--rule);padding-bottom:3px}.meta span{color:var(--ink2)}.meta b{direction:ltr;unicode-bidi:isolate}
+table{width:100%;border-collapse:collapse;font-size:10.5px}
+th{background:var(--band);color:var(--ink2);font-weight:600;padding:6px 6px;text-align:start;white-space:nowrap;border-bottom:1px solid var(--rule)}
+td{padding:6px;border-bottom:1px solid var(--rule);vertical-align:middle}
+.n{text-align:left;direction:ltr;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tot{width:220px;margin:12px 0 0 auto;font-size:11px}.tot div{display:flex;justify-content:space-between;padding:3px 0}.tot span{color:var(--ink2)}.tot .g{border-top:1.5px solid var(--ink);margin-top:4px;padding-top:6px;font-weight:700;font-size:12.5px}
+.words{margin-top:10px;font-size:10.5px;color:var(--ink2)}
+.pfoot{position:absolute;bottom:18px;left:38px;right:38px;display:flex;justify-content:space-between;font-size:9.5px;color:var(--ink2);border-top:1px solid var(--rule);padding-top:6px;direction:ltr}
+.side{border-inline-start:1px solid var(--ln);padding:14px;font-size:12.5px;overflow:auto}
+.side h3{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--t3);margin:14px 0 6px;display:flex;justify-content:space-between}.side h3:first-child{margin-top:0}
+.fmt{display:grid;gap:6px}
+.fmt div{border:1px solid var(--ln);border-radius:8px;padding:7px 10px;display:grid;grid-template-columns:1fr auto;gap:2px 8px;align-items:center}
+.fmt .on{border-color:var(--ac);background:var(--acs)}.fmt b{font-weight:500}.fmt small{color:var(--t3);grid-column:1}.fmt .tag{font-size:10px;color:var(--t2);border:1px solid var(--ln2);border-radius:4px;padding:0 5px}.fmt .star{color:#e0a100;grid-row:1/3}
+.seg{display:inline-flex;border:1px solid var(--ln2);border-radius:8px;overflow:hidden}.seg span{padding:5px 14px}.seg .on{background:var(--acs);color:var(--ac);font-weight:600}
+.lhs{display:flex;gap:8px;align-items:center;border:1px solid var(--ln);border-radius:8px;padding:6px 8px}.lhs i{width:52px;height:30px;border-radius:4px;background:linear-gradient(180deg,var(--band),var(--ln));display:block}.lhs small{color:var(--t3);display:block}
+.sw{display:grid;gap:8px}.sw div{display:grid;grid-template-columns:1fr 34px;gap:2px 8px;align-items:center}.sw small{color:var(--t3);grid-column:1}
+.tg{width:34px;height:20px;border-radius:10px;background:var(--ln2);position:relative;grid-row:1/3}.tg::after{content:"";position:absolute;top:3px;left:3px;width:14px;height:14px;border-radius:50%;background:#fff}.tg.on{background:var(--ac)}.tg.on::after{left:17px}
+.hint{margin-top:16px;padding:10px;background:var(--bg);border-radius:8px;color:var(--t2);font-size:12px}
+.legend{max-width:1240px;margin:14px auto 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;font-size:12.5px;color:var(--t2)}
+.legend div{background:var(--sf);border:1px solid var(--ln);border-radius:10px;padding:10px 12px}.legend b{color:var(--tx);display:block;margin-bottom:3px}
+@media (max-width:900px){.body{grid-template-columns:1fr}.side{border:0;border-top:1px solid var(--ln)}.paper{width:100%;padding:20px}}
+</style>
+<p class="note"><b>Mockup</b> — صفحة الطباعة بعد التغيير: الورقة على مكتب بحجمها الحقيقي مع zoom وشريط سياق، Print Style «Innomate» جوه الورقة (عربي مضبوط، جدول نظيف، إجمالي بارز، ختم الحالة)، ولوحة إعدادات بتتقري يمين. الأرقام توضيحية.</p>
+<div class="app">
+  <div class="head"><h2>SAL-ORD-2026-00002</h2><span class="crumb">Selling › Sales Order › Print</span><span class="sp"></span>
+    <span class="btn g">‹ Prev</span><span class="btn g">Next ›</span><span class="btn">⤓ PDF</span><span class="btn">✉ Email</span><span class="btn">⇪ Share</span><span class="btn">⧉ Open in tab</span><span class="btn">⋯</span><span class="btn p">⎙ Print</span></div>
+  <div class="body">
+    <div class="desk">
+      <div class="ctx"><b>Sales Order</b><span class="st">● Submitted</span><span>West View Software Ltd.</span><span>06-09-2026</span><span>2 items</span><span class="amt">ج.م 32,000.00</span></div>
+      <div class="zoom">A4 · Portrait <i>·</i> <span>Fit</span><span class="on">100%</span><span>125%</span> <i>·</i> Page 1 of 1</div>
+      <div class="paperwrap"><div class="paper">
+        <div class="lh"><div><b>شركة إنوميت للتقنية</b><small>القاهرة · +20 2 1234 5678 · info@innomate.com · س.ت 123456</small></div><span class="logo"></span></div>
+        <h1>طلب مبيعات <span class="no">SAL-ORD-2026-00002</span></h1>
+        <span class="stamp">SUBMITTED</span>
+        <div class="meta">
+          <div><span>العميل</span><b style="direction:rtl">West View Software Ltd.</b></div><div><span>التاريخ</span><b>06-09-2026</b></div>
+          <div><span>تاريخ التسليم</span><b>06-09-2026</b></div><div><span>شروط الدفع</span><b style="direction:rtl">30 يوم</b></div>
+        </div>
+        <table><tr><th>#</th><th>الصنف</th><th>الوصف</th><th>الكمية</th><th>الوحدة</th><th>السعر</th><th>الخصم</th><th>الإجمالي</th></tr>
+          <tr><td>1</td><td class="n">SKU001</td><td>T-shirt</td><td class="n">25</td><td>قطعة</td><td class="n">800.00</td><td class="n">0.00</td><td class="n">20,000.00</td></tr>
+          <tr><td>2</td><td class="n">SKU002</td><td>Laptop</td><td class="n">15</td><td>قطعة</td><td class="n">800.00</td><td class="n">0.00</td><td class="n">12,000.00</td></tr>
+        </table>
+        <div class="tot"><div><span>الإجمالي قبل الضريبة</span><b class="n">32,000.00</b></div><div><span>ضريبة القيمة المضافة 14%</span><b class="n">4,480.00</b></div><div class="g"><span>الإجمالي الكلي</span><b class="n">ج.م 36,480.00</b></div></div>
+        <div class="words">فقط ستة وثلاثون ألفًا وأربعمائة وثمانون جنيهًا مصريًا لا غير.</div>
+        <div class="pfoot"><span>Printed 18-09-2026 17:52 · Administrator</span><span>Page 1 of 1</span></div>
+      </div></div>
+    </div>
+    <aside class="side">
+      <h3>Print format <a style="color:var(--ac);letter-spacing:0;text-transform:none">Customize</a></h3>
+      <div class="fmt">
+        <div class="on"><b>Sales Order — Innomate</b><span class="star">★</span><small><span class="tag">Standard</span> default · used yesterday</small></div>
+        <div><b>Sales Order (Arabic)</b><small><span class="tag">Jinja</span></small></div>
+        <div><b>Quotation-style</b><small><span class="tag">Designer</span></small></div>
+      </div>
+      <h3>Language</h3><span class="seg"><span>EN</span><span class="on">AR</span></span>
+      <h3>Letter head</h3><div class="lhs"><i></i><div>Innomate — Main<small>logo · address · CR</small></div></div>
+      <h3>Options</h3>
+      <div class="sw">
+        <div><b>Compact item print</b><span class="tg"></span><small>Hides images and descriptions</small></div>
+        <div><b>UOM after quantity</b><span class="tg on"></span><small>25 Nos instead of two columns</small></div>
+        <div><b>Taxes with zero amount</b><span class="tg"></span><small>Show every tax row</small></div>
+        <div><b>Status stamp</b><span class="tg on"></span><small>DRAFT / SUBMITTED / CANCELLED on the page</small></div>
+      </div>
+      <div class="hint">Remembered for Sales Order: this format, AR, this letter head — next time it opens ready.</div>
+    </aside>
+  </div>
+</div>
+<div class="legend">
+  <div><b>1 · الورقة</b>Print Style «Innomate»: خط عربي، أرقام LTR، جدول برأس واحد، إجمالي بارز، ختم الحالة، ترقيم الصفحات. بيشتغل على كل Standard format.</div>
+  <div><b>2 · الاستوديو</b>مكتب + ورقة بحجمها + Fit/100/125 + شريط سياق (الحالة، العميل، الإجمالي) + Prev/Next على سجلات القائمة.</div>
+  <div><b>3 · اللوحة</b>Format ككروت (نوع + ★ افتراضي + آخر استخدام)، EN|AR، Letter head بمعاينة، خيارات كـ switches بشرح، بتتحفظ لكل doctype.</div>
+  <div><b>4 · الأزرار</b>Print أساسي · PDF · Email بالمرفق · Share · Open in tab · «…» فيه Refresh وPrint Settings وCustomize.</div>
+</div>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<!-- Structure mirrors frappe/www/app.html:2 — Frappe server-renders BOTH theme
+     attributes, so there is no flash-of-wrong-theme to defend against. -->
+<html data-theme-mode="light" data-theme="light" dir="ltr" lang="en">
+<head>
+<meta charset="utf-8">
+<!-- Stand-in for the native declarations Themate has to beat. Real load order
+     is desk.bundle.css first, then themate.bundle.css (frappe/www/app.py:48),
+     which this file reproduces. Values copied from
+     frappe/public/scss/common/css_variables.scss and common/form.scss. -->
+<style>
+  :root, [data-theme="light"] {
+    --bg-color: white; --fg-color: white; --primary: #171717; --btn-primary: #171717;
+    --border-color: #e2e2e2; --text-color: #171717; --navbar-height: 48px;
+    --input-height: 28px; --btn-height: 28px; --control-bg: #f4f5f6;
+    --placeholder-color: #f4f5f6;
+  }
+  [data-theme="dark"] { --bg-color: #191919; --fg-color: #232323; --text-color: #f6f6f6; }
+  /* common/global.scss:4 — what makes <body> exactly as tall as the window */
+  html, body { height: 100%; }
+  .form-control { border: none; height: var(--input-height); padding: 6px 8px; }
+  .list-row { padding: 15px 15px 15px 0; height: 40px; }
+</style>
+<link rel="stylesheet" href="themate.bundle.css">
+</head>
+<body>
+  <!-- List View — frappe/public/scss/desk/list.scss + list/list_view.js -->
+  <div class="list-row-container" id="plainrow">
+    <div class="level list-row">
+      <input type="checkbox" class="list-row-checkbox">
+      <div class="list-subject"><a href="#">ToDo item</a></div>
+      <div class="list-row-col"><span>Open</span></div>
+    </div>
+  </div>
+  <div class="list-row-container" id="selrow">
+    <div class="level list-row">
+      <input type="checkbox" class="list-row-checkbox" checked>
+      <div class="list-subject"><a href="#">Selected row</a></div>
+    </div>
+  </div>
+
+  <!-- Control — frappe/public/js/frappe/form/controls/base_input.js:13-26 -->
+  <div class="form-group frappe-control" data-fieldtype="Data">
+    <div class="clearfix"><label class="control-label reqd" style="padding-right: 0px;">Subject</label></div>
+    <div class="control-input-wrapper">
+      <div class="control-input"><input type="text" class="form-control" placeholder="placeholder"></div>
+      <p class="help-box small text-muted">help text</p>
+    </div>
+  </div>
+
+  <!-- Invalid control -->
+  <div class="form-group frappe-control has-error" data-fieldtype="Data" id="badctl">
+    <div class="control-input-wrapper">
+      <div class="control-input"><input type="text" class="form-control"></div>
+      <p class="help-box small text-muted">is required</p>
+    </div>
+  </div>
+
+  <!-- Numeric control — must align end and use tabular figures -->
+  <div class="form-group frappe-control" data-fieldtype="Currency" id="curctl">
+    <div class="control-input-wrapper">
+      <div class="control-input"><input type="text" class="form-control" value="1234.56"></div>
+    </div>
+  </div>
+
+  <!-- Buttons — frappe/public/scss/common/buttons.scss -->
+  <button class="btn btn-primary">Primary</button>
+  <button class="btn btn-default">Default</button>
+  <button class="btn btn-danger">Danger</button>
+  <button class="btn btn-primary" disabled>Disabled</button>
+
+  <!-- Child grid — frappe/public/scss/common/grid.scss -->
+  <div class="form-grid">
+    <div class="grid-heading-row"><div class="row"><div class="col grid-static-col">Item</div></div></div>
+    <div class="grid-body"><div class="rows">
+      <div class="grid-row"><div class="data-row row">
+        <div class="col grid-static-col" data-fieldtype="Currency">100.00</div>
+      </div></div>
+    </div></div>
+  </div>
+
+  <!-- Report DataTable — frappe/public/scss/desk/frappe_datatable.scss -->
+  <div class="datatable">
+    <div class="dt-header"><div class="dt-row dt-row-header">
+      <div class="dt-cell dt-cell--header"><div class="dt-cell__content">Column</div></div>
+    </div></div>
+    <div class="dt-scrollable"><div class="dt-row"><div class="dt-cell"><div class="dt-cell__content">Value</div></div></div></div>
+  </div>
+</body>
+</html>

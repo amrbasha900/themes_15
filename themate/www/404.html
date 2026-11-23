@@ -1,0 +1,80 @@
+{# Theme on: the theme's own frame on the bare base template. Theme off
+   (Theme Settings > Enable Theme): Frappe's own 404 — web.html and the
+   page_content block at the bottom. #}
+{% extends ("templates/base.html" if themate_on else "templates/web.html") %}
+
+{%- block title -%}{% if themate_on %}{{ _("Page not found") }}{% else %}{{ _("Not Found") }}{% endif %}{%- endblock -%}
+
+{# the error card is the whole page: no website navbar, footer or banner #}
+{%- block banner -%}{% if not themate_on %}{{ super() }}{% endif %}{%- endblock -%}
+{%- block navbar -%}{% if not themate_on %}{{ super() }}{% endif %}{%- endblock -%}
+{%- block footer -%}{% if not themate_on %}{{ super() }}{% endif %}{%- endblock -%}
+
+{% block head_include %}
+{% if themate_on %}
+{{ include_style('themate-login.bundle.css') }}
+<script>window.themate_login = {{ {"brand_color": themate.brand_color} | tojson }};</script>
+{{ include_script('themate-login.bundle.js') }}
+<style>
+	/* The error frame: one card on the ground, the brand mark, a large
+	 * numeral in the brand colour, and two ways out. Tokens come from the
+	 * login bundle (light + dark), so it follows Theme Settings. */
+	.tm-error-page-body { margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+		background: var(--tm-surface-app, #f5f6f8); font-family: var(--tm-font-stack, Inter, sans-serif); color: var(--tm-text, #1f1f1f); padding: 24px; }
+	.tm-error { width: min(560px, 100%); background: var(--tm-surface, #fff); border: 1px solid var(--tm-border, #e5e7eb); border-radius: 12px; padding: 40px 40px 32px; text-align: center; box-shadow: 0 12px 40px rgba(15, 27, 61, 0.08); }
+	.tm-error-brand { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 28px; color: var(--tm-text, #1f1f1f); text-decoration: none; font-weight: 600; letter-spacing: 0.04em; }
+	.tm-error-brand img { height: 28px; width: auto; }
+	.tm-error-code { font-size: 96px; font-weight: 700; line-height: 1; letter-spacing: -0.04em; color: var(--tm-brand-500, #1677ff); font-variant-numeric: tabular-nums; }
+	.tm-error-code span { color: var(--tm-brand-200, #bfdbff); }
+	.tm-error h1 { font-size: 22px; font-weight: 600; margin: 18px 0 8px; }
+	.tm-error p { color: var(--tm-text-2, #595959); margin: 0 auto; max-width: 40ch; line-height: 1.6; }
+	.tm-error code { display: inline-block; margin-top: 12px; padding: 2px 8px; border-radius: 4px; background: var(--tm-surface-sunken, #f0f2f5); color: var(--tm-text-2, #595959); font-size: 13px; direction: ltr; unicode-bidi: isolate; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: bottom; }
+	.tm-error-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 28px; }
+	.tm-error-actions a { display: inline-flex; align-items: center; gap: 6px; height: 36px; padding: 0 16px; border-radius: 6px; font-size: 14px; font-weight: 500; text-decoration: none; border: 1px solid var(--tm-border-strong, #d9d9d9); color: var(--tm-text, #1f1f1f); background: var(--tm-surface, #fff); }
+	.tm-error-actions a.is-primary { background: var(--tm-brand-500, #1677ff); border-color: var(--tm-brand-500, #1677ff); color: #fff; }
+	.tm-error-actions a:hover { filter: brightness(0.96); }
+	.tm-error-foot { margin-top: 24px; font-size: 12px; color: var(--tm-text-3, #8c8c8c); }
+	@media (max-width: 480px) { .tm-error { padding: 32px 20px 24px; } .tm-error-code { font-size: 72px; } }
+</style>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% if not themate_on %}{{ super() }}{% else %}
+<script>window.is_404 = true;</script>
+<main class="tm-error" {% if layout_direction == 'rtl' %}dir="rtl"{% endif %}>
+	<a class="tm-error-brand" href="{{ home }}">
+		<img src="{{ logo }}" alt="">
+		<span>{{ app_name }}</span>
+	</a>
+	<div class="tm-error-code" aria-hidden="true">4<span>0</span>4</div>
+	<h1>{{ _("There's nothing here") }}</h1>
+	<p>{{ _("The page you are looking for has gone missing.") }}<br>
+		<code>{{ frappe.request.path if frappe.request else "" }}</code></p>
+	<div class="tm-error-actions">
+		<a class="is-primary" href="{{ home }}">{{ _("Back to Home") }}</a>
+		<a href="javascript:history.back()">{{ _("Go back") }}</a>
+	</div>
+	<div class="tm-error-foot">{{ app_name }}</div>
+</main>
+{% endif %}
+{% endblock %}
+
+{% block page_content %}
+<script>
+	window.is_404 = true;
+</script>
+
+<div class="error-page">
+	<img class="img-404" src="/assets/frappe/images/ui-states/404.png" />
+	<div>
+		<h2 class="mb-1 mt-4">
+			{{ _("There's nothing here") }}
+		</h2>
+		<div class="text-muted error-text">
+			{{ _("The page you are looking for has gone missing.") }}
+		</div>
+		<div class="mt-6 back-to-home"><a href='/' class='btn btn-primary'>{{ _("Back to Home") }}</a></div>
+	</div>
+</div>
+{% endblock %}

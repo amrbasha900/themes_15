@@ -1,0 +1,415 @@
+/* Editable child-table Grid.
+ * Native source: frappe/public/scss/common/grid.scss,
+ *                frappe/public/js/frappe/form/grid.js
+ *
+ * This is NOT the List View and NOT the report DataTable — three separate
+ * implementations that must each be styled (brief §6). The report DataTable
+ * lives in components/_datatable.scss.
+ *
+ * Verified structure (common/grid.scss):
+ *   .form-grid
+ *     .grid-heading-row  > .row > .col.grid-static-col
+ *     .grid-body > .rows > .grid-row > .data-row > .row > .col.grid-static-col
+ *     .grid-footer-toolbar / .grid-append-row
+ *   .grid-row-open > .form-in-grid   <- expanded row editor
+ *
+ * Scoped to the form kill-switch — the grid only ever appears inside a form. */
+
+#{$tm-on}[data-tm-form="on"] {
+	.form-grid {
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface);
+		/* No overflow:hidden here: the Link dropdown (awesomplete <ul>) of an
+		 * editable row is absolutely positioned inside the grid and was cut
+		 * off at the grid's edge. The rounded corners are on the first and
+		 * last rows instead. */
+		overflow: visible;
+
+		> .grid-heading-row,
+		> .grid-heading-row > .row {
+			border-start-start-radius: var(--tm-radius-md);
+			border-start-end-radius: var(--tm-radius-md);
+		}
+
+		> :last-child,
+		> :last-child > :last-child {
+			border-end-start-radius: var(--tm-radius-md);
+			border-end-end-radius: var(--tm-radius-md);
+		}
+
+		&.error {
+			border-color: var(--tm-action-danger);
+		}
+	}
+
+	/* ---- Header row ------------------------------------------------------ */
+	.grid-heading-row {
+		background-color: var(--tm-surface-sunken);
+		border-block-end: 1px solid var(--tm-border);
+		color: var(--tm-text-2);
+		font-size: var(--tm-text-xs);
+		font-weight: var(--tm-weight-medium);
+		min-block-size: var(--tm-row-h);
+	}
+
+	/* ---- Data rows -------------------------------------------------------- */
+	.grid-body {
+		.rows .grid-row {
+			.data-row {
+				min-block-size: var(--tm-row-h);
+				font-size: var(--tm-text-sm);
+				color: var(--tm-text);
+			}
+
+			&:not(:last-child) > .data-row {
+				border-block-end: 1px solid var(--tm-border);
+			}
+
+			&:hover > .data-row {
+				background-color: var(--tm-surface-hover);
+			}
+		}
+
+		/* Row currently open in the inline editor. */
+		.grid-row-open {
+			background-color: var(--tm-surface-selected);
+		}
+	}
+
+	/* ---- Cells ------------------------------------------------------------ */
+	.grid-static-col {
+		font-size: var(--tm-text-sm);
+		color: var(--tm-text);
+		border-inline-end: 1px solid var(--tm-border);
+		display: flex;
+		align-items: center;
+		min-inline-size: 0;
+
+		/* The cell is a flex row, so its control and its value are flex items
+		 * and were only as wide as their content: in a wide column a Select
+		 * stopped after its text with the chevron against it, a Data input
+		 * short of the cell's end, and Frappe's text-center / text-right on
+		 * the cell (a Check, a number) had no width to align in. */
+		> .field-area,
+		> .static-area {
+			flex: 1 1 0;
+			min-inline-size: 0;
+		}
+
+		.static-area {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		/* Native marks edited/invalid cells with these classes
+		 * (common/grid.scss:177-187). */
+		&.bold {
+			font-weight: var(--tm-weight-medium);
+		}
+
+		&.invalid,
+		&.error {
+			background-color: var(--tm-danger-bg);
+			color: var(--tm-danger-text);
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--tm-action-primary);
+			outline-offset: -2px;
+		}
+	}
+
+	/* Long text, read-only row: one line that runs to the cell's end, from the
+	 * remark's start. nowrap did not hold — the formatter turns line breaks
+	 * into <br>, the centred flex cell showed a five-line remark's middle
+	 * lines — and an Arabic remark in an LTR form overflowed past its start,
+	 * so the cell showed its end. The clamp keeps the first line and marks
+	 * the rest; plaintext sets each remark's direction from its own text, as
+	 * the textarea does. */
+	.grid-static-col:is([data-fieldtype="Small Text"], [data-fieldtype="Text"], [data-fieldtype="Long Text"]) .static-area {
+		display: -webkit-box;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 1;
+		line-clamp: 1;
+		white-space: normal;
+		overflow-wrap: anywhere;
+		unicode-bidi: plaintext;
+		text-align: start;
+
+		/* A line break reads as a space here, so a remark typed on several
+		 * lines still fills the cell instead of stopping at its first break.
+		 * (content on <br> is Chromium/WebKit; elsewhere the break stays and
+		 * the cell shows the first line.) */
+		br {
+			content: "";
+
+			&::after {
+				content: " ";
+			}
+		}
+	}
+
+	/* Numeric columns align right and share a tabular figure so digits line up
+	 * down the column — the whole point of a grid. */
+	.grid-static-col[data-fieldtype="Currency"],
+	.grid-static-col[data-fieldtype="Float"],
+	.grid-static-col[data-fieldtype="Int"],
+	.grid-static-col[data-fieldtype="Percent"] {
+		justify-content: flex-end;
+		text-align: end;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.row-index,
+	.row-check {
+		color: var(--tm-text-3);
+		font-size: var(--tm-text-xs);
+		border-inline-end: 1px solid var(--tm-border);
+	}
+
+	/* ---- Inline editable control inside a cell ---------------------------- */
+	/* The control must fill the cell without adding its own chrome, or rows
+	 * grow taller on edit and the grid jumps. */
+	/* A control in a cell carries the form's 12px bottom margin; the flex cell
+	 * centred control and margin together, so every value in the row being
+	 * edited sat 6px above the values in the rows around it. */
+	.editable-row .grid-static-col .field-area > .form-group {
+		margin: 0;
+	}
+
+	.editable-row .frappe-control .form-control,
+	.grid-static-col .form-control {
+		height: calc(var(--tm-row-h) - 2px);
+		border: none;
+		border-radius: 0;
+		background-color: transparent;
+		padding-inline: var(--tm-space-2);
+
+		&:focus {
+			box-shadow: inset 0 0 0 1px var(--tm-action-primary);
+			background-color: var(--tm-surface);
+		}
+	}
+
+	/* A focused control is lifted to z-index 2 (common/grid.scss:268) and a
+	 * Select's chevron, its sibling, went under it: the open Select lost the
+	 * sign that it is one. The chevron takes no clicks (global.scss:68). */
+	.editable-row .frappe-control[data-fieldtype="Select"] .select-icon {
+		z-index: 3;
+	}
+
+	/* ---- Link in a row ------------------------------------------------------ */
+	/* The × and → buttons reserve 56px of the input (_forms.scss .link-field),
+	 * which left a 100px column about 29px of its value. In a row they show
+	 * while the field has focus, not on hover — pointing at a row must not
+	 * hide what it says — and a narrow column keeps only →: typing over a
+	 * value replaces it, opening the record has no other way in. */
+	.editable-row .grid-static-col {
+		container-type: inline-size;
+	}
+
+	/* Frappe shows the buttons by writing display:inline on them (link.js,
+	 * on mouseenter and focus), which outranked the flex that centres them:
+	 * the arrow sat at the cell's top edge. Frappe still decides whether they
+	 * show; this only decides how, and not on hover alone. */
+	.editable-row .link-field {
+		.link-btn[style*="inline"] {
+			display: flex !important;
+		}
+
+		&:hover:not(:focus-within) {
+			.link-btn {
+				display: none !important;
+			}
+
+			input.form-control {
+				padding-inline-end: var(--tm-space-2);
+			}
+		}
+	}
+
+	/* One 22px button 4px from the edge, and 2px clear of the value. */
+	@container (max-width: 12rem) {
+		.editable-row .link-field {
+			.link-btn .btn-clear {
+				display: none !important;
+			}
+
+			&:focus-within input.form-control {
+				padding-inline-end: 28px;
+			}
+		}
+	}
+
+	/* ---- Long text in a row (Small Text / Text / Long Text) --------------- */
+	/* A remark typed in a row must be readable while it is typed. The textarea
+	 * was taller than the row (native forces 46px !important, _forms.scss a
+	 * two-line min-height, plus the form-group's margin), the flex cell
+	 * centred it, and the cell's overflow:hidden (.grid-overflow-no-ellipsis)
+	 * cut its first line off; it was also only as wide as its cols="20".
+	 *
+	 * At rest it is one line, the cell's height and width, like every other
+	 * control in the row. Focused, it opens as a rectangle anchored at the
+	 * cell's top edge that grows with the text (field-sizing) from four lines
+	 * to ten, then scrolls. It lies over the rows below instead of pushing
+	 * them, so the grid does not jump and a click on the next row still lands
+	 * where the pointer is. */
+	.editable-row .grid-static-col:has(textarea.form-control) {
+		> .field-area {
+			align-self: stretch;
+		}
+
+		&:has(textarea.form-control:focus) {
+			overflow: visible;
+		}
+	}
+
+	/* At rest with a value, the cell shows the same one-line summary as a
+	 * read-only row (core/grid_text.js): the textarea itself stops at the
+	 * value's first line break. The textarea lies on the summary, transparent,
+	 * and takes the click; focused, it is the rectangle below. Empty, it stays
+	 * visible so its placeholder names the column like the row's other
+	 * controls. */
+	.editable-row .grid-static-col:has(textarea.form-control:not(:placeholder-shown)) {
+		/* toggle_editable_row() hid it with an inline display:none. */
+		> .static-area {
+			display: -webkit-box !important;
+			padding-inline: var(--tm-space-2);
+		}
+
+		> .field-area {
+			position: absolute;
+			inset: 0;
+		}
+
+		textarea.form-control:not(:focus) {
+			opacity: 0;
+		}
+	}
+
+	.editable-row .grid-static-col textarea.form-control {
+		display: block;
+		inline-size: 100%;
+		height: calc(var(--tm-row-h) - 2px) !important;
+		min-block-size: 0;
+		padding-block: calc((var(--tm-row-h) - 2px - 1lh) / 2);
+		overflow: hidden;
+		resize: none;
+		/* Each line takes its direction from its own text, as the resting
+		 * summary does: an English remark in an Arabic form no longer jumped
+		 * from the left edge to the right one when opened. */
+		unicode-bidi: plaintext;
+		text-align: start;
+		/* One line at rest. overflow clips at the padding box, so the top of
+		 * the second line showed in the bottom padding; the clip trims that
+		 * strip. Not nowrap: an Arabic remark in an LTR form then overflowed
+		 * past its start and the cell showed the end of the sentence. Wrapped,
+		 * the resting line is the first line of the open box. */
+		clip-path: inset(0 0 calc((var(--tm-row-h) - 2px - 1lh) / 2) 0);
+
+		&:focus {
+			clip-path: none;
+			position: absolute;
+			inset-block-start: 0;
+			inset-inline-start: 0;
+			z-index: 5;
+			inline-size: max(100%, 18rem);
+			height: auto !important;
+			field-sizing: content;
+			min-block-size: calc(4lh + 2 * var(--tm-space-2));
+			max-block-size: calc(10lh + 2 * var(--tm-space-2));
+			padding-block: var(--tm-space-2);
+			overflow-y: auto;
+			border: 1px solid var(--tm-action-primary);
+			border-radius: var(--tm-radius-sm);
+			box-shadow: var(--tm-shadow-md);
+			background-color: var(--tm-surface);
+		}
+	}
+
+	/* The last data column (the row's last child is the edit-button column)
+	 * opens towards the start, so a narrow column's 18rem box stays inside
+	 * the grid. */
+	.editable-row .grid-static-col:nth-last-child(2) textarea.form-control:focus {
+		inset-inline-start: auto;
+		inset-inline-end: 0;
+	}
+
+	/* ---- Expanded row editor ---------------------------------------------- */
+	/* common/grid.scss:387-434 */
+	.form-in-grid {
+		background-color: var(--tm-surface);
+		border-block-start: 1px solid var(--tm-border);
+		padding: var(--tm-space-3);
+
+		.grid-form-heading {
+			font-size: var(--tm-text-sm);
+			font-weight: var(--tm-weight-medium);
+			color: var(--tm-text);
+			border-block-end: 1px solid var(--tm-border);
+			padding-block-end: var(--tm-space-2);
+		}
+
+		.grid-delete-row,
+		.grid-append-row {
+			font-size: var(--tm-text-xs);
+		}
+	}
+
+	/* ---- Footer / add-row -------------------------------------------------- */
+	.grid-footer,
+	.grid-footer-toolbar {
+		border-block-start: 1px solid var(--tm-border);
+		background-color: var(--tm-surface-sunken);
+		font-size: var(--tm-text-sm);
+		padding: var(--tm-space-2) var(--tm-space-3);
+
+		.btn {
+			height: var(--tm-control-h-sm);
+			font-size: var(--tm-text-xs);
+		}
+	}
+
+	.grid-add-row,
+	.grid-append-row {
+		color: var(--tm-action-primary-fg);
+		font-size: var(--tm-text-sm);
+
+		&:hover {
+			color: var(--tm-action-primary-active);
+		}
+	}
+
+	/* ---- Totals row -------------------------------------------------------- */
+	.grid-total-row,
+	.grid-row.grid-total-row .data-row {
+		background-color: var(--tm-surface-sunken);
+		font-weight: var(--tm-weight-semibold);
+		color: var(--tm-text);
+		border-block-start: 1px solid var(--tm-border-strong);
+	}
+
+	/* ---- Empty state -------------------------------------------------------- */
+	.grid-empty {
+		color: var(--tm-text-3);
+		font-size: var(--tm-text-sm);
+		padding-block: var(--tm-space-4);
+		background-color: transparent;
+	}
+
+	/* Horizontal overflow stays inside the grid, so the page never scrolls
+	 * sideways because one child table is wide — except while a Link
+	 * dropdown is open (overflow-x: auto also clips vertically), when the
+	 * container lets it show. */
+	.form-grid-container {
+		overflow-x: auto;
+
+		&:has(.awesomplete > ul:not([hidden])),
+		&:has(.editable-row textarea.form-control:focus),
+		&:has(.grid-row-open) {
+			overflow: visible;
+		}
+	}
+}

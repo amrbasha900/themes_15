@@ -1,0 +1,69 @@
+{
+ "actions": [],
+ "creation": "2026-09-30 12:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "fieldname",
+  "label",
+  "display",
+  "bold",
+  "hide_if_empty"
+ ],
+ "fields": [
+  {
+   "fieldname": "fieldname",
+   "fieldtype": "Select",
+   "label": "Field",
+   "in_list_view": 1,
+   "reqd": 1,
+   "columns": 3,
+   "description": "A field of the document type, drawn under the event's title."
+  },
+  {
+   "fieldname": "label",
+   "fieldtype": "Data",
+   "label": "Label",
+   "in_list_view": 1,
+   "columns": 2,
+   "description": "Written before the value, e.g. Total. Leave empty for the value alone."
+  },
+  {
+   "fieldname": "display",
+   "fieldtype": "Select",
+   "label": "Show As",
+   "in_list_view": 1,
+   "columns": 2,
+   "options": "Value\nNumber\nProgress Bar\nBadge",
+   "default": "Value",
+   "description": "Value: formatted as in the form (an amount with its currency). Number: the figure alone. Progress Bar: a bar for a percentage from 0 to 100. Badge: a small tag, for a status or a type."
+  },
+  {
+   "fieldname": "bold",
+   "fieldtype": "Check",
+   "label": "Bold",
+   "in_list_view": 1,
+   "columns": 1,
+   "default": "0"
+  },
+  {
+   "fieldname": "hide_if_empty",
+   "fieldtype": "Check",
+   "label": "Hide If Empty",
+   "in_list_view": 1,
+   "columns": 2,
+   "default": "1"
+  }
+ ],
+ "istable": 1,
+ "modified": "2026-09-30 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Themate",
+ "name": "Calendar Layout Field",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

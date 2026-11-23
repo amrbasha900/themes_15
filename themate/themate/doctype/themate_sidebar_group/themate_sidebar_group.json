@@ -1,0 +1,48 @@
+{
+ "actions": [],
+ "creation": "2026-09-16 12:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "workspace",
+  "group_label",
+  "hidden"
+ ],
+ "fields": [
+  {
+   "fieldname": "workspace",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Workspace",
+   "options": "Workspace",
+   "reqd": 1
+  },
+  {
+   "fieldname": "group_label",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Group",
+   "reqd": 0,
+   "description": "Section title in the sidebar, e.g. Operations. Blank keeps the module rule. Workspaces without a row follow the module rule."
+  },
+  {
+   "fieldname": "hidden",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Hide",
+   "default": 0,
+   "description": "Take this workspace out of the sidebar (it stays reachable by URL and search)."
+  }
+ ],
+ "istable": 1,
+ "modified": "2026-09-16 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Themate",
+ "name": "Themate Sidebar Group",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

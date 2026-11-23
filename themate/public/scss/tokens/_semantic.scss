@@ -1,0 +1,252 @@
+/* Semantic tokens. Components consume these, never the raw palette.
+ * Bundled font faces only — no CDN. See DESIGN_CONTRACT.md §3. */
+
+@font-face {
+	font-family: "InterVariable";
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url("/assets/themate/fonts/InterVariable.woff2") format("woff2");
+}
+
+@font-face {
+	font-family: "InterVariable";
+	font-style: italic;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url("/assets/themate/fonts/InterVariable-Italic.woff2") format("woff2");
+}
+
+$cairo-weights: 200 "ExtraLight", 300 "Light", 400 "Regular", 500 "Medium", 600 "SemiBold",
+	700 "Bold", 800 "ExtraBold", 900 "Black";
+
+@each $weight, $name in $cairo-weights {
+	@font-face {
+		font-family: "Cairo";
+		font-style: normal;
+		font-weight: $weight;
+		font-display: swap;
+		src: url("/assets/themate/fonts/Cairo-#{$name}.ttf") format("truetype");
+	}
+}
+
+#{$tm-on} {
+	/* ---- Typography ---------------------------------------------------- */
+	/* Latin then Arabic, both bundled. Overridden at runtime only by an
+	 * explicit Theme Settings font choice (core/bootstrap.js). */
+	--tm-font-stack: "InterVariable", "Cairo", -apple-system, BlinkMacSystemFont, "Segoe UI",
+		sans-serif;
+
+	/* Type ramp. Every size is `<contract px> * --tm-font-scale`, so the
+	 * whole UI — theme rules AND native Frappe rules through the bridge —
+	 * scales together. core/bootstrap.js sets --tm-font-scale inline as
+	 * <base font size px> / 14 from the user's preference or the site
+	 * default; this is the pre-JS value. */
+	--tm-font-scale: 1;
+	--tm-text-xs: calc(12px * var(--tm-font-scale)); /* metadata only */
+	--tm-text-sm: calc(13px * var(--tm-font-scale)); /* dense rows, controls, tables */
+	--tm-text-md: calc(14px * var(--tm-font-scale)); /* base */
+	--tm-text-lg: calc(16px * var(--tm-font-scale));
+	--tm-text-xl: calc(20px * var(--tm-font-scale));
+	--tm-text-2xl: calc(24px * var(--tm-font-scale));
+
+	/* ---- Icons (Themate Business set, public/icons.svg) ------------------ */
+	/* The symbols set no stroke-width / fill-opacity, so these inherit into
+	 * every <use>. core/icons.js overwrites them inline from Theme Settings
+	 * and the user's preference; these are the pre-JS defaults. */
+	--tm-icon-size: 18px;
+	--tm-icon-stroke: 1.75;
+	--tm-icon-tint: 0.18;
+
+	/* ---- Chart series (charts/adapter.js) -------------------------------- */
+	/* Brand first, then a fixed hue order so the same series keeps its
+	 * colour across charts. Dark redefines the last seven a step lighter. */
+	--tm-chart-1: var(--tm-brand-500);
+	--tm-chart-2: #13c2c2;
+	--tm-chart-3: #faad14;
+	--tm-chart-4: #722ed1;
+	--tm-chart-5: #52c41a;
+	--tm-chart-6: #eb2f96;
+	--tm-chart-7: #fa8c16;
+	--tm-chart-8: #2f54eb;
+
+	--tm-weight-regular: 400;
+	--tm-weight-medium: 500;
+	--tm-weight-semibold: 600;
+
+	--tm-leading-dense: 1.4;
+	--tm-leading: 1.5;
+
+	/* ---- Surfaces ------------------------------------------------------ */
+	--tm-surface-app: var(--tm-gray-app);
+	--tm-surface: var(--tm-white);
+	--tm-surface-raised: var(--tm-white);
+	--tm-surface-sunken: var(--tm-gray-50);
+	--tm-surface-hover: var(--tm-gray-50);
+	--tm-surface-active: var(--tm-gray-100);
+	--tm-surface-selected: var(--tm-brand-50);
+	--tm-surface-disabled: var(--tm-gray-app);
+
+	/* ---- Board / timeline surfaces ------------------------------------- */
+	/* These six are the ONLY values in this theme taken from another design
+	 * system, and they are taken deliberately: the brief for Kanban, Gantt
+	 * and Calendar is Jira's, so the surfaces are Atlassian's own published
+	 * tokens rather than an approximation of them. Read from
+	 * @atlaskit/tokens 18.2.0, artifacts/themes/atlassian-light.js:
+	 *
+	 *   --tm-board-column       = --ds-background-neutral   #0515240F
+	 *   --tm-board-column-hover = --ds-background-neutral-hovered #0B120E24
+	 *   --tm-board-card         = --ds-surface-raised       #FFFFFF
+	 *   --tm-board-card-hover   = --ds-surface-hovered      #F0F1F2
+	 *   --tm-board-shadow       = --ds-shadow-raised
+	 *   --tm-board-shadow-drag  = --ds-shadow-overlay
+	 *
+	 * The column is a TRANSLUCENT wash, not a flat gray, which is why a Jira
+	 * column sits correctly on a white page and on a tinted one. The card
+	 * carries a hairline shadow INSTEAD of a border — that pair is what makes
+	 * a board read as a board, and DESIGN_CONTRACT.md §3's "cards get a
+	 * border, not a shadow" is suspended here for the same reason: these
+	 * cards are dragged, so they are a floating surface by definition. */
+	--tm-board-column: rgb(5 21 36 / 0.06);
+	--tm-board-column-hover: rgb(11 18 14 / 0.14);
+	--tm-board-card: var(--tm-white);
+	--tm-board-card-hover: #f0f1f2;
+	--tm-board-shadow: 0 1px 1px rgb(30 31 33 / 0.25), 0 0 1px rgb(30 31 33 / 0.31);
+	--tm-board-shadow-drag: 0 8px 12px rgb(30 31 33 / 0.15), 0 0 1px rgb(30 31 33 / 0.31);
+
+	/* ---- Borders ------------------------------------------------------- */
+	--tm-border: var(--tm-gray-100); /* subtle divider */
+	--tm-border-strong: var(--tm-gray-200); /* input border */
+	--tm-border-accent: var(--tm-brand-500);
+
+	/* ---- Text ---------------------------------------------------------- */
+	--tm-text: var(--tm-gray-900);
+	--tm-text-2: var(--tm-gray-600);
+	--tm-text-3: var(--tm-gray-500); /* 4.5:1 on white, sunken and the page */
+	--tm-text-disabled: var(--tm-gray-400);
+	--tm-text-inverse: var(--tm-white);
+	--tm-text-accent: var(--tm-brand-500);
+	--tm-text-link: var(--tm-brand-600);
+	--tm-text-link-hover: var(--tm-brand-700);
+
+	/* ---- Action roles -------------------------------------------------- */
+	--tm-action-primary: var(--tm-brand-500);
+	--tm-action-primary-hover: var(--tm-brand-400);
+	--tm-action-primary-active: var(--tm-brand-600);
+	--tm-action-primary-text: var(--tm-white);
+	/* The accent as text on a surface. Dark lifts it: brand-500 is too dim to read there. */
+	--tm-action-primary-fg: var(--tm-action-primary);
+
+	/* Default actions are neutral, never a second hue (DESIGN_CONTRACT.md §1). */
+	--tm-action-default-bg: var(--tm-white);
+	--tm-action-default-hover-bg: var(--tm-brand-50);
+	--tm-action-default-active-bg: var(--tm-brand-100);
+	--tm-action-default-border: var(--tm-gray-200);
+	--tm-action-default-hover-border: var(--tm-brand-400);
+	--tm-action-default-text: var(--tm-gray-900);
+
+	--tm-action-danger: var(--tm-red-500);
+	--tm-action-danger-hover: #ff7875;
+	--tm-action-danger-active: var(--tm-red-600);
+
+	/* ---- Status -------------------------------------------------------- */
+	--tm-success-bg: var(--tm-green-50);
+	--tm-success-text: var(--tm-green-600);
+	--tm-warning-bg: var(--tm-gold-50);
+	--tm-warning-text: var(--tm-gold-600);
+	--tm-danger-bg: var(--tm-red-50);
+	--tm-danger-text: var(--tm-red-600);
+	--tm-info-bg: var(--tm-brand-50);
+	--tm-info-text: var(--tm-brand-600);
+
+	/* Hued avatars (initials in lists, leaderboards): the hue comes from the
+	 * name, the saturation / lightness pair from the mode. */
+	--tm-avatar-bg-sl: 70% 91%;
+	--tm-avatar-fg-sl: 55% 34%;
+	/* aging severity: current → oldest */
+	--tm-age-1: #52c41a;
+	--tm-age-2: #faad14;
+	--tm-age-3: #fa8c16;
+	--tm-age-4: var(--tm-red-500);
+
+	/* ---- Elevation — floating surfaces only ---------------------------- */
+	--tm-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.03);
+	--tm-shadow-sm: 0 2px 6px rgb(0 0 0 / 0.06);
+	--tm-shadow-md: 0 6px 16px rgb(0 0 0 / 0.08), 0 3px 6px -4px rgb(0 0 0 / 0.12);
+	--tm-shadow-lg: 0 9px 28px rgb(0 0 0 / 0.05), 0 6px 16px rgb(0 0 0 / 0.08);
+	--tm-shadow-xl: 0 12px 48px rgb(0 0 0 / 0.1), 0 9px 28px rgb(0 0 0 / 0.05);
+
+	/* ---- Radius — 4px controls, 6px panels ----------------------------- */
+	--tm-radius-xs: 2px;
+	--tm-radius-sm: 4px; /* controls */
+	--tm-radius-md: 6px; /* panels, dialogs, menus */
+	--tm-radius-lg: 8px;
+	--tm-radius-xl: 12px;
+	--tm-radius-2xl: 16px;
+	--tm-radius-full: 999px;
+
+	/* ---- Focus --------------------------------------------------------- */
+	--tm-ring-color: rgb(5 145 255 / 0.1);
+	--tm-ring: 0 0 0 3px var(--tm-ring-color);
+	--tm-ring-danger: 0 0 0 3px rgb(255 38 5 / 0.06);
+
+	/* ---- Motion -------------------------------------------------------- */
+	--tm-ease: cubic-bezier(0.645, 0.045, 0.355, 1);
+	--tm-dur-fast: 100ms;
+	--tm-dur: 200ms;
+
+	/* ---- Spacing — 4 / 8 / 12 / 16 / 24 -------------------------------- */
+	--tm-space-1: 4px;
+	--tm-space-2: 8px;
+	--tm-space-3: 12px;
+	--tm-space-4: 16px;
+	--tm-space-5: 24px;
+	--tm-space-6: 32px;
+
+	/* ---- Dimensions — comfortable is the default ----------------------- */
+	--tm-control-h: 32px;
+	--tm-control-h-sm: 24px;
+	--tm-row-h: 36px;
+	--tm-navbar-h: 48px;
+	--tm-sidebar-w: 216px;
+
+	/* ---- Navy sidebar (design rail) ------------------------------------- */
+	--tm-sidebar-bg: #0f1b3d;
+	--tm-sidebar-bg-raised: #14224a;
+	--tm-sidebar-bg-hover: rgb(255 255 255 / 0.06);
+	--tm-sidebar-bg-active: rgb(255 255 255 / 0.12);
+	--tm-sidebar-border: rgb(255 255 255 / 0.08);
+	--tm-sidebar-text: rgb(255 255 255 / 0.78);
+	--tm-sidebar-text-strong: #ffffff;
+	--tm-sidebar-text-muted: rgb(255 255 255 / 0.45);
+	--tm-sidebar-accent: var(--tm-brand-500);
+	--tm-sidebar-w-rail: 56px;
+}
+
+/* Radius presets keep the 4px control / 6px panel relationship. */
+#{$tm-on}[data-tm-radius="sharp"] {
+	--tm-radius-xs: 0;
+	--tm-radius-sm: 2px;
+	--tm-radius-md: 3px;
+	--tm-radius-lg: 4px;
+	--tm-radius-xl: 6px;
+	--tm-radius-2xl: 8px;
+}
+
+#{$tm-on}[data-tm-radius="round"] {
+	--tm-radius-xs: 4px;
+	--tm-radius-sm: 6px;
+	--tm-radius-md: 10px;
+	--tm-radius-lg: 14px;
+	--tm-radius-xl: 18px;
+	--tm-radius-2xl: 24px;
+}
+
+/* Density changes dimensions only — never font size below the readable floor,
+ * never zoom or transforms (DESIGN_CONTRACT.md §6). */
+#{$tm-on}[data-tm-density="compact"] {
+	--tm-control-h: 28px;
+	--tm-control-h-sm: 22px;
+	--tm-row-h: 32px;
+	--tm-navbar-h: 44px;
+}

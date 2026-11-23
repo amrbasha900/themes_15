@@ -1,0 +1,207 @@
+/* Buttons — action hierarchy.
+ * Native source: frappe/public/scss/common/buttons.scss
+ *
+ * The contract is: ONE primary accent, neutral default actions, explicit
+ * danger. The previous revision coloured every default/secondary button from a
+ * `--tm-secondary-*` scale that existed only if runtime JS had already run, and
+ * forced all of it with !important (FRAPPE_UI_MAP.md §5 finding 4). That scale
+ * is gone; default actions are neutral, as the contract requires. */
+
+#{$tm-on} {
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--tm-space-2);
+		height: var(--tm-control-h);
+		padding-inline: var(--tm-space-3);
+		border: 1px solid transparent;
+		border-radius: var(--tm-radius-sm);
+		font-size: var(--tm-text-sm);
+		font-weight: var(--tm-weight-regular);
+		line-height: 1;
+		white-space: nowrap;
+		box-shadow: none;
+		transition: background-color var(--tm-dur-fast) var(--tm-ease),
+			border-color var(--tm-dur-fast) var(--tm-ease), color var(--tm-dur-fast) var(--tm-ease);
+
+		&:focus-visible {
+			box-shadow: var(--tm-ring);
+		}
+
+	}
+
+	/* Primary — the single accent. */
+	.btn.btn-primary {
+		background-color: var(--tm-action-primary);
+		border-color: var(--tm-action-primary);
+		color: var(--tm-action-primary-text);
+		font-weight: var(--tm-weight-regular);
+
+		&:hover:not([disabled]) {
+			background-color: var(--tm-action-primary-hover);
+			border-color: var(--tm-action-primary-hover);
+			color: var(--tm-action-primary-text);
+		}
+
+		&:active:not([disabled]) {
+			background-color: var(--tm-action-primary-active);
+			border-color: var(--tm-action-primary-active);
+		}
+	}
+
+	/* Default + secondary — neutral outline. Accent appears only on hover, as a
+	 * hint of affordance, not as a second brand colour. */
+	.btn.btn-default,
+	.btn.btn-secondary {
+		background-color: var(--tm-action-default-bg);
+		border-color: var(--tm-action-default-border);
+		color: var(--tm-action-default-text);
+
+		&:hover:not([disabled]) {
+			background-color: var(--tm-action-default-hover-bg);
+			border-color: var(--tm-action-default-hover-border);
+			color: var(--tm-action-primary-fg);
+		}
+
+		&:active:not([disabled]) {
+			background-color: var(--tm-action-default-active-bg);
+			border-color: var(--tm-action-primary-active);
+			color: var(--tm-action-primary-active);
+		}
+	}
+
+	/* Danger — explicit semantics, never reused for emphasis. */
+	.btn.btn-danger {
+		background-color: var(--tm-action-danger);
+		border-color: var(--tm-action-danger);
+		color: var(--tm-white);
+
+		&:hover:not([disabled]) {
+			background-color: var(--tm-action-danger-hover);
+			border-color: var(--tm-action-danger-hover);
+			color: var(--tm-white);
+		}
+
+		&:active:not([disabled]) {
+			background-color: var(--tm-action-danger-active);
+			border-color: var(--tm-action-danger-active);
+		}
+
+		&:focus-visible {
+			box-shadow: var(--tm-ring-danger);
+		}
+	}
+
+	/* Subtle / link-weight actions. Native .btn-primary-light is Frappe's tinted
+	 * accent button (common/buttons.scss:55). */
+	.btn.btn-primary-light {
+		background-color: var(--tm-brand-50);
+		border-color: transparent;
+		color: var(--tm-action-primary-fg);
+
+		&:hover:not([disabled]) {
+			background-color: var(--tm-brand-100);
+			color: var(--tm-action-primary-active);
+		}
+	}
+
+	.btn.btn-secondary-dark {
+		background-color: var(--tm-gray-800);
+		border-color: var(--tm-gray-800);
+		color: var(--tm-white);
+
+		&:hover:not([disabled]) {
+			background-color: var(--tm-gray-900);
+			border-color: var(--tm-gray-900);
+		}
+	}
+
+	/* Icon-only and reset buttons keep the control height so they align with
+	 * inputs and text buttons on the same row. */
+	.btn.btn-reset,
+	.btn.icon-btn {
+		background-color: transparent;
+		border-color: transparent;
+		color: var(--tm-text-2);
+		padding-inline: var(--tm-space-2);
+
+		&:hover:not([disabled]) {
+			background-color: var(--tm-surface-hover);
+			color: var(--tm-text);
+		}
+	}
+
+	/* Small variant — used inside grids, list toolbars and dialogs. */
+	.btn.btn-xs,
+	.btn-group-xs > .btn {
+		height: var(--tm-control-h-sm);
+		padding-inline: var(--tm-space-2);
+		font-size: var(--tm-text-xs);
+		border-radius: var(--tm-radius-sm);
+	}
+
+	.btn.btn-sm {
+		height: var(--tm-control-h-sm);
+		padding-inline: var(--tm-space-2);
+		font-size: var(--tm-text-sm);
+	}
+
+	/* Split / dropdown groups: inner corners square, outer corners rounded, and a
+	 * single shared border so the seam does not double up. Logical properties keep
+	 * this correct in RTL. */
+	.btn-group {
+		> .btn {
+			border-radius: 0;
+
+			&:first-child {
+				border-start-start-radius: var(--tm-radius-sm);
+				border-end-start-radius: var(--tm-radius-sm);
+			}
+
+			&:last-child {
+				border-start-end-radius: var(--tm-radius-sm);
+				border-end-end-radius: var(--tm-radius-sm);
+			}
+
+			&:not(:first-child) {
+				margin-inline-start: -1px;
+			}
+
+			&:hover,
+			&:focus-visible {
+				z-index: 1; /* keep the active border above its neighbour */
+			}
+		}
+	}
+
+	/* Page-level primary action. Native: scss/desk/page.scss `.page-actions`. */
+	.page-actions {
+		.btn {
+			height: var(--tm-control-h);
+		}
+	}
+
+	/* ---- Disabled -------------------------------------------------------------
+	 * Declared LAST on purpose. `.btn[disabled]` and `.btn.btn-primary` have the
+	 * same specificity (0,2,0), so whichever comes later wins. Placing this after
+	 * every variant makes a disabled primary actually look disabled without
+	 * reaching for !important — the cascade does the work.
+	 *
+	 * Verified by tests/css/contract.test.js ("buttons: disabled is inert"), which
+	 * caught this exact ordering bug. */
+	.btn[disabled],
+	.btn.disabled,
+	.btn[disabled]:hover,
+	.btn.disabled:hover {
+		background-color: var(--tm-surface-disabled);
+		border-color: var(--tm-border-strong);
+		color: var(--tm-text-disabled);
+		cursor: not-allowed;
+		/* Full opacity: the colours already say "disabled". Fading instead would
+		 * also fade the label below its contrast floor. */
+		opacity: 1;
+		box-shadow: none;
+	}
+
+}

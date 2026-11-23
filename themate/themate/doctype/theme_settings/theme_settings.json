@@ -1,0 +1,565 @@
+{
+ "actions": [],
+ "creation": "2026-06-11 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "brand_tab",
+  "app_name",
+  "brand_color",
+  "accent_preset",
+  "app_logo",
+  "app_logo_dark",
+  "favicon",
+  "appearance_tab",
+  "font_family",
+  "font_size",
+  "text_styles",
+  "radius_preset",
+  "density",
+  "default_mode",
+  "charts_section",
+  "chart_engine",
+  "chart_detail",
+  "chart_palette",
+  "chart_colors",
+  "icons_tab",
+  "icon_style",
+  "icon_stroke",
+  "icon_size",
+  "icon_color",
+  "navbar_tab",
+  "show_language_switcher",
+  "navbar_languages",
+  "show_customizer_button",
+  "whitelabel_tab",
+  "whitelabel",
+  "forms_tab",
+  "item_layout",
+  "activity_display",
+  "form_panel_side",
+  "calendar_tab",
+  "calendar_weekend_section",
+  "weekend_sunday",
+  "weekend_monday",
+  "weekend_tuesday",
+  "weekend_wednesday",
+  "column_break_calendar_weekend",
+  "weekend_thursday",
+  "weekend_friday",
+  "weekend_saturday",
+  "calendar_look_section",
+  "calendar_shade_weekend",
+  "calendar_layouts_html",
+  "layout_flags_tab",
+  "enable_theme",
+  "enable_sidebar",
+  "enable_navbar_restyle",
+  "enable_list_restyle",
+  "enable_form_restyle",
+  "sidebar_tab",
+  "default_workspace",
+  "show_workspace_icons",
+  "sidebar_default",
+  "sidebar_theme",
+  "sidebar_bg",
+  "sidebar_art",
+  "sidebar_art_colors",
+  "sidebar_groups",
+  "sidebar_hidden_groups",
+  "sidebar_group_order",
+  "sidebar_outside_departments",
+  "sidebar_show_my_workspaces",
+  "sidebar_show_user_card",
+  "hide_workspace_shortcuts",
+  "login_tab",
+  "login_layout",
+  "login_background",
+  "login_tagline"
+ ],
+ "fields": [
+  {
+   "fieldname": "brand_tab",
+   "fieldtype": "Tab Break",
+   "label": "Brand"
+  },
+  {
+   "fieldname": "app_name",
+   "fieldtype": "Data",
+   "label": "App Name",
+   "description": "The wordmark next to the logo in the sidebar and on the login page. Blank uses System Settings > App Name."
+  },
+  {
+   "default": "#1677ff",
+   "fieldname": "brand_color",
+   "fieldtype": "Color",
+   "label": "Brand Color"
+  },
+  {
+   "default": "Blue",
+   "fieldname": "accent_preset",
+   "fieldtype": "Select",
+   "label": "Accent Preset",
+   "options": "Blue\nIndigo\nViolet\nTeal\nCustom",
+   "description": "Picking a preset sets Brand Color; editing Brand Color switches this to Custom."
+  },
+  {
+   "fieldname": "app_logo",
+   "fieldtype": "Attach Image",
+   "label": "App Logo"
+  },
+  {
+   "fieldname": "app_logo_dark",
+   "fieldtype": "Attach Image",
+   "label": "App Logo Dark"
+  },
+  {
+   "fieldname": "favicon",
+   "fieldtype": "Attach Image",
+   "label": "Favicon"
+  },
+  {
+   "fieldname": "appearance_tab",
+   "fieldtype": "Tab Break",
+   "label": "Appearance"
+  },
+  {
+   "default": "Inter",
+   "fieldname": "font_family",
+   "fieldtype": "Select",
+   "label": "Font Family",
+   "options": "Inter\nCairo\nSystem"
+  },
+  {
+   "fieldname": "font_size",
+   "fieldtype": "Int",
+   "label": "Base Font Size (px)",
+   "default": "14",
+   "description": "Site-wide default, 11–20. Every user can set their own from the Theme Customizer."
+  },
+  {
+   "fieldname": "text_styles",
+   "fieldtype": "Small Text",
+   "label": "Text Styles (JSON)",
+   "description": "Site defaults written by the Theme Customizer (\"Save as site default\"). Per element: size, weight, italic, color."
+  },
+  {
+   "default": "Default",
+   "fieldname": "radius_preset",
+   "fieldtype": "Select",
+   "label": "Radius Preset",
+   "options": "Sharp\nDefault\nRound"
+  },
+  {
+   "default": "Comfortable",
+   "fieldname": "density",
+   "fieldtype": "Select",
+   "label": "Density",
+   "options": "Comfortable\nCompact"
+  },
+  {
+   "default": "Light",
+   "fieldname": "default_mode",
+   "fieldtype": "Select",
+   "label": "Default Mode",
+   "options": "Light\nDark\nAuto"
+  },
+  {
+   "fieldname": "charts_section",
+   "fieldtype": "Section Break",
+   "label": "Charts"
+  },
+  {
+   "fieldname": "chart_engine",
+   "fieldtype": "Select",
+   "label": "Chart Engine",
+   "options": "ECharts\nFrappe Charts",
+   "default": "ECharts",
+   "description": "ECharts (Apache-2.0) renders bar, line, pie, donut, percentage and mixed charts with the theme's colours, fonts and capped bar widths; it is loaded only on pages that draw a chart (≈205 KB gzip once). Heatmaps always use Frappe Charts."
+  },
+  {
+   "fieldname": "chart_detail",
+   "fieldtype": "Select",
+   "label": "Chart Detail",
+   "options": "Rich\nSimple",
+   "default": "Rich",
+   "depends_on": "eval:doc.chart_engine != 'Frappe Charts'",
+   "description": "Rich: gradient bars with value labels, smooth area lines with average line and peak marker, a toolbox (bar/line switch, reset, save as image), data zoom on long series, donut centre total and percentages in the legend. Simple: flat fills and none of the extras."
+  },
+  {
+   "fieldname": "chart_palette",
+   "fieldtype": "Select",
+   "label": "Chart Palette",
+   "options": "Brand\nOcean\nSunset\nForest\nSlate\nPastel\nCustom",
+   "default": "Brand",
+   "description": "Series colours for every chart and widget. Brand starts from the brand colour; Custom uses the eight colours below. Users may pick their own in the Theme Customizer."
+  },
+  {
+   "fieldname": "chart_colors",
+   "fieldtype": "Data",
+   "label": "Custom Chart Colours",
+   "depends_on": "eval:doc.chart_palette == 'Custom'",
+   "description": "Eight hex colours, comma separated, e.g. #1677ff,#13c2c2,#faad14,#722ed1,#52c41a,#eb2f96,#fa8c16,#2f54eb"
+  },
+  {
+   "fieldname": "icons_tab",
+   "fieldtype": "Tab Break",
+   "label": "Icons"
+  },
+  {
+   "fieldname": "icon_style",
+   "fieldtype": "Select",
+   "label": "Icon Style",
+   "options": "Duotone\nOutline",
+   "default": "Duotone",
+   "description": "Themate Business icons: Duotone adds a tinted layer behind the line work."
+  },
+  {
+   "fieldname": "icon_stroke",
+   "fieldtype": "Select",
+   "label": "Icon Weight",
+   "options": "Light\nRegular\nBold",
+   "default": "Regular"
+  },
+  {
+   "fieldname": "icon_size",
+   "fieldtype": "Int",
+   "label": "Icon Size (px)",
+   "default": "18",
+   "description": "Sidebar and workspace icons, 12–28."
+  },
+  {
+   "fieldname": "icon_color",
+   "fieldtype": "Select",
+   "label": "Icon Color",
+   "options": "Inherit\nBrand",
+   "default": "Inherit",
+   "description": "Inherit follows the text next to the icon; Brand paints every Themate icon in the brand color."
+  },
+  {
+   "fieldname": "navbar_tab",
+   "fieldtype": "Tab Break",
+   "label": "Navbar"
+  },
+  {
+   "fieldname": "show_language_switcher",
+   "fieldtype": "Check",
+   "label": "Show Language Switcher",
+   "default": "1",
+   "description": "A language menu in the navbar, next to the user menu. Switching sets the user's language and reloads."
+  },
+  {
+   "fieldname": "navbar_languages",
+   "fieldtype": "Table",
+   "label": "Languages",
+   "options": "Themate Navbar Language",
+   "depends_on": "show_language_switcher",
+   "description": "Empty means English and Arabic."
+  },
+  {
+   "fieldname": "show_customizer_button",
+   "fieldtype": "Check",
+   "label": "Show Theme Customizer Button",
+   "default": "1",
+   "description": "A palette button in the navbar that opens the Theme Customizer. The user menu entry is always there."
+  },
+  {
+   "fieldname": "whitelabel_tab",
+   "fieldtype": "Tab Break",
+   "label": "Whitelabel"
+  },
+  {
+   "fieldname": "whitelabel",
+   "fieldtype": "Check",
+   "label": "Whitelabel",
+   "default": "1",
+   "description": "Removes every Frappe / ERPNext reference from the desk: Help menu keeps only Keyboard Shortcuts; the Apps item, marketing banners in list sidebars, documentation and tutorial links, \"Learn …\" shortcuts, About dialog are hidden; links to frappe.io, erpnext.com, frappecloud.com, github.com/frappe and YouTube are hidden everywhere. On migrate: the standard email footer is disabled, the website footer's \"Powered by\" is replaced by the App Name, and System / Website Settings App Name are set to it when still \"Frappe\"."
+  },
+  {
+   "fieldname": "forms_tab",
+   "fieldtype": "Tab Break",
+   "label": "Forms"
+  },
+  {
+   "fieldname": "item_layout",
+   "fieldtype": "Check",
+   "label": "Item: Basic Information / Stock & Valuation sections",
+   "default": "1",
+   "description": "Adds two section breaks to the Item form (custom fields tm_basic_information_section and tm_stock_valuation_section) so the Details tab reads as Basic Information, Stock & Valuation, Description, Units of Measure. No field is hidden, moved between tabs, or changed. Turn off and migrate to remove them."
+  },
+  {
+   "default": "Dialog",
+   "fieldname": "activity_display",
+   "fieldtype": "Select",
+   "label": "Activity Display",
+   "options": "Dialog\nInline",
+   "description": "Where a record's comments and timeline show. Dialog: a button with a count in the page head opens them. Inline: under the form, as in stock Frappe. Users can choose their own in the Theme Customizer."
+  },
+  {
+   "default": "Auto",
+   "fieldname": "form_panel_side",
+   "fieldtype": "Select",
+   "label": "Form Side Panel",
+   "options": "Auto\nLeft\nRight",
+   "description": "Which side of the screen a record's side panel (overview, assignments, attachments, tags, share) sits on. Auto: the end of the line, so right in English and left in Arabic. Users can choose their own in the Theme Customizer."
+  },
+  {
+   "fieldname": "layout_flags_tab",
+   "fieldtype": "Tab Break",
+   "label": "Layout Flags"
+  },
+  {
+   "default": "1",
+   "description": "Turn the entire theme off — its stylesheets, the sidebar, the restyled pages and every script that rebuilds them — leaving the original Frappe desk. Use this to rule the theme in or out when diagnosing a UI problem. Each user can still choose for themselves (Theme Customizer > Themate Theme, or Themate User Preference). The per-area switches below only remove structure of one area; they do not bring back Frappe's own look.",
+   "fieldname": "enable_theme",
+   "fieldtype": "Check",
+   "label": "Enable Theme"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_sidebar",
+   "fieldtype": "Check",
+   "label": "Enable Sidebar"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_navbar_restyle",
+   "fieldtype": "Check",
+   "label": "Enable Navbar Restyle"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_list_restyle",
+   "fieldtype": "Check",
+   "label": "Enable List Restyle"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_form_restyle",
+   "fieldtype": "Check",
+   "label": "Enable Form Restyle"
+  },
+  {
+   "fieldname": "sidebar_tab",
+   "fieldtype": "Tab Break",
+   "label": "Sidebar"
+  },
+  {
+   "fieldname": "default_workspace",
+   "fieldtype": "Link",
+   "label": "Default Workspace",
+   "options": "Workspace"
+  },
+  {
+   "default": "1",
+   "fieldname": "show_workspace_icons",
+   "fieldtype": "Check",
+   "label": "Show Workspace Icons"
+  },
+  {
+   "default": "Expanded",
+   "fieldname": "sidebar_default",
+   "fieldtype": "Select",
+   "label": "Sidebar Default",
+   "options": "Expanded\nRail"
+  },
+  {
+   "fieldname": "sidebar_theme",
+   "fieldtype": "Select",
+   "label": "Sidebar Theme",
+   "options": "Dark\nLight",
+   "default": "Dark",
+   "description": "Dark is the navy rail from the design; Light matches the page surface."
+  },
+  {
+   "fieldname": "sidebar_bg",
+   "fieldtype": "Color",
+   "label": "Sidebar Background",
+   "depends_on": "eval:doc.sidebar_theme != 'Light'",
+   "description": "Navy by default (#0f1b3d). Hover, active and raised tones are derived from it."
+  },
+  {
+   "fieldname": "sidebar_art",
+   "fieldtype": "Select",
+   "label": "Sidebar Background Image",
+   "options": "On\nOff",
+   "default": "On",
+   "depends_on": "eval:doc.sidebar_theme != 'Light'",
+   "description": "Flowing ribbons behind the dark sidebar. Users may pick their own in the Theme Customizer."
+  },
+  {
+   "fieldname": "sidebar_art_colors",
+   "fieldtype": "Data",
+   "label": "Background Image Colours",
+   "depends_on": "eval:doc.sidebar_art != 'Off' && doc.sidebar_theme != 'Light'",
+   "description": "Five hex colours, comma separated: background top, background bottom, wave dark, wave light, glow. Blank follows Sidebar Background."
+  },
+  {
+   "fieldname": "sidebar_groups",
+   "fieldtype": "Table",
+   "label": "Groups and Hidden Items",
+   "options": "Themate Sidebar Group",
+   "description": "Optional. A row assigns a workspace to a sidebar section, or hides it (tick Hide). A child workspace (Recruitment under HR) with its own row, or whose parent is hidden, shows on its own in that section. Without rows: Home under Workspace, operational modules (Accounts, Buying, Selling, Stock, Assets, Manufacturing, Quality, Projects, Support, HR, Payroll) under Operations, everything else under Administration."
+  },
+  {
+   "fieldname": "sidebar_hidden_groups",
+   "fieldtype": "Data",
+   "label": "Hidden Groups",
+   "description": "Sidebar sections to leave out entirely, comma separated, e.g. Administration, Governance. Matches the section title."
+  },
+  {
+   "fieldname": "sidebar_group_order",
+   "fieldtype": "Small Text",
+   "label": "Group Order",
+   "description": "Sidebar sections top to bottom, one per line, e.g. Workspace / Operations / Governance / Setup. Sections not listed follow in their usual order (Workspace, My Workspaces, Operations, Administration, then the custom ones). Matches the section title."
+  },
+  {
+   "fieldname": "sidebar_outside_departments",
+   "fieldtype": "Select",
+   "label": "Workspaces Outside Departments",
+   "options": "Show in their groups\nHide",
+   "default": "Show in their groups",
+   "description": "Departments are set in the Themate Department list. For someone who has departments: Show in their groups keeps the workspaces no department lists in their usual groups below; Hide leaves them out of the sidebar (still reachable by URL and search)."
+  },
+  {
+   "fieldname": "sidebar_show_my_workspaces",
+   "fieldtype": "Check",
+   "label": "Show My Workspaces",
+   "default": 1,
+   "description": "The section with the user's private workspaces and the + that creates one."
+  },
+  {
+   "fieldname": "sidebar_show_user_card",
+   "fieldtype": "Check",
+   "label": "Show User Card",
+   "default": 1,
+   "description": "Name, email and Log out at the bottom of the sidebar. The collapse control stays."
+  },
+  {
+   "fieldname": "hide_workspace_shortcuts",
+   "fieldtype": "Check",
+   "label": "Hide Workspace Shortcuts",
+   "default": "0",
+   "description": "Workspaces show number cards, then charts, then shortcuts, then link groups. Tick to drop the shortcuts row entirely."
+  },
+  {
+   "fieldname": "login_tab",
+   "fieldtype": "Tab Break",
+   "label": "Login"
+  },
+  {
+   "default": "Centered",
+   "fieldname": "login_layout",
+   "fieldtype": "Select",
+   "label": "Login Layout",
+   "options": "Centered\nSplit"
+  },
+  {
+   "fieldname": "login_background",
+   "fieldtype": "Attach Image",
+   "label": "Login Background"
+  },
+  {
+   "fieldname": "login_tagline",
+   "fieldtype": "Data",
+   "label": "Login Tagline"
+  },
+  {
+   "fieldname": "calendar_tab",
+   "fieldtype": "Tab Break",
+   "label": "Calendar"
+  },
+  {
+   "fieldname": "calendar_weekend_section",
+   "fieldtype": "Section Break",
+   "label": "Weekend",
+   "description": "The days every calendar shades as the weekend and hides with its Hide Weekends button. The week starts on the day set in System Settings > First Day of the Week. A calendar can have a weekend of its own in its Calendar Layout."
+  },
+  {
+   "fieldname": "weekend_sunday",
+   "fieldtype": "Check",
+   "label": "Sunday",
+   "default": "0"
+  },
+  {
+   "fieldname": "weekend_monday",
+   "fieldtype": "Check",
+   "label": "Monday",
+   "default": "0"
+  },
+  {
+   "fieldname": "weekend_tuesday",
+   "fieldtype": "Check",
+   "label": "Tuesday",
+   "default": "0"
+  },
+  {
+   "fieldname": "weekend_wednesday",
+   "fieldtype": "Check",
+   "label": "Wednesday",
+   "default": "0"
+  },
+  {
+   "fieldname": "column_break_calendar_weekend",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "weekend_thursday",
+   "fieldtype": "Check",
+   "label": "Thursday",
+   "default": "0"
+  },
+  {
+   "fieldname": "weekend_friday",
+   "fieldtype": "Check",
+   "label": "Friday",
+   "default": "1"
+  },
+  {
+   "fieldname": "weekend_saturday",
+   "fieldtype": "Check",
+   "label": "Saturday",
+   "default": "1"
+  },
+  {
+   "fieldname": "calendar_look_section",
+   "fieldtype": "Section Break",
+   "label": "Look"
+  },
+  {
+   "fieldname": "calendar_shade_weekend",
+   "fieldtype": "Check",
+   "label": "Shade Weekend Days",
+   "default": "1",
+   "description": "Hatch the weekend columns so a working day and a day off read differently at a glance."
+  },
+  {
+   "fieldname": "calendar_layouts_html",
+   "fieldtype": "HTML",
+   "label": "Event Layouts"
+  }
+ ],
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-11-06 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Themate",
+ "name": "Theme Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,2213 @@
+/*! rtl:begin:ignore */
+/* Formerly public/css/modern_sidebar.css. Bundled into themate.bundle.css as its LAST import (so it still wins the
+ * cascade over the token layer, exactly as the separate <link> did) and
+ * therefore content-hashed. This file mirrors itself with explicit
+ * [dir="ltr"] / [dir="rtl"] rules, so Frappe's rtlcss pass must leave it
+ * alone — hence the begin/end:ignore directives wrapping the whole file. */
+:root {
+    /* Common Variables - These will be inherited by all themes */
+
+    /* Dimensions — re-pointed at the shared Themate tokens so the sidebar,
+       the navbar and the content offsets move together. Fallbacks keep this
+       file standalone if the bundle ever fails to load. */
+    --sidebar-width: var(--tm-sidebar-w, 224px);
+    --sidebar-collapsed-width: var(--tm-sidebar-w-rail, 56px);
+    --sidebar-header-height: var(--tm-navbar-h, 48px);
+    --sidebar-item-padding: 7px var(--tm-space-3, 12px);
+    --sidebar-item-padding-collapsed: 7px 0;
+    --sidebar-border-radius: var(--tm-radius-sm, 4px);
+
+    /* Transitions */
+    /* width (expand / collapse) and transform (mobile drawer) only: `all`
+     * also animated the background, so the sidebar faded between colours
+     * whenever a theme or brand value landed after it was drawn */
+    --sidebar-transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --sidebar-item-transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+
+    /* Scrollbar */
+    --sidebar-scrollbar-width: 3px;
+
+    /* Typography */
+    --sidebar-font-size: var(--tm-text-sm, 13px);
+    --sidebar-child-font-size: var(--tm-text-sm, 13px);
+    --sidebar-section-font-size: var(--tm-text-xs, 12px);
+    --sidebar-icon-size: var(--tm-icon-size, 18px);
+    --sidebar-icon-size-collapsed: calc(var(--tm-icon-size, 18px) + 2px);
+
+    /* Spacing (the SaaS skin at the end of this file sets the values in
+       force, and the theme's density tightens them) */
+    --sidebar-section-spacing: 14px;
+    --sidebar-section-title-padding: 6px 16px 2px;
+    --sidebar-item-gap: 2px;
+    --sidebar-item-margin: 2px var(--tm-space-2, 8px);
+    --sidebar-children-indent: 6px;
+}
+
+/* Default Theme (Dark) */
+:root,
+[data-theme="dark"] {
+    /* Color System */
+    --sidebar-bg: var(--tm-surface, #141414);
+    --sidebar-header-bg: var(--tm-surface, #141414);
+    --sidebar-border-color: var(--tm-border, rgba(255, 255, 255, 0.08));
+    --sidebar-hover-bg: var(--tm-surface-hover, rgba(255, 255, 255, 0.06));
+    --sidebar-active-bg: var(--tm-surface-selected, rgba(22, 104, 220, 0.16));
+    --sidebar-active-bg-collapsed: var(--tm-surface-selected, rgba(22, 104, 220, 0.2));
+    --sidebar-shadow: none;
+    --sidebar-submenu-bg: var(--tm-surface-raised, #1f1f1f);
+    --sidebar-tooltip-bg: #ffffff;
+    --sidebar-tooltip-shadow: rgba(255, 255, 255, 0.8);
+    --sidebar-tooltip-border-color: #ffffff;
+
+    /* Text Colors */
+    --sidebar-navbar: var(--tm-text, #ffffff);
+    --sidebar-text: var(--tm-text-2, rgba(255, 255, 255, 0.65));
+    --sidebar-text-hover: var(--tm-text, rgba(255, 255, 255, 0.85));
+    --sidebar-text-muted: var(--tm-text-3, rgba(255, 255, 255, 0.45));
+    --sidebar-icon-color: var(--tm-text-2, rgba(255, 255, 255, 0.65));
+    --sidebar-tooltip-text: var(--tm-text-inverse, #141414);
+
+    /* Accent Colors — the single theme accent. */
+    --sidebar-primary: var(--tm-action-primary, #1668dc);
+    --sidebar-primary-hover: var(--tm-action-primary-active, #3c89e8);
+    --sidebar-active-indicator: var(--sidebar-primary);
+
+    /* Scrollbar Theme Colors */
+    --sidebar-scrollbar-thumb: rgba(180, 180, 180, 0.2);
+    --sidebar-scrollbar-thumb-hover: rgba(180, 180, 180, 0.35);
+
+    /* Icons */
+    --sidebar-icon-fill: transparent;
+    --sidebar-icon-stroke: #012955;
+}
+
+/* Light Theme — colours re-pointed at the shared Themate tokens. This is the
+   block that actually applies on a light Desk, because frappe/www/app.html
+   server-renders <html data-theme="light">. Literal fallbacks are retained so
+   the file still renders sensibly on its own. */
+[data-theme="light"] {
+    /* Color System */
+    --sidebar-bg: var(--tm-surface, #ffffff);
+    --sidebar-header-bg: var(--tm-surface, #ffffff);
+    --sidebar-border-color: var(--tm-border, #f0f0f0);
+    --sidebar-hover-bg: var(--tm-surface-hover, #fafafa);
+    --sidebar-active-bg: var(--tm-surface-selected, #e6f4ff);
+    --sidebar-active-bg-collapsed: var(--tm-surface-selected, #e6f4ff);
+    --sidebar-shadow: none;
+    --sidebar-submenu-bg: var(--tm-surface, #ffffff);
+    --sidebar-tooltip-bg: var(--tm-gray-800, #262626);
+    --sidebar-tooltip-shadow: rgba(0, 0, 0, 0.7);
+    --sidebar-tooltip-border-color: var(--tm-gray-800, #262626);
+
+    /* Text Colors */
+    --sidebar-navbar: var(--tm-text, #1f1f1f);
+    --sidebar-text: var(--tm-text-2, #595959);
+    --sidebar-text-hover: var(--tm-text, #1f1f1f);
+    --sidebar-text-muted: var(--tm-text-3, #8c8c8c);
+    --sidebar-icon-color: var(--tm-text-2, #595959);
+    --sidebar-tooltip-text: var(--tm-white, #ffffff);
+
+    /* Accent Colors — the single theme accent, not a second blue. */
+    --sidebar-primary: var(--tm-action-primary, #1677ff);
+    --sidebar-primary-hover: var(--tm-action-primary-active, #0958d9);
+    --sidebar-active-indicator: var(--sidebar-primary);
+
+    /* Scrollbar Theme Colors */
+    --sidebar-scrollbar-thumb: var(--tm-gray-200, #d9d9d9);
+    --sidebar-scrollbar-thumb-hover: var(--tm-gray-300, #bfbfbf);
+
+    /* Icons */
+    --sidebar-icon-fill: transparent;
+    --sidebar-icon-stroke: var(--tm-text-2, #595959);
+}
+
+/* Blue Theme */
+[data-theme="blue"] {
+    /* Color System */
+    --sidebar-bg: #1a2b4d;
+    --sidebar-header-bg: rgba(0, 0, 0, 0.15);
+    --sidebar-border-color: rgba(255, 255, 255, 0.05);
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
+    --sidebar-active-bg: rgba(66, 153, 225, 0.15);
+    --sidebar-active-bg-collapsed: rgba(66, 153, 225, 0.2);
+    --sidebar-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --sidebar-submenu-bg: #243860;
+
+    /* Text Colors */
+    --sidebar-navbar: #000;
+    --sidebar-text: rgba(255, 255, 255, 0.8);
+    --sidebar-text-hover: #ffffff;
+    --sidebar-text-muted: rgba(255, 255, 255, 0.5);
+    --sidebar-icon-color: rgba(255, 255, 255, 0.7);
+
+    /* Accent Colors */
+    --sidebar-primary: #4299e1;
+    --sidebar-primary-hover: #3182ce;
+    --sidebar-active-indicator: var(--sidebar-primary);
+
+    /* Scrollbar Theme Colors */
+    --sidebar-scrollbar-thumb: rgba(180, 180, 180, 0.25);
+    --sidebar-scrollbar-thumb-hover: rgba(180, 180, 180, 0.4);
+
+    /* Icons */
+    --sidebar-icon-fill: #db9703;
+    --sidebar-icon-stroke: #db9703;
+}
+
+/* Green Theme */
+[data-theme="green"] {
+    /* Color System */
+    --sidebar-bg: #1b3a2a;
+    --sidebar-header-bg: rgba(0, 0, 0, 0.15);
+    --sidebar-border-color: rgba(255, 255, 255, 0.05);
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
+    --sidebar-active-bg: rgba(72, 187, 120, 0.15);
+    --sidebar-active-bg-collapsed: rgba(72, 187, 120, 0.2);
+    --sidebar-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --sidebar-submenu-bg: #264835;
+
+    /* Text Colors */
+    --sidebar-navbar: #000;
+    --sidebar-text: rgba(255, 255, 255, 0.8);
+    --sidebar-text-hover: #ffffff;
+    --sidebar-text-muted: rgba(255, 255, 255, 0.5);
+    --sidebar-icon-color: rgba(255, 255, 255, 0.7);
+
+    /* Accent Colors */
+    --sidebar-primary: #48bb78;
+    --sidebar-primary-hover: #38a169;
+    --sidebar-active-indicator: var(--sidebar-primary);
+
+    /* Scrollbar Theme Colors */
+    --sidebar-scrollbar-thumb: rgba(180, 180, 180, 0.25);
+    --sidebar-scrollbar-thumb-hover: rgba(180, 180, 180, 0.4);
+}
+
+/* Indigo Theme */
+[data-theme="indigo"] {
+    /* Color System */
+    --sidebar-bg: #1e3a8a;
+    --sidebar-header-bg: rgba(0, 0, 0, 0.15);
+    --sidebar-border-color: rgba(255, 255, 255, 0.05);
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
+    --sidebar-active-bg: rgba(99, 102, 241, 0.15);
+    --sidebar-active-bg-collapsed: rgba(99, 102, 241, 0.2);
+    --sidebar-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --sidebar-submenu-bg: #1e40af;
+
+    /* Text Colors */
+    --sidebar-navbar: #000;
+    --sidebar-text: rgba(255, 255, 255, 0.8);
+    --sidebar-text-hover: #ffffff;
+    --sidebar-text-muted: rgba(255, 255, 255, 0.5);
+    --sidebar-icon-color: rgba(255, 255, 255, 0.7);
+
+    /* Accent Colors */
+    --sidebar-primary: #6366f1;
+    --sidebar-primary-hover: #4f46e5;
+    --sidebar-active-indicator: var(--sidebar-primary);
+
+    /* Scrollbar Theme Colors */
+    --sidebar-scrollbar-thumb: rgba(180, 180, 180, 0.25);
+    --sidebar-scrollbar-thumb-hover: rgba(180, 180, 180, 0.4);
+}
+
+/* Nature Theme */
+[data-theme="nature"] {
+    /* Color System */
+    --sidebar-bg: #2f3e2f;
+    --sidebar-header-bg: rgba(0, 0, 0, 0.12);
+    --sidebar-border-color: rgba(255, 255, 255, 0.05);
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
+    --sidebar-active-bg: rgba(148, 173, 140, 0.18);
+    --sidebar-active-bg-collapsed: rgba(148, 173, 140, 0.25);
+    --sidebar-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --sidebar-submenu-bg: #3a493a;
+
+    /* Text Colors */
+    --sidebar-navbar: #000;
+    --sidebar-text: rgba(255, 255, 255, 0.8);
+    --sidebar-text-hover: #ffffff;
+    --sidebar-text-muted: rgba(255, 255, 255, 0.5);
+    --sidebar-icon-color: rgba(255, 255, 255, 0.7);
+
+    /* Accent Colors */
+    --sidebar-primary: #94ad8c;
+    --sidebar-primary-hover: #7a9671;
+    --sidebar-active-indicator: var(--sidebar-primary);
+
+    /* Scrollbar Theme Colors */
+    --sidebar-scrollbar-thumb: rgba(180, 180, 180, 0.25);
+    --sidebar-scrollbar-thumb-hover: rgba(180, 180, 180, 0.4);
+}
+
+/* Vintage Theme */
+[data-theme="vintage"] {
+    /* Color System */
+    --sidebar-bg: #4a4439;
+    --sidebar-header-bg: rgba(0, 0, 0, 0.15);
+    --sidebar-border-color: rgba(255, 255, 255, 0.05);
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
+    --sidebar-active-bg: rgba(200, 170, 110, 0.15);
+    --sidebar-active-bg-collapsed: rgba(200, 170, 110, 0.2);
+    --sidebar-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --sidebar-submenu-bg: #5a5347;
+
+    /* Text Colors */
+    --sidebar-navbar: #000;
+    --sidebar-text: rgba(255, 255, 255, 0.8);
+    --sidebar-text-hover: #ffffff;
+    --sidebar-text-muted: rgba(255, 255, 255, 0.5);
+    --sidebar-icon-color: rgba(255, 255, 255, 0.7);
+
+    /* Accent Colors */
+    --sidebar-primary: #c8aa6e;
+    --sidebar-primary-hover: #b89c62;
+    --sidebar-active-indicator: var(--sidebar-primary);
+
+    /* Scrollbar Theme Colors */
+    --sidebar-scrollbar-thumb: rgba(180, 180, 180, 0.25);
+    --sidebar-scrollbar-thumb-hover: rgba(180, 180, 180, 0.4);
+}
+
+/* Ocean Theme */
+[data-theme="ocean"] {
+    /* Color System */
+    --sidebar-bg: #1a3b5d;
+    --sidebar-header-bg: rgba(0, 0, 0, 0.15);
+    --sidebar-border-color: rgba(255, 255, 255, 0.05);
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
+    --sidebar-active-bg: rgba(56, 178, 226, 0.15);
+    --sidebar-active-bg-collapsed: rgba(56, 178, 226, 0.2);
+    --sidebar-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --sidebar-submenu-bg: #234b76;
+
+    /* Text Colors */
+    --sidebar-navbar: #000;
+    --sidebar-text: rgba(255, 255, 255, 0.8);
+    --sidebar-text-hover: #ffffff;
+    --sidebar-text-muted: rgba(255, 255, 255, 0.5);
+    --sidebar-icon-color: rgba(255, 255, 255, 0.7);
+
+    /* Accent Colors */
+    --sidebar-primary: #38b2e2;
+    --sidebar-primary-hover: #0e9ed6;
+    --sidebar-active-indicator: var(--sidebar-primary);
+
+    /* Scrollbar Theme Colors */
+    --sidebar-scrollbar-thumb: rgba(180, 180, 180, 0.25);
+    --sidebar-scrollbar-thumb-hover: rgba(180, 180, 180, 0.4);
+}
+
+/* Nord Theme */
+[data-theme="nord"] {
+    /* Color System */
+    --sidebar-bg: #2e3440;
+    --sidebar-header-bg: rgba(0, 0, 0, 0.12);
+    --sidebar-border-color: rgba(255, 255, 255, 0.05);
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
+    --sidebar-active-bg: rgba(136, 192, 208, 0.15);
+    --sidebar-active-bg-collapsed: rgba(136, 192, 208, 0.2);
+    --sidebar-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --sidebar-submenu-bg: #3b4252;
+
+    /* Text Colors */
+    --sidebar-navbar: #000;
+    --sidebar-text: rgba(229, 233, 240, 0.85);
+    --sidebar-text-hover: #eceff4;
+    --sidebar-text-muted: rgba(229, 233, 240, 0.5);
+    --sidebar-icon-color: rgba(229, 233, 240, 0.7);
+
+    /* Accent Colors */
+    --sidebar-primary: #88c0d0;
+    --sidebar-primary-hover: #81a1c1;
+    --sidebar-active-indicator: var(--sidebar-primary);
+
+    /* Scrollbar Theme Colors */
+    --sidebar-scrollbar-thumb: rgba(180, 180, 180, 0.25);
+    --sidebar-scrollbar-thumb-hover: rgba(180, 180, 180, 0.4);
+}
+
+/* Purple Theme */
+[data-theme="purple"] {
+    /* Color System */
+    --sidebar-bg: #322659;
+    --sidebar-header-bg: rgba(0, 0, 0, 0.15);
+    --sidebar-border-color: rgba(255, 255, 255, 0.05);
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
+    --sidebar-active-bg: rgba(159, 122, 234, 0.15);
+    --sidebar-active-bg-collapsed: rgba(159, 122, 234, 0.2);
+    --sidebar-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --sidebar-submenu-bg: #44337a;
+
+    /* Text Colors */
+    --sidebar-navbar: #000;
+    --sidebar-text: rgba(255, 255, 255, 0.8);
+    --sidebar-text-hover: #ffffff;
+    --sidebar-text-muted: rgba(255, 255, 255, 0.5);
+    --sidebar-icon-color: rgba(255, 255, 255, 0.7);
+
+    /* Accent Colors */
+    --sidebar-primary: #9f7aea;
+    --sidebar-primary-hover: #805ad5;
+    --sidebar-active-indicator: var(--sidebar-primary);
+
+    /* Scrollbar Theme Colors */
+    --sidebar-scrollbar-thumb: rgba(180, 180, 180, 0.25);
+    --sidebar-scrollbar-thumb-hover: rgba(180, 180, 180, 0.4);
+}
+
+/* Rose Theme */
+[data-theme="rose"] {
+    /* Color System */
+    --sidebar-bg: #4a2c40;
+    --sidebar-header-bg: rgba(0, 0, 0, 0.15);
+    --sidebar-border-color: rgba(255, 255, 255, 0.05);
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.07);
+    --sidebar-active-bg: rgba(244, 114, 182, 0.15);
+    --sidebar-active-bg-collapsed: rgba(244, 114, 182, 0.2);
+    --sidebar-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    --sidebar-submenu-bg: #5c3751;
+
+    /* Text Colors */
+    --sidebar-navbar: #000;
+    --sidebar-text: rgba(255, 255, 255, 0.8);
+    --sidebar-text-hover: #ffffff;
+    --sidebar-text-muted: rgba(255, 255, 255, 0.5);
+    --sidebar-icon-color: rgba(255, 255, 255, 0.7);
+
+    /* Accent Colors */
+    --sidebar-primary: #f472b6;
+    --sidebar-primary-hover: #ec4899;
+    --sidebar-active-indicator: var(--sidebar-primary);
+
+    /* Scrollbar Theme Colors */
+    --sidebar-scrollbar-thumb: rgba(180, 180, 180, 0.25);
+    --sidebar-scrollbar-thumb-hover: rgba(180, 180, 180, 0.4);
+}
+
+/* High Contrast Theme */
+[data-theme="high-contrast"] {
+    /* Color System */
+    --sidebar-bg: #000000;
+    --sidebar-header-bg: #222;
+    --sidebar-border-color: rgba(255, 255, 255, 0.1);
+    --sidebar-hover-bg: rgba(255, 255, 255, 0.1);
+    --sidebar-active-bg: rgba(255, 255, 255, 0.15);
+    --sidebar-active-bg-collapsed: rgba(255, 255, 255, 0.2);
+    --sidebar-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    --sidebar-submenu-bg: #111;
+
+    /* Text Colors */
+    --sidebar-navbar: #fff;
+    --sidebar-text: rgba(255, 255, 255, 0.9);
+    --sidebar-text-hover: #ffffff;
+    --sidebar-text-muted: rgba(255, 255, 255, 0.6);
+    --sidebar-icon-color: rgba(255, 255, 255, 0.8);
+
+    /* Accent Colors */
+    --sidebar-primary: #ffffff;
+    --sidebar-primary-hover: #f0f0f0;
+    --sidebar-active-indicator: var(--sidebar-primary);
+
+    /* Scrollbar Theme Colors */
+    --sidebar-scrollbar-thumb: rgba(255, 255, 255, 0.3);
+    --sidebar-scrollbar-thumb-hover: rgba(255, 255, 255, 0.5);
+}
+
+/* Modern Sidebar Styles - LTR */
+[dir="ltr"] .modern-sidebar {
+    position: fixed;
+    top: 0px;
+    left: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    box-shadow: var(--sidebar-shadow);
+    z-index: 1021;
+    transition: var(--sidebar-transition);
+    overflow-y: auto;
+    border-right: 1px solid var(--sidebar-border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Modern Sidebar Styles - RTL */
+[dir="rtl"] .modern-sidebar {
+    position: fixed;
+    top: 0px;
+    right: 0;
+    bottom: 0;
+    width: var(--sidebar-width);
+    background-color: var(--sidebar-bg);
+    box-shadow: var(--sidebar-shadow);
+    z-index: 1021;
+    transition: var(--sidebar-transition);
+    overflow-y: auto;
+    border-left: 1px solid var(--sidebar-border-color);
+    display: flex;
+    flex-direction: column;
+}
+
+/* Custom scrollbar styling */
+.modern-sidebar::-webkit-scrollbar {
+    width: var(--sidebar-scrollbar-width);
+}
+
+.modern-sidebar::-webkit-scrollbar-track {
+    background: transparent;
+    margin: 2px 0;
+}
+
+.modern-sidebar::-webkit-scrollbar-thumb {
+    background-color: var(--sidebar-scrollbar-thumb);
+    border-radius: 10px;
+    transition: background-color 0.3s ease;
+}
+
+.modern-sidebar::-webkit-scrollbar-thumb:hover {
+    background-color: var(--sidebar-scrollbar-thumb-hover);
+}
+
+/* Firefox scrollbar */
+.modern-sidebar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--sidebar-scrollbar-thumb) transparent;
+}
+
+/* Container for our sidebar - LTR */
+[dir="ltr"] .modern-sidebar-container {
+    position: fixed;
+    top: 0px;
+    bottom: 0;
+    left: 0;
+    z-index: 1021;
+}
+
+/* Container for our sidebar - RTL */
+[dir="rtl"] .modern-sidebar-container {
+    position: fixed;
+    top: 0px;
+    bottom: 0;
+    right: 0;
+    z-index: 1021;
+}
+
+/* Collapsed state - LTR */
+[dir="ltr"] .modern-sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Collapsed state - RTL */
+[dir="rtl"] .modern-sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+.collapsed .toggle-children {
+    display: none;
+}
+
+/* Sidebar Header */
+.modern-sidebar-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--sidebar-border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--sidebar-header-height);
+    min-height: var(--sidebar-header-height);
+    background-color: var(--sidebar-bg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+
+.modern-sidebar-logo {
+    max-width: 180px;
+    overflow: hidden;
+    transition: var(--sidebar-item-transition);
+}
+
+.modern-sidebar-logo img {
+    max-height: 30px;
+    max-width: 100%;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.05));
+}
+
+.collapsed .modern-sidebar-logo {
+    max-width: 30px;
+}
+
+.modern-sidebar-toggle button {
+    background: transparent;
+    border: none;
+    color: var(--sidebar-text-muted);
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: var(--sidebar-item-transition);
+}
+
+.modern-sidebar-toggle button:hover {
+    color: var(--sidebar-primary);
+    background-color: rgba(0, 123, 255, 0.08);
+}
+
+/* New navbar toggle button styling & original navbar-home fallback */
+.navbar-brand.modern-sidebar-toggle-nav,
+.navbar-brand.navbar-home {
+    cursor: pointer !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    width: 40px !important;
+    height: 40px !important;
+    position: relative !important;
+    transition: var(--sidebar-item-transition) !important;
+}
+
+/* Hide original logo contents immediately to avoid flicker */
+.navbar-brand.navbar-home img,
+.navbar-brand.navbar-home svg,
+.navbar-brand.navbar-home span,
+.navbar-brand.navbar-home .app-logo {
+    display: none !important;
+}
+
+/* Inject bars icon via CSS to render instantly on page load */
+.navbar-brand.navbar-home::before {
+    content: "\f0c9" !important;
+    font-family: "Font Awesome 5 Free", "FontAwesome" !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+    font-variant: normal !important;
+    text-rendering: auto !important;
+    -webkit-font-smoothing: antialiased !important;
+    font-size: 18px !important;
+    color: var(--sidebar-navbar) !important;
+    transition: transform 0.3s ease !important;
+    display: inline-block !important;
+}
+
+.navbar-brand.navbar-home:hover::before {
+    transform: rotate(90deg) !important;
+}
+
+.navbar-brand.modern-sidebar-toggle-nav i {
+    font-size: 18px;
+    color: var(--sidebar-navbar) !important;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-item-icon .icon {
+    fill: var(--sidebar-icon-fill) !important;
+    stroke: var(--sidebar-icon-stroke) !important;
+}
+
+.navbar-brand.modern-sidebar-toggle-nav:hover i {
+    transform: rotate(90deg);
+    color: var(--sidebar-navbar) !important;
+}
+
+/* Sidebar Menu */
+.modern-sidebar-menu {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px 0;
+    scrollbar-width: none;
+    scrollbar-color: transparent transparent !important;
+}
+
+/* Sidebar Sections */
+.modern-sidebar-section {
+    margin-bottom: var(--sidebar-section-spacing);
+    position: relative;
+}
+
+/* Section divider - LTR */
+[dir="ltr"] .modern-sidebar-section:after {
+    content: '';
+    position: absolute;
+    bottom: calc(var(--sidebar-section-spacing) / -2);
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--sidebar-border-color), transparent);
+}
+
+/* Section divider - RTL */
+[dir="rtl"] .modern-sidebar-section:after {
+    content: '';
+    position: absolute;
+    bottom: calc(var(--sidebar-section-spacing) / -2);
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: linear-gradient(to left, transparent, var(--sidebar-border-color), transparent);
+}
+
+.modern-sidebar-section-title {
+    padding: var(--sidebar-section-title-padding);
+    font-size: var(--sidebar-section-font-size);
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--sidebar-text-muted);
+    letter-spacing: 0.6px;
+    margin-bottom: 2px;
+}
+
+.modern-sidebar-section-title span {
+    position: relative;
+}
+
+/* "+" on the My Workspaces title: creates a private workspace
+ * (js/sidebar/modern_sidebar.js -> window.themate.newWorkspace). */
+.modern-sidebar-section-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modern-sidebar-add {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 22px;
+    block-size: 22px;
+    padding: 0;
+    border: 1px solid var(--sidebar-border-color, rgba(255, 255, 255, 0.14));
+    border-radius: 6px;
+    background: transparent;
+    color: var(--sidebar-text-muted);
+    cursor: pointer;
+    transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+
+    .icon {
+        inline-size: 12px;
+        block-size: 12px;
+    }
+
+    &:hover,
+    &:focus-visible {
+        color: var(--sidebar-text);
+        border-color: var(--sidebar-primary);
+        background-color: var(--sidebar-hover-bg, rgba(255, 255, 255, 0.08));
+    }
+}
+
+.modern-sidebar.collapsed .modern-sidebar-add {
+    display: none;
+}
+
+/* Section title underline - LTR */
+[dir="ltr"] .modern-sidebar-section-title span:after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 20px;
+    height: 2px;
+    background-color: var(--sidebar-primary);
+    opacity: 0.7;
+    border-radius: 1px;
+}
+
+/* Section title underline - RTL */
+[dir="rtl"] .modern-sidebar-section-title span:after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    right: 0;
+    width: 20px;
+    height: 2px;
+    background-color: var(--sidebar-primary);
+    opacity: 0.7;
+    border-radius: 1px;
+}
+
+.collapsed .modern-sidebar-section-title span {
+    display: none;
+}
+
+.collapsed .modern-sidebar-section-title {
+    text-align: center;
+    padding: 6px 5px 2px;
+}
+
+/* Collapsed section divider - LTR */
+[dir="ltr"] .collapsed .modern-sidebar-section:after {
+    left: 10px;
+    right: 10px;
+}
+
+/* Collapsed section divider - RTL */
+[dir="rtl"] .collapsed .modern-sidebar-section:after {
+    left: 10px;
+    right: 10px;
+}
+
+/* Sidebar Items */
+.modern-sidebar-item {
+    position: relative;
+    border-radius: var(--sidebar-border-radius);
+    overflow: hidden;
+    margin-top: var(--sidebar-item-gap);
+}
+
+.modern-sidebar-item a {
+    padding: var(--sidebar-item-padding);
+    display: flex;
+    align-items: center;
+    color: var(--sidebar-text);
+    text-decoration: none;
+    transition: var(--sidebar-item-transition);
+    border-radius: var(--sidebar-border-radius);
+}
+
+.modern-sidebar-item a:hover {
+    background-color: var(--sidebar-hover-bg);
+    color: var(--sidebar-text-hover);
+}
+
+.modern-sidebar-item.active a {
+    background-color: var(--sidebar-active-bg);
+    font-weight: 500;
+    color: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(0, 123, 255, 0.1);
+}
+
+/* Active indicator - LTR */
+[dir="ltr"] .modern-sidebar-item.active:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: var(--sidebar-active-indicator);
+    border-radius: 0 2px 2px 0;
+}
+
+/* Active indicator - RTL */
+[dir="rtl"] .modern-sidebar-item.active:before {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: var(--sidebar-active-indicator);
+    border-radius: 2px 0 0 2px;
+}
+
+/* Icon positioning - LTR */
+[dir="ltr"] .modern-sidebar-item i,
+[dir="ltr"] .modern-sidebar-item .sidebar-item-icon {
+    margin-right: 10px;
+    font-size: var(--sidebar-icon-size);
+    text-align: center;
+    color: var(--sidebar-icon-color);
+    transition: var(--sidebar-item-transition);
+}
+
+/* Icon positioning - RTL */
+[dir="rtl"] .modern-sidebar-item i,
+[dir="rtl"] .modern-sidebar-item .sidebar-item-icon {
+    margin-left: 10px;
+    font-size: var(--sidebar-icon-size);
+    text-align: center;
+    color: var(--sidebar-icon-color);
+    transition: var(--sidebar-item-transition);
+}
+
+.modern-sidebar-item a:hover i,
+.modern-sidebar-item a:hover .sidebar-item-icon {
+    color: var(--sidebar-text-hover);
+}
+
+.modern-sidebar-item.active i,
+.modern-sidebar-item.active .sidebar-item-icon {
+    color: #ffffff !important;
+}
+
+.modern-sidebar-item.active .sidebar-item-icon .icon {
+    fill: transparent !important;
+    stroke: #ffffff !important;
+}
+
+.sidebar-item-label {
+    flex-grow: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: var(--sidebar-item-transition);
+    font-size: var(--tm-ts-menu-size, var(--sidebar-font-size));
+    font-weight: var(--tm-ts-menu-weight, inherit);
+    font-style: var(--tm-ts-menu-style, normal);
+    color: var(--sidebar-text);
+}
+
+.collapsed .sidebar-item-label {
+    opacity: 0;
+    display: none;
+}
+
+[dir="ltr"] .modern-sidebar-items {
+    padding-left: 3px;
+}
+
+[dir="rtl"] .modern-sidebar-items {
+    padding-right: 3px;
+}
+
+/* Collapsed state enhancements */
+.collapsed .modern-sidebar-item {
+    text-align: center;
+    position: relative;
+}
+
+/* Collapsed icon positioning - LTR */
+[dir="ltr"] .collapsed .modern-sidebar-item i,
+[dir="ltr"] .collapsed .modern-sidebar-item .sidebar-item-icon {
+    margin-right: 0;
+    font-size: var(--sidebar-icon-size-collapsed);
+}
+
+/* Collapsed icon positioning - RTL */
+[dir="rtl"] .collapsed .modern-sidebar-item i,
+[dir="rtl"] .collapsed .modern-sidebar-item .sidebar-item-icon {
+    margin-left: 0;
+    font-size: var(--sidebar-icon-size-collapsed);
+}
+
+.collapsed .modern-sidebar-item a {
+    justify-content: center;
+}
+
+.collapsed .modern-sidebar-item.active a {
+    background-color: var(--sidebar-active-bg-collapsed);
+}
+
+/* Tooltip styles - LTR */
+[dir="ltr"] .modern-sidebar.collapsed .sidebar-tooltip {
+    position: fixed;
+    left: 70px;
+    background: var(--sidebar-tooltip-bg);
+    box-shadow: var(--sidebar-tooltip-shadow);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 400;
+    opacity: 0;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translateX(-10%) translateY(-50%);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    color: var(--sidebar-tooltip-text);
+    z-index: 9999;
+    min-width: 120px;
+    text-align: center;
+}
+
+/* Tooltip styles - RTL */
+[dir="rtl"] .modern-sidebar.collapsed .sidebar-tooltip {
+    position: fixed;
+    right: 70px;
+    background: var(--sidebar-tooltip-bg);
+    box-shadow: var(--sidebar-tooltip-shadow);
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 400;
+    opacity: 0;
+    white-space: nowrap;
+    pointer-events: none;
+    transform: translateX(10%) translateY(-50%);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    color: var(--sidebar-tooltip-text);
+    z-index: 9999;
+    min-width: 120px;
+    text-align: center;
+}
+
+/* Basic visibility on hover */
+.modern-sidebar.collapsed .modern-sidebar-item:hover .sidebar-tooltip {
+    opacity: 1;
+    transform: translateX(0) translateY(-50%);
+    transition-delay: 0.3s;
+}
+
+/* Arrow for tooltip - LTR */
+[dir="ltr"] .modern-sidebar.collapsed .sidebar-tooltip::after {
+    content: "";
+    position: absolute;
+    right: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent var(--sidebar-tooltip-border-color) transparent transparent;
+}
+
+/* Arrow for tooltip - RTL */
+[dir="rtl"] .modern-sidebar.collapsed .sidebar-tooltip::after {
+    content: "";
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent transparent transparent var(--sidebar-tooltip-border-color);
+}
+
+/* Hide tooltips when sidebar is expanded */
+.modern-sidebar:not(.collapsed) .sidebar-tooltip {
+    display: none;
+}
+
+/* Hide tooltips when submenu is visible/hovered */
+.collapsed .modern-sidebar-item.has-children:hover .sidebar-tooltip,
+.collapsed .modern-sidebar-children.submenu-visible~.modern-sidebar-item .sidebar-tooltip {
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Child workspace items - LTR.
+ *
+ * Measured before the change: a child's icon sat 39px in from its parent's,
+ * on a 216px rail — the submenu took a fifth of the sidebar's width to say
+ * "one level down". Three separate offsets stacked up to that: the wrapper's
+ * margin (20px), its own padding (10px) and the child item's inline margin
+ * (8px). All three are cut, to 6 / 7 / 4, which puts the child icon ~17px in:
+ * enough to read as nested, not enough to shove the labels off the rail.
+ * The guide line follows the sidebar's own border colour instead of a
+ * hard-coded blue that ignored every sidebar theme. */
+[dir="ltr"] .modern-sidebar-children {
+    margin-left: var(--sidebar-children-indent);
+    position: relative;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding-left: 7px;
+    border-left: 1px solid var(--sidebar-border, rgba(255, 255, 255, 0.12));
+}
+
+/* Child workspace items styling - RTL */
+[dir="rtl"] .modern-sidebar-children {
+    margin-right: var(--sidebar-children-indent);
+    position: relative;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding-right: 7px;
+    border-right: 1px solid var(--sidebar-border, rgba(255, 255, 255, 0.12));
+}
+
+.modern-sidebar-item.child-item {
+    margin: 1px 4px;
+}
+
+.modern-sidebar-item.child-item a {
+    font-size: var(--sidebar-child-font-size);
+    /* A child row is shorter than its parent: 29px against 33px. Same
+       vertical rhythm, one step quieter. */
+    padding-block: 4px;
+}
+
+/* A child's icon is a marker, not a heading icon. */
+.modern-sidebar-item.child-item .sidebar-item-icon svg {
+    width: 15px;
+    height: 15px;
+}
+
+/* Toggle children positioning - LTR */
+[dir="ltr"] .modern-sidebar-item.has-children .toggle-children {
+    margin-left: 8px;
+    font-size: 10px;
+    color: var(--sidebar-text-muted);
+    transition: var(--sidebar-item-transition);
+}
+
+/* Toggle children positioning - RTL */
+[dir="rtl"] .modern-sidebar-item.has-children .toggle-children {
+    margin-right: 8px;
+    font-size: 10px;
+    color: var(--sidebar-text-muted);
+    transition: var(--sidebar-item-transition);
+}
+
+.modern-sidebar-item.has-children:hover .toggle-children {
+    color: var(--sidebar-primary);
+}
+
+.collapsed .modern-sidebar-item.has-children:hover+.modern-sidebar-children {
+    display: block !important;
+}
+
+.collapsed .modern-sidebar-children:hover {
+    display: block !important;
+}
+
+/* Collapsed children items - LTR */
+[dir="ltr"] .collapsed .modern-sidebar-children .modern-sidebar-item {
+    text-align: left;
+    margin: 2px 5px;
+}
+
+/* Collapsed children items - RTL */
+[dir="rtl"] .collapsed .modern-sidebar-children .modern-sidebar-item {
+    text-align: right;
+    margin: 2px 5px;
+}
+
+.collapsed .modern-sidebar-children .modern-sidebar-item a {
+    justify-content: flex-start;
+    padding: 8px 15px;
+    color: var(--sidebar-text);
+}
+
+/* Collapsed children icons - LTR */
+[dir="ltr"] .collapsed .modern-sidebar-children .modern-sidebar-item i,
+[dir="ltr"] .collapsed .modern-sidebar-children .modern-sidebar-item .sidebar-item-icon {
+    margin-right: 10px;
+    font-size: var(--sidebar-icon-size);
+    color: var(--sidebar-icon-color);
+}
+
+/* Collapsed children icons - RTL */
+[dir="rtl"] .collapsed .modern-sidebar-children .modern-sidebar-item i,
+[dir="rtl"] .collapsed .modern-sidebar-children .modern-sidebar-item .sidebar-item-icon {
+    margin-left: 10px;
+    font-size: var(--sidebar-icon-size);
+    color: var(--sidebar-icon-color);
+}
+
+.collapsed .modern-sidebar-children .sidebar-item-label {
+    display: block;
+    opacity: 1;
+    color: var(--sidebar-text);
+}
+
+/* Adjust main content when sidebar is present - LTR */
+[dir="ltr"] .main-section {
+    margin-left: var(--sidebar-width);
+    transition: margin-left 0.3s ease;
+}
+
+/* Adjust main content when sidebar is present - RTL */
+[dir="rtl"] .main-section {
+    margin-right: var(--sidebar-width);
+    transition: margin-right 0.3s ease;
+}
+
+/* When sidebar is collapsed, adjust main content - LTR/RTL.
+   Scoped to >=992px only: on mobile the collapsed sidebar is fully
+   off-canvas (see the max-width:991px block below) and must reserve
+   no space, but this selector's specificity would otherwise beat the
+   mobile ".main-section { margin: 0 }" reset regardless of source order.
+   By body class (sync_collapsed_state), never body:has(): a :has() on body
+   is re-checked on every DOM change in the page, and adding a child-table
+   row went from ~25ms to ~200ms with it. */
+@media (min-width: 992px) {
+    [dir="ltr"] body.sidebar-collapsed .main-section {
+        margin-left: var(--sidebar-collapsed-width) !important;
+    }
+
+    [dir="rtl"] body.sidebar-collapsed .main-section {
+        margin-right: var(--sidebar-collapsed-width) !important;
+    }
+}
+
+/* No sidebar during the setup wizard (msidebar_override.js) */
+html[data-tm-setup="pending"] .main-section {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Hide the standard desk sidebar */
+#page-Workspaces .layout-side-section {
+    display: none !important;
+}
+
+#page-Workspaces .sidebar-toggle-btn {
+    display: none !important;
+}
+
+/* Submenu styling for collapsed sidebar - LTR */
+[dir="ltr"] .collapsed .modern-sidebar-children {
+    position: fixed;
+    left: 70px;
+    background-color: var(--sidebar-submenu-bg);
+    border-radius: 4px;
+    min-width: 200px;
+    margin: 0;
+    padding: 5px;
+    z-index: 1100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    display: none;
+    border-left: none;
+}
+
+/* Submenu styling for collapsed sidebar - RTL */
+[dir="rtl"] .collapsed .modern-sidebar-children {
+    position: fixed;
+    right: 70px;
+    background-color: var(--sidebar-submenu-bg);
+    border-radius: 4px;
+    min-width: 200px;
+    margin: 0;
+    padding: 5px;
+    z-index: 1100;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    display: none;
+    border-right: none;
+}
+
+/* Show submenu when parent is hovered and has submenu-visible class */
+.collapsed .modern-sidebar-children.submenu-visible {
+    display: block !important;
+    animation: submenuFadeIn 0.2s ease-in-out;
+    transform: translateY(0%) translateY(0%);
+}
+
+/* Style for submenu items */
+.collapsed .modern-sidebar-children .modern-sidebar-item {
+    margin: 2px 5px;
+}
+
+/* Submenu items text alignment - LTR */
+[dir="ltr"] .collapsed .modern-sidebar-children .modern-sidebar-item {
+    text-align: left;
+}
+
+/* Submenu items text alignment - RTL */
+[dir="rtl"] .collapsed .modern-sidebar-children .modern-sidebar-item {
+    text-align: right;
+}
+
+.collapsed .modern-sidebar-children .modern-sidebar-item a {
+    justify-content: flex-start;
+    padding: 8px 12px;
+    border-radius: 4px;
+}
+
+.collapsed .modern-sidebar-children .sidebar-item-label {
+    display: block !important;
+    opacity: 1 !important;
+    color: var(--sidebar-text);
+}
+
+/* A workspace tree may be deeper than parent + child. Only the first child
+ * container becomes the rail popover; deeper containers remain nested inside
+ * it and keep their own toggle state. */
+.collapsed .modern-sidebar-children .modern-sidebar-children {
+    position: relative;
+    inset: auto;
+    min-width: 0;
+    max-height: none;
+    overflow: visible;
+    z-index: auto;
+    margin: 2px 0 4px;
+    margin-inline-start: 18px;
+    padding: 0;
+    padding-inline-start: 4px;
+    border: 0;
+    border-inline-start: 1px solid var(--sidebar-border-color);
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
+/* Submenu icons - LTR */
+[dir="ltr"] .collapsed .modern-sidebar-children .modern-sidebar-item i,
+[dir="ltr"] .collapsed .modern-sidebar-children .modern-sidebar-item .sidebar-item-icon {
+    margin-right: 10px;
+    text-align: center;
+}
+
+/* Submenu icons - RTL */
+[dir="rtl"] .collapsed .modern-sidebar-children .modern-sidebar-item i,
+[dir="rtl"] .collapsed .modern-sidebar-children .modern-sidebar-item .sidebar-item-icon {
+    margin-left: 10px;
+    text-align: center;
+}
+
+/* Fix z-index issue between sidebar and content - set to auto to prevent trapping child tables / grid row forms in a low stacking context */
+.main-section {
+    z-index: auto;
+}
+
+/* Animation for submenu appearance */
+@keyframes submenuFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Add a subtle triangle/arrow pointing to parent item - LTR */
+[dir="ltr"] .collapsed .modern-sidebar-children:before {
+    content: '';
+    position: absolute;
+    left: -6px;
+    top: var(--arrow-top, 15px);
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-right: 6px solid var(--sidebar-submenu-bg);
+}
+
+/* Add a subtle triangle/arrow pointing to parent item - RTL */
+[dir="rtl"] .collapsed .modern-sidebar-children:before {
+    content: '';
+    position: absolute;
+    right: -6px;
+    top: var(--arrow-top, 15px);
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 6px solid var(--sidebar-submenu-bg);
+}
+
+/* Make sure collapsed sidebar items with children show indicator */
+.collapsed .modern-sidebar-item.has-children>a:after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    opacity: 0.7;
+}
+
+/* Position indicator for collapsed items - LTR */
+[dir="ltr"] .collapsed .modern-sidebar-item.has-children>a:after {
+    right: 10px;
+}
+
+/* Position indicator for collapsed items - RTL */
+[dir="rtl"] .collapsed .modern-sidebar-item.has-children>a:after {
+    left: 10px;
+}
+
+/* Fix tooltip issue for items with children */
+.collapsed .modern-sidebar-item.has-children:hover a:after {
+    content: attr(title);
+    font-size: 14px;
+}
+
+/* Position submenu based on parent position */
+.collapsed .modern-sidebar-item {
+    position: relative;
+}
+
+/* Enhancement for touch screens */
+@media (hover: none) {
+    .collapsed .modern-sidebar-item.has-children>a {
+        position: relative;
+    }
+
+    /* Touch indicator - LTR */
+    [dir="ltr"] .collapsed .modern-sidebar-item.has-children>a:after {
+        content: "+";
+        right: 8px;
+    }
+
+    /* Touch indicator - RTL */
+    [dir="rtl"] .collapsed .modern-sidebar-item.has-children>a:after {
+        content: "+";
+        left: 8px;
+    }
+
+    /* Make tapping toggle the submenu on touch devices */
+    .collapsed .modern-sidebar-children.touch-visible {
+        display: block !important;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+    .modern-sidebar {
+        z-index: 1023;
+        transform: translateX(0);
+        overflow-y: auto;
+    }
+
+    /* Sidebar container - LTR */
+    [dir="ltr"] .modern-sidebar-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        margin-top: 0 !important;
+        z-index: 1022;
+    }
+
+    /* Sidebar container - RTL */
+    [dir="rtl"] .modern-sidebar-container {
+        position: fixed;
+        top: 0;
+        right: 0;
+        margin-top: 0 !important;
+        z-index: 1022;
+    }
+
+    .modern-sidebar-container:has(.modern-sidebar:not(.collapsed)) {
+        width: 100% !important;
+    }
+
+    .modern-sidebar-container:has(.modern-sidebar.collapsed) {
+        width: 0 !important;
+        overflow: hidden;
+    }
+
+    /* Collapsed sidebar - LTR */
+    [dir="ltr"] .modern-sidebar.collapsed {
+        margin-top: 0 !important;
+        width: 0;
+        opacity: 0;
+        visibility: hidden;
+        transition: transform 200ms ease-in-out;
+        height: 100%;
+        width: 60%;
+        display: block !important;
+        box-shadow: var(--shadow-base);
+        padding: var(--padding-md);
+        transform: translateX(-110%);
+    }
+
+    /* Collapsed sidebar - RTL */
+    [dir="rtl"] .modern-sidebar.collapsed {
+        margin-top: 0 !important;
+        width: 0;
+        opacity: 0;
+        visibility: hidden;
+        transition: transform 200ms ease-in-out;
+        height: 100%;
+        width: 60%;
+        display: block !important;
+        box-shadow: var(--shadow-base);
+        padding: var(--padding-md);
+        transform: translateX(110%);
+    }
+
+    .modern-sidebar-logo {
+        max-width: 30px;
+    }
+
+    /* Main section adjustments */
+    .main-section {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .modern-sidebar-item {
+        text-align: left;
+        margin: 5px;
+    }
+
+    /* Responsive icons - LTR */
+    [dir="ltr"] .modern-sidebar-item i,
+    [dir="ltr"] .modern-sidebar-item .sidebar-item-icon {
+        margin-right: 0;
+        padding-right: 5px;
+    }
+
+    /* Responsive icons - RTL */
+    [dir="rtl"] .modern-sidebar-item i,
+    [dir="rtl"] .modern-sidebar-item .sidebar-item-icon {
+        margin-left: 0;
+        padding-left: 5px;
+    }
+
+    .modern-sidebar-item a {
+        justify-content: center;
+    }
+
+    .modern-sidebar-section-title {
+        text-align: left;
+        padding: 8px 5px;
+    }
+}
+
+/* Dark theme support with improved styling */
+body[data-theme="dark"] .modern-sidebar {
+    background-color: var(--sidebar-bg);
+    border-right-color: var(--sidebar-border-color);
+}
+
+body[data-theme="dark"] .modern-sidebar-header {
+    background-color: var(--sidebar-header-bg);
+    border-bottom-color: var(--sidebar-border-color);
+}
+
+body[data-theme="dark"] .modern-sidebar-section:after {
+    background: linear-gradient(to right, transparent, var(--sidebar-border-color), transparent);
+}
+
+body[data-theme="dark"] .modern-sidebar-item a:hover {
+    background-color: var(--sidebar-hover-bg);
+}
+
+body[data-theme="dark"] .modern-sidebar-item.active a {
+    background-color: var(--sidebar-active-bg);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+body[data-theme="dark"] .modern-sidebar-toggle button:hover {
+    background-color: var(--sidebar-hover-bg);
+}
+
+body[data-theme="dark"] .modern-sidebar-children {
+    border-left-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Fix for sidebar-item-icon alignment */
+.sidebar-item-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Animation for sidebar toggle */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(-10px);
+    }
+}
+
+/* Only while the person expands or collapses it (toggle_sidebar() holds
+ * .tm-sb-toggling for the length of the animation). Unscoped, every label
+ * faded in each time it was INSERTED — on every page load, and again on
+ * every rebuild of the workspace list — which read as the sidebar blinking. */
+.modern-sidebar.tm-sb-toggling:not(.collapsed) .sidebar-item-label {
+    animation: fadeIn 0.3s forwards;
+}
+
+.modern-sidebar.tm-sb-toggling.collapsed .sidebar-item-label {
+    animation: fadeOut 0.2s forwards;
+}
+
+
+/* An LTR page never scrolls sideways: whatever is wider than the window (a
+ * child table's 738px on a phone while its Link dropdown is open) is cut at
+ * the edge of the content shell. LTR only, like the rule this replaces.
+ *
+ * This was `[dir="ltr"] { overflow-x: hidden }`, which matched <html>, and an
+ * overflow on <html> is the one the window takes — <body>'s own then stays on
+ * body. Frappe writes one there inline: `auto` each time a dialog closes
+ * (ui/dialog.js:92 -> :290) or a workspace link is clicked
+ * (views/workspace/workspace.js:234), `hidden` while a dialog is open. So
+ * after the first dialog, body (height: 100%, common/global.scss:4) became a
+ * scroll box the height of the window: a second scrollbar beside the
+ * window's, a Link dropdown and the end of the form cut off at body's bottom
+ * edge with empty ground below, and the navbar and page head stuck to body's
+ * top instead of the window's, so they scrolled away.
+ *
+ * Nothing on <html> or <body> now. `clip`, unlike `hidden`, makes no scroll
+ * box: it cuts sideways only, and what is sticky still sticks to the window. */
+[dir="ltr"] .main-section {
+    overflow-x: clip;
+}
+
+/* RTL-specific scrollbar positioning */
+[dir="rtl"] {
+    scrollbar-width: none;
+}
+
+/* Webkit browsers specific styling for RTL */
+[dir="rtl"]::-webkit-scrollbar {
+    width: 0px;
+}
+
+[dir="rtl"]::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+[dir="rtl"]::-webkit-scrollbar-thumb {
+    background: transparent;
+}
+
+[dir="rtl"]::-webkit-scrollbar-thumb:hover {
+    background: transparent;
+}
+
+/* =====================================================================
+ * THEMATE SaaS SKIN  (appended — wins over the rules above)
+ * Re-points the sidebar's own --sidebar-* variables onto the global
+ * --tm-* design tokens (defined by themate.bundle.css) so the custom
+ * sidebar inherits the SaaS design language, then strips the dated
+ * decorations (gradient dividers, title underline, heavy shadows,
+ * hard-coded icon stroke). Light + dark follow the tokens automatically.
+ * ===================================================================== */
+
+.modern-sidebar-container,
+.modern-sidebar {
+    /* surfaces & lines */
+    --sidebar-bg: var(--tm-surface);
+    --sidebar-header-bg: var(--tm-surface);
+    --sidebar-submenu-bg: var(--tm-surface);
+    --sidebar-border-color: var(--tm-border);
+    --sidebar-shadow: var(--tm-shadow-sm);
+
+    /* interaction */
+    --sidebar-hover-bg: var(--tm-surface-hover);
+    --sidebar-active-bg: var(--tm-brand-50);
+    --sidebar-active-bg-collapsed: var(--tm-brand-50);
+    --sidebar-active-indicator: var(--tm-brand-500);
+
+    /* text */
+    --sidebar-navbar: var(--tm-text);
+    --sidebar-text: var(--tm-text-2);
+    --sidebar-text-hover: var(--tm-text);
+    --sidebar-text-muted: var(--tm-text-3);
+    --sidebar-icon-color: var(--tm-text-2);
+
+    /* accent */
+    --sidebar-primary: var(--tm-brand-600);
+    --sidebar-primary-hover: var(--tm-brand-700);
+
+    /* icons: let SVGs use currentColor instead of a fixed stroke */
+    --sidebar-icon-fill: none;
+    --sidebar-icon-stroke: currentColor;
+
+    /* scrollbar */
+    --sidebar-scrollbar-thumb: var(--tm-gray-300);
+    --sidebar-scrollbar-thumb-hover: var(--tm-gray-400);
+
+    /* dimensions tuned to the SaaS mockup.
+       --sidebar-width is deliberately NOT overridden here: this block is
+       scoped to .modern-sidebar, but .main-section and the navbar read the
+       :root value (--tm-sidebar-w). Overriding it only in the sidebar's scope
+       made the sidebar 248px while the content was offset by 224px, so the
+       page-head toggle and the list/form side sections sat under it. */
+    --sidebar-border-radius: var(--tm-radius-md);
+    --sidebar-item-padding: 7px 12px;
+    --sidebar-section-spacing: 12px;
+    --sidebar-section-title-padding: 10px 16px 4px;
+    --sidebar-item-gap: 1px;
+    --sidebar-item-margin: 1px 8px;
+    --sidebar-font-size: var(--tm-text-sm);
+    --sidebar-section-font-size: 11px;
+}
+
+/* Theme Settings / Customizer > Density: Compact pulls the rows and the
+ * sections closer (dimensions only, the type stays readable). */
+html[data-tm-density="compact"] .modern-sidebar-container,
+html[data-tm-density="compact"] .modern-sidebar {
+    --sidebar-item-padding: 5px 12px;
+    --sidebar-section-spacing: 6px;
+    --sidebar-section-title-padding: 8px 16px 2px;
+    --sidebar-item-gap: 0px;
+}
+
+/* shell */
+.modern-sidebar {
+    background: var(--tm-surface);
+    border-inline-end: 1px solid var(--tm-border);
+    box-shadow: none;
+}
+
+.modern-sidebar-header {
+    border-bottom: 1px solid var(--tm-border);
+    box-shadow: none;
+}
+
+.modern-sidebar-logo img {
+    filter: none;
+}
+
+.modern-sidebar-menu {
+    padding: var(--tm-space-3) 0;
+}
+
+/* kill the dated decorations */
+.modern-sidebar-section:after {
+    display: none !important;
+}
+
+/* gradient divider */
+.modern-sidebar-section-title span:after {
+    display: none !important;
+}
+
+/* accent underline  */
+
+/* section labels */
+.modern-sidebar-section-title {
+    padding: var(--sidebar-section-title-padding);
+    color: var(--tm-text-3);
+    font-weight: var(--tm-weight-semibold);
+    letter-spacing: 0.04em;
+    margin-bottom: 2px;
+}
+
+/* items */
+.modern-sidebar-item {
+    margin-top: var(--sidebar-item-gap);
+}
+
+.modern-sidebar-item a {
+    gap: var(--tm-space-2);
+    font-weight: var(--tm-weight-medium);
+    line-height: 1.35; /* the row is the icon plus padding, not the text's leading */
+}
+
+.modern-sidebar-item.active:before {
+    display: none !important;
+}
+
+/* Active item: brand tint, a 3px bar on the start edge and brand text —
+   not a solid fill. A filled pill was the loudest thing on the page and
+   the white-on-brand text failed contrast on light brand colours (#81a103,
+   #90a617). The bar is drawn by "Item shape" at the end of this file. */
+.modern-sidebar-item.active a {
+    background: var(--tm-brand-50);
+    color: var(--tm-brand-600);
+    box-shadow: none;
+    font-weight: var(--tm-weight-semibold);
+}
+
+.modern-sidebar-item.active a .sidebar-item-label {
+    color: var(--tm-brand-600);
+}
+
+.modern-sidebar-item.active i,
+.modern-sidebar-item.active .sidebar-item-icon,
+.modern-sidebar-item.active a:hover .sidebar-item-icon {
+    color: var(--tm-brand-600);
+}
+
+.modern-sidebar-item.active .sidebar-item-icon svg,
+.modern-sidebar-item.active .sidebar-item-icon svg *,
+.modern-sidebar-item.active .sidebar-item-icon .icon,
+.modern-sidebar-item.active .sidebar-item-icon .icon * {
+    stroke: var(--tm-brand-600) !important;
+    fill: none !important;
+}
+
+/* non-active icons follow text colour via currentColor */
+.modern-sidebar-item .sidebar-item-icon svg,
+.modern-sidebar-item .sidebar-item-icon .icon {
+    stroke: currentColor !important;
+    fill: none !important;
+    width: var(--sidebar-icon-size);
+    height: var(--sidebar-icon-size);
+}
+
+.modern-sidebar.collapsed .modern-sidebar-item .sidebar-item-icon svg,
+.modern-sidebar.collapsed .modern-sidebar-item .sidebar-item-icon .icon {
+    width: var(--sidebar-icon-size-collapsed);
+    height: var(--sidebar-icon-size-collapsed);
+}
+
+/* `svg *` reaches only the <use>, never the symbol's shapes, which carry
+   their own explicit fill/stroke — so the duotone tint layer survives this. */
+.modern-sidebar-item .sidebar-item-icon svg *,
+.modern-sidebar-item .sidebar-item-icon .icon * {
+    stroke: currentColor !important;
+    fill: none !important;
+}
+
+/* hover */
+.modern-sidebar-item a:hover {
+    background: var(--tm-surface-hover);
+    color: var(--tm-text);
+}
+
+/* active hover: one step deeper tint, text stays brand */
+.modern-sidebar-item.active a:hover {
+    background: var(--tm-brand-100) !important;
+    color: var(--tm-brand-700) !important;
+}
+
+.modern-sidebar-item.active a:hover .sidebar-item-label {
+    color: var(--tm-brand-700) !important;
+}
+
+.modern-sidebar-item.active a:hover .sidebar-item-icon,
+.modern-sidebar-item.active a:hover .sidebar-item-icon svg,
+.modern-sidebar-item.active a:hover .sidebar-item-icon svg *,
+.modern-sidebar-item.active a:hover .sidebar-item-icon .icon,
+.modern-sidebar-item.active a:hover .sidebar-item-icon .icon * {
+    color: var(--tm-brand-700) !important;
+    stroke: var(--tm-brand-700) !important;
+    fill: none !important;
+}
+
+.modern-sidebar-item.active:hover .toggle-children {
+    color: var(--tm-brand-700) !important;
+}
+
+/* Sidebar toggle button inside the sidebar is always hidden, as toggling is handled by the navbar burger button */
+.modern-sidebar-toggle {
+    display: none !important;
+}
+
+.modern-sidebar-logo {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+.modern-sidebar.collapsed .modern-sidebar-logo {
+    display: flex !important;
+    max-width: 30px !important;
+}
+
+/* Active icon follows the active text, overriding [dir="ltr"] specificity */
+[dir="ltr"] .modern-sidebar-item.active .sidebar-item-icon,
+[dir="rtl"] .modern-sidebar-item.active .sidebar-item-icon,
+.modern-sidebar-item.active .sidebar-item-icon {
+    color: var(--tm-brand-600) !important;
+}
+
+/* Parent of the active child workspace (set by update_active_items). The
+   child carries the filled .active pill; the parent only gets the accent
+   text so the rail — where children are hidden — still shows the group. */
+.modern-sidebar-item.has-active-child > a,
+.modern-sidebar-item.has-active-child > a .sidebar-item-icon {
+    color: var(--sidebar-primary);
+}
+
+/* Theme Settings > App Logo (Dark): one <img> per theme. */
+html[data-theme="dark"] .modern-sidebar-logo .tm-logo-light,
+html:not([data-theme="dark"]) .modern-sidebar-logo .tm-logo-dark {
+    display: none;
+}
+
+/* Theme Settings > Show Workspace Icons off: text-only items while expanded.
+   The rail keeps its icons — without them it would be an empty strip. */
+html[data-tm-ws-icons="off"] .modern-sidebar:not(.collapsed) .modern-sidebar-item .sidebar-item-icon {
+    display: none;
+}
+
+/* =====================================================================
+ * Header wordmark, section titles, footer — structure shared by both
+ * sidebar themes.
+ * ===================================================================== */
+.modern-sidebar-logo a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.modern-sidebar-logo .tm-logo {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+    flex: none;
+}
+
+.tm-app-name {
+    font-size: var(--tm-text-md);
+    font-weight: var(--tm-weight-semibold);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.modern-sidebar.collapsed .tm-app-name {
+    display: none;
+}
+
+.modern-sidebar-section-title {
+    font-size: 11px;
+    font-weight: var(--tm-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.modern-sidebar.collapsed .modern-sidebar-section-title {
+    padding: 10px 0 4px;
+    height: 1px;
+    overflow: hidden;
+    border-top: 1px solid var(--sidebar-border-color);
+    margin: 8px 12px 0;
+}
+
+.modern-sidebar {
+    display: flex;
+    flex-direction: column;
+}
+
+.modern-sidebar-menu {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+.modern-sidebar-footer {
+    flex: none;
+    display: none !important;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-top: 1px solid var(--sidebar-border-color);
+}
+
+.modern-sidebar-user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1 1 auto;
+    color: inherit;
+    text-decoration: none;
+}
+
+.modern-sidebar-user:hover {
+    color: inherit;
+    text-decoration: none;
+}
+
+.modern-sidebar-user-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    line-height: 1.25;
+}
+
+.modern-sidebar-user-name {
+    font-size: var(--tm-text-sm);
+    font-weight: var(--tm-weight-medium);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.modern-sidebar-user-email {
+    font-size: 11px;
+    color: var(--sidebar-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    direction: ltr;
+    unicode-bidi: isolate;
+}
+
+.modern-sidebar-logout {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--tm-radius-sm);
+    color: inherit;
+    opacity: 0.7;
+}
+
+.modern-sidebar-logout:hover {
+    opacity: 1;
+    color: var(--tm-red-500);
+    background: var(--sidebar-hover-bg);
+}
+
+.modern-sidebar-collapse {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--tm-radius-sm);
+    color: inherit;
+    opacity: 0.7;
+}
+
+.modern-sidebar-collapse:hover {
+    opacity: 1;
+    background: var(--sidebar-hover-bg);
+}
+
+.modern-sidebar.collapsed .modern-sidebar-user-text,
+.modern-sidebar.collapsed .modern-sidebar-logout {
+    display: none;
+}
+
+.modern-sidebar.collapsed .modern-sidebar-footer {
+    flex-direction: column;
+    padding: 10px 0;
+}
+
+.modern-sidebar.collapsed .modern-sidebar-collapse .icon {
+    transform: scaleX(-1);
+}
+
+[dir="rtl"] .modern-sidebar-collapse .icon {
+    transform: scaleX(-1);
+}
+
+[dir="rtl"] .modern-sidebar.collapsed .modern-sidebar-collapse .icon {
+    transform: none;
+}
+
+/* =====================================================================
+ * NAVY SIDEBAR (Theme Settings > Sidebar > Sidebar Theme = Dark).
+ * The design's rail: deep navy ground, light text, white active item with
+ * a brand bar on the start edge. Scoped by attribute so "Light" restores
+ * the surface-coloured sidebar above. High specificity on purpose: the
+ * rules above carry !important in places.
+ * ===================================================================== */
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-container,
+html[data-tm-sidebar-theme="dark"] .modern-sidebar {
+    --sidebar-bg: var(--tm-sidebar-bg);
+    --sidebar-header-bg: var(--tm-sidebar-bg);
+    --sidebar-submenu-bg: var(--tm-sidebar-bg-raised);
+    --sidebar-border-color: var(--tm-sidebar-border);
+    --sidebar-hover-bg: var(--tm-sidebar-bg-hover);
+    --sidebar-active-bg: var(--tm-sidebar-bg-active);
+    --sidebar-active-bg-collapsed: var(--tm-sidebar-bg-active);
+    --sidebar-active-indicator: var(--tm-sidebar-accent);
+    --sidebar-navbar: var(--tm-sidebar-text-strong);
+    --sidebar-text: var(--tm-sidebar-text);
+    --sidebar-text-hover: var(--tm-sidebar-text-strong);
+    --sidebar-text-muted: var(--tm-sidebar-text-muted);
+    --sidebar-icon-color: var(--tm-sidebar-text);
+    --sidebar-primary: var(--tm-sidebar-text-strong);
+    --sidebar-primary-hover: var(--tm-sidebar-text-strong);
+    --sidebar-scrollbar-thumb: rgb(255 255 255 / 0.18);
+    --sidebar-scrollbar-thumb-hover: rgb(255 255 255 / 0.3);
+}
+
+/* The background art (js/core/art.js supplies the image). Sized to the
+   full width even on the rail, so collapsing crops it instead of re-rasterising
+   it on every frame of the transition. */
+html[data-tm-sidebar-art="on"] .modern-sidebar {
+    --sidebar-header-bg: transparent;
+    /* the art is brighter than the flat colour, so the quiet text steps up */
+    --tm-sidebar-text: rgb(255 255 255 / 0.92);
+    --tm-sidebar-text-muted: rgb(255 255 255 / 0.78);
+    background-repeat: no-repeat;
+    background-size: var(--sidebar-width) 100%;
+}
+
+html[data-tm-sidebar-art="on"][dir="rtl"] .modern-sidebar {
+    background-position: right top;
+}
+
+/* A custom background (Theme Settings or the customizer) sets only
+   --tm-sidebar-bg; the other tones follow it. */
+html[data-tm-sidebar-custom="on"] {
+    --tm-sidebar-bg-raised: color-mix(in srgb, var(--tm-sidebar-bg), white 6%);
+    --tm-sidebar-bg-hover: color-mix(in srgb, var(--tm-sidebar-bg), white 8%);
+    --tm-sidebar-bg-active: color-mix(in srgb, var(--tm-sidebar-bg), white 14%);
+    --tm-sidebar-border: color-mix(in srgb, var(--tm-sidebar-bg), white 10%);
+}
+
+html[data-tm-sidebar-theme="dark"] .modern-sidebar {
+    background-color: var(--tm-sidebar-bg);
+    border-inline-end: 1px solid var(--tm-sidebar-border);
+    color: var(--tm-sidebar-text);
+}
+
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-header {
+    background-color: var(--sidebar-header-bg);
+    border-bottom: 1px solid var(--tm-sidebar-border);
+}
+
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-logo a,
+html[data-tm-sidebar-theme="dark"] .tm-app-name {
+    color: var(--tm-sidebar-text-strong);
+}
+
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-section-title,
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-section-title span {
+    color: var(--tm-sidebar-text-muted);
+}
+
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item a,
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item a .sidebar-item-label,
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item .sidebar-item-icon {
+    color: var(--tm-sidebar-text);
+}
+
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item a:hover {
+    background: var(--tm-sidebar-bg-hover);
+    color: var(--tm-sidebar-text-strong);
+}
+
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item a:hover .sidebar-item-label,
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item a:hover .sidebar-item-icon {
+    color: var(--tm-sidebar-text-strong);
+}
+
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item.active a,
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item.active a:hover {
+    background: var(--tm-sidebar-bg-active) !important;
+    color: var(--tm-sidebar-text-strong) !important;
+    box-shadow: none;
+}
+
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item.active a .sidebar-item-label,
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item.active a:hover .sidebar-item-label,
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item.active .sidebar-item-icon,
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item.active a:hover .sidebar-item-icon,
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item.active:hover .toggle-children,
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item.has-active-child > a,
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item.has-active-child > a .sidebar-item-icon {
+    color: var(--tm-sidebar-text-strong) !important;
+}
+
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item.active .sidebar-item-icon svg,
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item.active .sidebar-item-icon svg *,
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item.active a:hover .sidebar-item-icon svg,
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-item.active a:hover .sidebar-item-icon svg * {
+    stroke: var(--tm-sidebar-text-strong) !important;
+}
+
+/* the rail's flyout only: expanded, children sit on the sidebar's ground */
+html[data-tm-sidebar-theme="dark"] .collapsed .modern-sidebar-children {
+    background: var(--tm-sidebar-bg-raised);
+}
+
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-footer {
+    border-top-color: var(--tm-sidebar-border);
+    color: var(--tm-sidebar-text);
+}
+
+html[data-tm-sidebar-theme="dark"] .modern-sidebar-collapse:hover {
+    background: var(--tm-sidebar-bg-hover);
+}
+
+/* =====================================================================
+ * Item shape (both sidebar themes, expanded): rows are pills inset 8px from
+ * both edges; the active one carries a short rounded bar on its start edge
+ * (the old inset shadow bent around the corner radius). Children hang off
+ * one guide line under the parent's icon (8 + 12 + 9 = 21px into the list)
+ * and the active child lights its stretch of that line. Logical properties
+ * only, so LTR and RTL need no pair.
+ * ===================================================================== */
+.modern-sidebar:not(.collapsed) {
+    .modern-sidebar-items {
+        padding-inline: 8px;
+    }
+
+    .modern-sidebar-item > a {
+        position: relative;
+        border-radius: 8px;
+    }
+
+    .modern-sidebar-item.active > a::before {
+        content: "";
+        position: absolute;
+        inset-inline-start: 0;
+        inset-block: 8px;
+        width: 3px;
+        border-start-end-radius: 3px;
+        border-end-end-radius: 3px;
+        background: var(--sidebar-active-indicator);
+    }
+
+    .modern-sidebar-children {
+        margin: 2px 0 6px;
+        margin-inline-start: 20px;
+        padding: 0;
+        padding-inline-start: 4px;
+        border: 0;
+        border-inline-start: 1px solid var(--sidebar-border-color);
+        background: transparent;
+    }
+
+    .modern-sidebar-item.child-item {
+        margin: 1px 0;
+        overflow: visible;
+    }
+
+    .modern-sidebar-item.child-item > a {
+        padding-block: 5px;
+        padding-inline: 8px;
+    }
+
+    /* the row's flex gap already spaces icon and label */
+    .modern-sidebar-item.child-item .sidebar-item-icon {
+        margin-inline-end: 0;
+        opacity: 0.85;
+    }
+
+    .modern-sidebar-item.child-item.active > a::before {
+        inset-inline-start: -6px;
+        inset-block: 4px;
+        border-radius: 3px;
+    }
+
+    .modern-sidebar-item.child-item.active .sidebar-item-icon {
+        opacity: 1;
+    }
+
+    /* the chevron reads as part of the row, not a stray glyph */
+    .modern-sidebar-item.has-children .toggle-children {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+        margin-inline-start: 4px;
+        border-radius: 5px;
+        font-size: 9px;
+        opacity: 0.7;
+    }
+
+    .modern-sidebar-item.has-children .toggle-children:hover {
+        opacity: 1;
+        background: var(--sidebar-hover-bg);
+    }
+}
+
+/*! rtl:end:ignore */
+
+/* Skeleton rows while the workspace list is on its way (modern_sidebar.js;
+ * with boot.allowed_workspaces it is never seen). */
+.modern-sidebar-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 10px 16px;
+}
+
+.modern-sidebar-skeleton span {
+    display: block;
+    height: 14px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.08) 25%, rgba(255, 255, 255, 0.16) 50%, rgba(255, 255, 255, 0.08) 75%);
+    background-size: 200% 100%;
+    animation: tm-shimmer 1.2s linear infinite;
+}
+
+.modern-sidebar-skeleton span:nth-child(2n) { width: 70%; }
+.modern-sidebar-skeleton span:nth-child(3n) { width: 55%; }
+
+.modern-sidebar-footer-bare {
+    justify-content: flex-end;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .modern-sidebar-skeleton span { animation: none; }
+}

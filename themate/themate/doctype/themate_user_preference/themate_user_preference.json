@@ -1,0 +1,203 @@
+{
+ "actions": [],
+ "autoname": "field:user",
+ "creation": "2026-06-11 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "user",
+  "use_theme",
+  "sidebar_collapsed",
+  "pinned_workspaces",
+  "theme_mode",
+  "font_size",
+  "accent_color",
+  "font_family",
+  "radius_preset",
+  "density",
+  "icon_size",
+  "icon_style",
+  "sidebar_theme",
+  "sidebar_bg",
+  "sidebar_art",
+  "sidebar_art_colors",
+  "text_styles",
+  "chart_palette",
+  "chart_colors",
+  "activity_display",
+  "form_panel_side",
+  "desk_state",
+  "department"
+ ],
+ "fields": [
+  {
+   "fieldname": "user",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "User",
+   "options": "User",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "sidebar_collapsed",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Sidebar Collapsed"
+  },
+  {
+   "fieldname": "pinned_workspaces",
+   "fieldtype": "Small Text",
+   "label": "Pinned Workspaces"
+  },
+  {
+   "fieldname": "theme_mode",
+   "fieldtype": "Select",
+   "label": "Theme Mode",
+   "options": "\nLight\nDark\nAuto"
+  },
+  {
+   "fieldname": "font_size",
+   "fieldtype": "Int",
+   "label": "Base Font Size (px)",
+   "description": "0 or blank follows the site default."
+  },
+  {
+   "fieldname": "accent_color",
+   "fieldtype": "Color",
+   "label": "Accent Color",
+   "description": "Blank follows the site brand color."
+  },
+  {
+   "fieldname": "font_family",
+   "fieldtype": "Select",
+   "label": "Font",
+   "options": "\nInter\nCairo\nSystem"
+  },
+  {
+   "fieldname": "radius_preset",
+   "fieldtype": "Select",
+   "label": "Corner Radius",
+   "options": "\nSharp\nDefault\nRound"
+  },
+  {
+   "fieldname": "density",
+   "fieldtype": "Select",
+   "label": "Density",
+   "options": "\nComfortable\nCompact"
+  },
+  {
+   "fieldname": "icon_size",
+   "fieldtype": "Int",
+   "label": "Icon Size (px)",
+   "description": "0 or blank follows the site default."
+  },
+  {
+   "fieldname": "icon_style",
+   "fieldtype": "Select",
+   "label": "Icon Style",
+   "options": "\nDuotone\nOutline"
+  },
+  {
+   "fieldname": "sidebar_theme",
+   "fieldtype": "Select",
+   "label": "Sidebar Theme",
+   "options": "\nDark\nLight"
+  },
+  {
+   "fieldname": "sidebar_bg",
+   "fieldtype": "Color",
+   "label": "Sidebar Background",
+   "description": "Blank follows the site."
+  },
+  {
+   "fieldname": "sidebar_art",
+   "fieldtype": "Select",
+   "label": "Sidebar Background Image",
+   "options": "\nOn\nOff",
+   "description": "Blank follows the site."
+  },
+  {
+   "fieldname": "sidebar_art_colors",
+   "fieldtype": "Small Text",
+   "label": "Background Image Colours"
+  },
+  {
+   "fieldname": "text_styles",
+   "fieldtype": "Small Text",
+   "label": "Text Styles (JSON)"
+  },
+  {
+   "fieldname": "chart_palette",
+   "fieldtype": "Select",
+   "label": "Chart Palette",
+   "options": "\nBrand\nOcean\nSunset\nForest\nSlate\nPastel\nCustom"
+  },
+  {
+   "fieldname": "chart_colors",
+   "fieldtype": "Small Text",
+   "label": "Custom Chart Colours"
+  },
+  {
+   "fieldname": "activity_display",
+   "fieldtype": "Select",
+   "label": "Activity Display",
+   "options": "\nDialog\nInline",
+   "description": "Blank follows the site default."
+  },
+  {
+   "fieldname": "use_theme",
+   "fieldtype": "Select",
+   "label": "Themate Theme",
+   "options": "\nOn\nOff",
+   "description": "Blank follows the site default (Theme Settings > Enable Theme). Off: this account sees the original Frappe desk, with none of Themate's styling, sidebar or restyled pages. Turn it back on from the user menu (Turn on Themate theme) or here."
+  },
+  {
+   "fieldname": "form_panel_side",
+   "fieldtype": "Select",
+   "label": "Form Side Panel",
+   "options": "\nAuto\nLeft\nRight",
+   "description": "Blank follows the site default."
+  },
+  {
+   "fieldname": "desk_state",
+   "fieldtype": "Code",
+   "label": "Desk State",
+   "options": "JSON",
+   "hidden": 1,
+   "description": "Where the user left each workspace (Dashboard or Records, which dashboard) and the period chosen on each widget. Written by the desk, follows the user across browsers."
+  },
+  {
+   "fieldname": "department",
+   "fieldtype": "Data",
+   "label": "Department",
+   "description": "The sidebar department this person is in: a Themate Department's name, or All for every department at once. Blank: their first one. They change it from the sidebar."
+  }
+ ],
+ "links": [],
+ "modified": "2026-11-06 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Themate",
+ "name": "Themate User Preference",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "user",
+ "track_changes": 1
+}

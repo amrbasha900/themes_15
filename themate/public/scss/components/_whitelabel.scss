@@ -1,0 +1,30 @@
+/* Whitelabel — the CSS half (see core/whitelabel.js for what and why).
+ * Anything linking to Frappe / ERPNext properties is hidden by href, so it
+ * covers list-sidebar banners, onboarding text, login page social buttons
+ * and workspace links without knowing where each one is rendered. */
+
+html[data-tm-whitelabel="on"] {
+	a[href*="frappe.io"],
+	a[href*="erpnext.com"],
+	a[href*="frappeframework.com"],
+	a[href*="frappecloud.com"],
+	a[href*="frappe.cloud"],
+	a[href*="frappe.school"],
+	a[href*="github.com/frappe"],
+	a[href*="youtube.com"],
+	a[href*="youtu.be"],
+	.list-sidebar .sidebar-section:has(> a[href*="frappe.io"]),
+	.list-sidebar .sidebar-section:has(> a[href*="erpnext.com"]),
+	.onboarding-step-preview .video-player,
+	.tm-whitelabel-hidden,
+	.ce-block:has(.tm-whitelabel-hidden), /* the block keeps its grid cell otherwise */
+	#toolbar-user a.dropdown-item[href="/apps"] {
+		display: none !important;
+	}
+
+	/* A Help menu reduced to one item needs no divider above it. */
+	#toolbar-help > .dropdown-divider:first-child,
+	#toolbar-help > .dropdown-divider + .dropdown-divider {
+		display: none;
+	}
+}

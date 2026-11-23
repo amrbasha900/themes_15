@@ -1,0 +1,125 @@
+/* Base layer — typography and shared primitives.
+ *
+ * Deliberately small. The previous revision restyled h1–h6 and p globally with
+ * !important, which recoloured body copy everywhere and then needed
+ * _grid.scss / _modals.scss purely to undo itself. Headings are now left to
+ * the surfaces that own them (FRAPPE_UI_MAP.md §5 finding 9). */
+
+#{$tm-on} {
+	body {
+		font-family: var(--tm-font-stack);
+		font-size: var(--tm-text-md);
+		line-height: var(--tm-leading);
+		color: var(--tm-text);
+		background-color: var(--tm-surface-app);
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
+	}
+
+	/* Arabic needs slightly more leading than Latin at the same size.
+	 *
+	 * On the font stack: core/bootstrap.js writes --tm-font-stack as an INLINE
+	 * style on <html> once Theme Settings is read, and an inline style beats this
+	 * rule. That is fine and intentional — InterVariable carries no Arabic glyphs,
+	 * so the browser falls back per-glyph to Cairo, which is next in every stack
+	 * the bootstrap offers. The declaration below only governs the pre-JS paint
+	 * and the case where no font is configured. The leading overrides are not
+	 * touched by JS and always apply. */
+	[lang="ar"],
+	[dir="rtl"] {
+		--tm-font-stack: "Cairo", "InterVariable", -apple-system, BlinkMacSystemFont, "Segoe UI",
+			sans-serif;
+		--tm-leading: 1.6;
+		--tm-leading-dense: 1.5;
+	}
+
+	/* Links in CONTENT are coloured; navigation chrome (sidebar, page
+	 * actions, dropdown items, list rows) keeps its own treatment. Frappe's
+	 * base rule paints every <a> in text colour (desk/global.scss:22), which
+	 * is why a link to a Customer looked exactly like the label next to it. */
+	.control-value a,
+	.form-control + a,
+	.comment-content a,
+	.timeline-content a:not(.btn),
+	.frappe-card p a,
+	.msgprint a,
+	.help-box a,
+	.form-message a,
+	.widget-body a:not(.btn),
+	.onboarding-step-body a:not(.btn),
+	a.text-link,
+	a.underline {
+		color: var(--tm-text-link);
+
+		&:hover,
+		&:focus-visible {
+			color: var(--tm-text-link-hover);
+			text-decoration: underline;
+		}
+	}
+
+	/* Themate Business icons (core/icons.js adds .tm-icon to the <svg>).
+	 * stroke-width and fill-opacity are inherited by the symbol's shapes;
+	 * nothing else about the symbol is styled from outside. */
+	.tm-icon {
+		stroke-width: var(--tm-icon-stroke);
+		fill-opacity: var(--tm-icon-tint);
+	}
+
+	&[data-tm-icon-color="brand"] .tm-icon {
+		color: var(--tm-brand-600);
+	}
+
+	/* Visible focus everywhere. Never remove an outline without replacing it
+	 * (DESIGN_CONTRACT.md §4). */
+	:focus-visible {
+		outline: 2px solid var(--tm-action-primary);
+		outline-offset: 1px;
+	}
+
+	::placeholder {
+		color: var(--tm-text-3);
+		opacity: 1; /* Firefox dims placeholders by default */
+	}
+
+	::selection {
+		background-color: var(--tm-brand-100);
+		color: var(--tm-text);
+	}
+
+	/* Scrollbars: thin and neutral, visible only over content that scrolls.
+	 * Native equivalent: scss/desk/scrollbar.scss */
+	* {
+		scrollbar-width: thin;
+		scrollbar-color: var(--tm-gray-200) transparent;
+	}
+
+	::-webkit-scrollbar {
+		width: 8px;
+		height: 8px;
+	}
+
+	::-webkit-scrollbar-track {
+		background: transparent;
+	}
+
+	::-webkit-scrollbar-thumb {
+		background-color: var(--tm-gray-200);
+		border-radius: var(--tm-radius-full);
+
+		&:hover {
+			background-color: var(--tm-gray-300);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		*,
+		*::before,
+		*::after {
+			animation-duration: 0.01ms !important; /* documented: honour OS motion setting */
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.01ms !important;
+		}
+	}
+
+}

@@ -1,0 +1,248 @@
+/* Chart cards: dashboard chart widgets (workspaces, dashboards) and the
+ * ECharts canvas js/charts/adapter.js mounts inside them.
+ * Native source: frappe/public/js/frappe/widgets/chart_widget.js,
+ *                frappe/public/scss/desk/widgets.scss
+ *
+ * Two things the native card does not do:
+ *  1. Fill. The canvas has a fixed height (240px by default) and the card
+ *     is stretched by the grid row it sits on, so beside a taller card the
+ *     bottom third was blank. Head, body and canvas are a flex column now;
+ *     the canvas grows and the ECharts ResizeObserver redraws into it.
+ *     Every chart on a row ends up the same height.
+ *  2. Empty. "No Data" was muted text on a white card. Both Frappe's own
+ *     empty/loading states and the adapter's (all-zero data) show a
+ *     centred icon and message on a faint dashed panel. */
+
+#{$tm-on} {
+	.widget.dashboard-widget-box {
+		display: flex;
+		flex-direction: column;
+		background-color: var(--tm-surface);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		box-shadow: none;
+		padding: var(--tm-space-3) var(--tm-space-4) var(--tm-space-3);
+		min-inline-size: 0;
+
+		.widget-head {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: var(--tm-space-2);
+			margin-block-end: var(--tm-space-2);
+			border: none;
+			flex: none;
+
+			.widget-label {
+				min-inline-size: 0;
+			}
+
+			.widget-subtitle {
+				color: var(--tm-text-3);
+				font-size: var(--tm-text-xs);
+			}
+
+			/* filter button, timespan select and the … menu */
+			.widget-control {
+				display: flex;
+				align-items: center;
+				gap: var(--tm-space-1);
+				flex: none;
+
+				.btn,
+				.chart-menu,
+				.filter-button {
+					block-size: 28px;
+					min-inline-size: 28px;
+					padding: 0 var(--tm-space-2);
+					border: 1px solid var(--tm-border);
+					border-radius: var(--tm-radius-sm);
+					background-color: var(--tm-surface);
+					color: var(--tm-text-2);
+
+					&:hover {
+						border-color: var(--tm-border-strong);
+						color: var(--tm-text);
+					}
+				}
+
+				select.form-control {
+					block-size: 28px;
+					padding-block: 0;
+					font-size: var(--tm-text-xs);
+				}
+			}
+		}
+
+		.widget-body {
+			flex: 1 1 auto;
+			display: flex;
+			flex-direction: column;
+			min-block-size: 0;
+
+			/* the anonymous chart wrapper (chart_widget.js:63) */
+			> div:not(.chart-loading-state) {
+				flex: 1 1 auto;
+				display: flex;
+				flex-direction: column;
+				min-block-size: 0;
+				position: relative;
+			}
+		}
+
+		.widget-footer:empty {
+			display: none;
+		}
+	}
+
+	.tm-chart {
+		flex: 1 1 auto;
+		min-block-size: 0;
+
+		&.tm-chart-is-empty {
+			display: none;
+		}
+	}
+
+	/* ---- Empty / loading -------------------------------------------------- */
+	.chart-loading-state,
+	.tm-chart-empty {
+		flex: 1 1 auto;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: var(--tm-space-2);
+		min-block-size: 160px;
+		border: 1px dashed var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface-sunken);
+		color: var(--tm-text-3);
+		font-size: var(--tm-text-sm);
+		text-align: center;
+		padding: var(--tm-space-4);
+
+		&[hidden] {
+			display: none;
+		}
+	}
+
+	.chart-loading-state::before,
+	.tm-chart-empty-icon {
+		content: "";
+		display: block;
+		inline-size: 36px;
+		block-size: 36px;
+		background-color: currentColor;
+		opacity: 0.55;
+		mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M3 20h18'/><rect x='5' y='11' width='3.5' height='7' rx='1'/><rect x='10.25' y='6' width='3.5' height='12' rx='1'/><rect x='15.5' y='14' width='3.5' height='4' rx='1'/><path d='M5 8l5-3 5 2 4-3'/></svg>") center / contain no-repeat;
+		-webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'><path d='M3 20h18'/><rect x='5' y='11' width='3.5' height='7' rx='1'/><rect x='10.25' y='6' width='3.5' height='12' rx='1'/><rect x='15.5' y='14' width='3.5' height='4' rx='1'/><path d='M5 8l5-3 5 2 4-3'/></svg>") center / contain no-repeat;
+	}
+
+	/* Frappe's "Loading..." (the first state div): a shimmer block, no
+	 * icon, no text — the card holds its size until the chart arrives. */
+	.chart-loading-state:first-child {
+		border: 0;
+		color: transparent;
+		background: linear-gradient(90deg, var(--tm-surface-sunken) 25%, var(--tm-surface-hover) 50%, var(--tm-surface-sunken) 75%);
+		background-size: 200% 100%;
+		animation: tm-shimmer 1.2s linear infinite;
+
+		&::before {
+			display: none;
+		}
+	}
+
+	@keyframes tm-chart-pulse {
+		0%, 100% { opacity: 0.25; }
+		50% { opacity: 0.6; }
+	}
+
+	/* Dashboard view (/app/dashboard-view/<name>) and the same groups
+	 * rendered inside a workspace: Frappe centres grid items
+	 * (desktop.scss .grid-col-*), which is what left a short chart
+	 * floating beside a tall one — stretch, and let the canvas fill. */
+	.widget-group .widget-group-body.grid-col-1,
+	.widget-group .widget-group-body.grid-col-2,
+	.widget-group .widget-group-body.grid-col-3 {
+		align-items: stretch;
+	}
+
+	.widget-group .widget.dashboard-widget-box,
+	.dashboard-widget-box.full-width {
+		block-size: 100%;
+	}
+}
+
+/* A chart with nothing to draw (core/charts.js noData): one calm row — why,
+ * and what can be done — instead of a 240px dashed box. */
+/* the card holds no more than the note: no 240px body kept for a chart.
+ * As specific as the card's own ".widget-body > div" column rule above. */
+#{$tm-on} .widget.dashboard-widget-box:has(.tm-chart-none) {
+	block-size: auto;
+	min-block-size: 0;
+
+	.widget-body {
+		display: block;
+		flex: none;
+	}
+}
+
+#{$tm-on} .widget.dashboard-widget-box .widget-body > div.tm-chart-none,
+#{$tm-on} .tm-chart-none {
+	flex: none;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	text-align: start;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: var(--tm-space-3);
+	padding: var(--tm-space-3);
+	border-radius: var(--tm-radius-md);
+	background-color: var(--tm-surface-sunken);
+	color: var(--tm-text-2);
+
+	.tm-chart-none-icon {
+		flex: none;
+		inline-size: 32px;
+		block-size: 32px;
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface);
+		position: relative;
+
+		&::after {
+			content: "";
+			position: absolute;
+			inset: 7px;
+			background-color: var(--tm-text-3);
+			mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M3 20h18'/><rect x='5' y='11' width='3.5' height='7' rx='1'/><rect x='10.25' y='6' width='3.5' height='12' rx='1'/><rect x='15.5' y='14' width='3.5' height='4' rx='1'/></svg>") center / contain no-repeat;
+			-webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'><path d='M3 20h18'/><rect x='5' y='11' width='3.5' height='7' rx='1'/><rect x='10.25' y='6' width='3.5' height='12' rx='1'/><rect x='15.5' y='14' width='3.5' height='4' rx='1'/></svg>") center / contain no-repeat;
+		}
+	}
+
+	.tm-chart-none-text {
+		display: flex;
+		flex-direction: column;
+		flex: 1 1 200px;
+		min-inline-size: 0;
+		line-height: 1.35;
+
+		b {
+			font-size: var(--tm-text-sm);
+			font-weight: var(--tm-weight-semibold);
+			color: var(--tm-text);
+		}
+
+		small {
+			font-size: var(--tm-text-xs);
+			color: var(--tm-text-3);
+		}
+	}
+
+	.tm-chart-none-actions {
+		display: inline-flex;
+		flex-wrap: wrap;
+		gap: var(--tm-space-2);
+	}
+}

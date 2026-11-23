@@ -1,0 +1,1390 @@
+/* Activity — the composer, the tabs and the timeline, in a dialog or inline.
+ * Native source: frappe/public/js/frappe/form/footer/footer.js (the panel),
+ *                form/footer/form_timeline.js (the entries),
+ *                frappe/public/scss/desk/timeline.scss (the native look),
+ *                frappe/public/js/frappe/ui/dialog.js (the dialog)
+ * Driven by js/core/form_activity.js (panel, composer, tabs, dialog) and
+ * js/core/activity_timeline.js (entries: node + card, `data-tm-cat`).
+ *
+ * One look, two places. Everything about the panel is written against
+ * `.after-save.tm-act` (the class form_activity.js puts on it), so it is the
+ * same card whether it sits in `.tm-activity-dialog` or under the form
+ * (`.form-footer`, `html[data-tm-activity="inline"]`). Only the frame differs:
+ * the dialog scrolls the timeline inside itself, the inline panel lets the page
+ * scroll.
+ *
+ * Imported after _modals.scss and _timeline.scss on purpose. Both style the
+ * same elements, and the cascade between equal selectors is decided by import
+ * order alone — put this file earlier in the bundle and the rules below
+ * silently lose. Where Frappe's native rules are stronger than the theme's
+ * (timeline.scss uses `.new-timeline .timeline-item …`), the panel prefix
+ * here is deliberately long instead of using !important.
+ *
+ * Not scoped to the form flag: once the panel is in the dialog it is no
+ * longer part of the form's layout, and the dialog is its own surface.
+ * No literal colours (tokens/_palette.scss rule): categories borrow the
+ * decorative tone pairs already defined for the workspace cards, which have
+ * dark-mode values. A tone is an identity, never a status. */
+
+/* --tm-act-bg / --tm-act-fg for each tone. `brand` follows the accent, so a
+ * brand colour chosen in Theme Settings recolours the active tab and the
+ * comment entries with it. */
+$tm-act-tones: (
+	"brand": (var(--tm-surface-selected), var(--tm-action-primary)),
+	"purple": (var(--tm-tone-purple-bg), var(--tm-tone-purple-fg)),
+	"orange": (var(--tm-tone-orange-bg), var(--tm-tone-orange-fg)),
+	"green": (var(--tm-tone-green-bg), var(--tm-tone-green-fg)),
+	"pink": (var(--tm-tone-pink-bg), var(--tm-tone-pink-fg)),
+	"slate": (var(--tm-surface-active), var(--tm-text-2)),
+);
+
+@mixin tm-act-tone($name) {
+	--tm-act-bg: #{nth(map-get($tm-act-tones, $name), 1)};
+	--tm-act-fg: #{nth(map-get($tm-act-tones, $name), 2)};
+}
+
+/* The pencil / check drawn into the Edit button, which Frappe makes in JS
+ * from a bare string (so there is no element to put an icon in). */
+$tm-act-pencil: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/%3E%3Cpath d='m15 5 4 4'/%3E%3C/svg%3E");
+$tm-act-check: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
+
+#{$tm-on} {
+	[data-tm-tone] {
+		@each $name, $pair in $tm-act-tones {
+			&[data-tm-tone="#{$name}"] {
+				@include tm-act-tone($name);
+			}
+		}
+	}
+
+	/* ---- The button that opens it ------------------------------------- */
+	.page-actions .tm-activity-btn {
+		position: relative;
+
+		/* Comments + communications, capped so a busy record cannot widen
+		 * the icon row. Hidden at zero: a badge reading 0 is noise. */
+		.tm-activity-count {
+			position: absolute;
+			inset-block-start: -4px;
+			inset-inline-end: -4px;
+			min-inline-size: 16px;
+			block-size: 16px;
+			padding: 0 4px;
+			border-radius: var(--tm-radius-full);
+			background-color: var(--tm-action-primary);
+			color: var(--tm-action-primary-text);
+			font-size: 10px;
+			font-weight: var(--tm-weight-semibold);
+			line-height: 16px;
+			text-align: center;
+			font-variant-numeric: tabular-nums;
+
+			&[hidden] {
+				display: none;
+			}
+		}
+	}
+
+	/* ---- Title block: dialog header and inline panel ------------------- */
+	.tm-act-head {
+		display: flex;
+		align-items: center;
+		gap: var(--tm-space-3);
+		min-inline-size: 0;
+
+		.tm-act-head__icon {
+			display: inline-grid;
+			place-items: center;
+			flex: none;
+			inline-size: 32px;
+			block-size: 32px;
+			border-radius: var(--tm-radius-full);
+			background-color: var(--tm-surface-selected);
+			color: var(--tm-action-primary-fg);
+		}
+
+		.tm-act-head__text {
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+			min-inline-size: 0;
+		}
+
+		.tm-act-head__title {
+			font-size: var(--tm-text-lg);
+			font-weight: var(--tm-weight-bold, 700);
+			line-height: 1.2;
+			color: var(--tm-text);
+		}
+
+		.tm-act-head__sub {
+			font-size: var(--tm-text-sm);
+			line-height: 1.3;
+			color: var(--tm-text-2);
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+
+	/* ---- The dialog ---------------------------------------------------- */
+	.tm-activity-dialog {
+		.modal-content {
+			display: flex;
+			flex-direction: column;
+			max-block-size: calc(100vh - 3.5rem);
+			border-radius: var(--tm-radius-xl);
+			background-color: var(--tm-surface-sunken);
+			overflow: hidden;
+		}
+
+		.modal-header {
+			flex: none;
+			align-items: center;
+			padding: var(--tm-space-4) var(--tm-space-4) var(--tm-space-3);
+			border: 0;
+			background: none;
+
+			.title-section {
+				flex: 1;
+				min-inline-size: 0;
+			}
+
+			.modal-title {
+				margin: 0;
+				min-inline-size: 0;
+				font-size: inherit;
+				font-weight: inherit;
+				line-height: inherit;
+			}
+
+			.modal-actions {
+				margin-inline-start: var(--tm-space-3);
+			}
+
+			.btn-modal-close {
+				display: inline-grid;
+				place-items: center;
+				inline-size: 28px;
+				block-size: 28px;
+				padding: 0;
+				border-radius: var(--tm-radius-lg);
+				background-color: var(--tm-surface-active);
+				color: var(--tm-text-2);
+
+				&:hover,
+				&:focus-visible {
+					background-color: var(--tm-border-strong);
+					color: var(--tm-text);
+				}
+			}
+		}
+
+		/* A fixed frame: the header and the composer stay, the timeline
+		 * scrolls. _modals.scss deliberately lets dialog bodies overflow, so a
+		 * date picker or autocomplete can escape them. This one holds nothing
+		 * that needs to — the only popups are inside the composer, which is
+		 * above the scroller — and everything under it is meant to scroll,
+		 * which is the whole point of taking the timeline off the form. */
+		.modal-body {
+			display: flex;
+			flex-direction: column;
+			flex: 1 1 auto;
+			min-block-size: 0;
+			max-block-size: none;
+			padding: 0;
+			overflow: hidden;
+			background-color: var(--tm-surface-sunken);
+
+			> :first-child {
+				display: flex;
+				flex-direction: column;
+				flex: 1 1 auto;
+				min-block-size: 0;
+			}
+		}
+
+		.modal-footer {
+			display: none;
+		}
+
+		.after-save.tm-act {
+			display: flex;
+			flex-direction: column;
+			flex: 1 1 auto;
+			min-block-size: 0;
+			--tm-act-gutter: var(--tm-space-4);
+			--tm-act-ground: var(--tm-surface-sunken);
+
+			.new-timeline {
+				flex: 1 1 auto;
+				min-block-size: 0;
+				overflow-y: auto;
+				overscroll-behavior: contain;
+			}
+		}
+	}
+
+	/* ---- Inline, under the form ---------------------------------------- */
+	.form-footer > .after-save.tm-act {
+		--tm-act-gutter: 0px;
+		--tm-act-ground: var(--tm-surface-sunken);
+		margin-block-end: var(--tm-space-4);
+		padding: var(--tm-space-4);
+		border: 1px solid var(--tm-act-line);
+		border-radius: var(--tm-radius-lg);
+		background-color: var(--tm-surface-sunken);
+
+		> .tm-act-head {
+			margin-block-end: var(--tm-space-4);
+		}
+	}
+
+	/* ---- The panel (both places) --------------------------------------- */
+	.after-save.tm-act {
+		--tm-act-line: color-mix(in srgb, var(--tm-border-strong) 55%, var(--tm-border));
+		--tm-act-rail: 42px; /* the node's column */
+		--tm-act-node: 28px;
+		--tm-act-lead: 32px; /* avatar / tile inside a card */
+		--tm-act-pad: 10px; /* card padding: the rail aligns to its first line */
+		--tm-act-center: calc(var(--tm-act-pad) + var(--tm-act-lead) / 2);
+		--tm-act-ctl: var(--tm-control-h); /* buttons: the theme's own control height */
+		--tm-act-gutter: var(--tm-space-4);
+		--tm-act-ground: var(--tm-surface-sunken);
+		background: none;
+		border-radius: 0;
+		box-shadow: none;
+		font-size: var(--tm-text-sm);
+		color: var(--tm-text);
+
+		/* -- Composer card -- */
+		.comment-box {
+			position: relative;
+			z-index: 3; /* its menus open over the tabs and the timeline */
+			flex: none;
+			margin: 0 var(--tm-act-gutter) var(--tm-space-3);
+			padding: var(--tm-space-3);
+			border: 1px solid var(--tm-act-line);
+			border-radius: var(--tm-radius-lg);
+			background-color: var(--tm-surface);
+			box-shadow: var(--tm-shadow-xs);
+		}
+
+		.comment-input-header,
+		.comment-input-wrapper > .btn-comment {
+			display: none;
+		}
+
+		.comment-input-wrapper {
+			display: flex;
+			flex-direction: column;
+			gap: var(--tm-space-3);
+			margin: 0;
+			padding: 0;
+		}
+
+		.comment-input-container {
+			display: flex;
+			align-items: flex-start;
+			gap: var(--tm-space-3);
+			margin: 0;
+			padding: 0;
+			border: 0;
+			background: none;
+
+			.avatar {
+				flex: none;
+				inline-size: var(--tm-act-lead);
+				block-size: var(--tm-act-lead);
+				margin: 0;
+			}
+
+			.avatar .avatar-frame,
+			.avatar img {
+				inline-size: 100%;
+				block-size: 100%;
+				border-radius: var(--tm-radius-full);
+				font-size: var(--tm-text-md);
+				font-weight: var(--tm-weight-semibold);
+			}
+
+			.frappe-control {
+				flex: 1 1 auto;
+				min-inline-size: 0;
+				margin: 0;
+				padding: 0;
+				border: 1px solid var(--tm-border-strong);
+				border-radius: var(--tm-radius-lg);
+				background-color: var(--tm-surface-sunken);
+				transition:
+					border-color var(--tm-dur-fast) var(--tm-ease),
+					box-shadow var(--tm-dur-fast) var(--tm-ease);
+
+				&:focus-within {
+					border-color: var(--tm-action-primary);
+					box-shadow: 0 0 0 3px color-mix(in srgb, var(--tm-action-primary) 18%, transparent);
+				}
+			}
+
+			.ql-container {
+				border: 0;
+				background: none;
+				font-size: var(--tm-text-sm);
+			}
+
+			/* Frappe paints the editor `var(--control-bg) !important` (desk/form.scss),
+			 * which is light in a dark dialog and not this card's ground anyway:
+			 * the field around it carries the fill, so the variable is emptied
+			 * rather than the declaration fought. */
+			--control-bg: transparent;
+
+			.ql-editor {
+				min-block-size: 56px;
+				max-block-size: 220px;
+				padding: 8px 12px;
+				border: 0;
+				line-height: 1.55;
+				overflow-y: auto;
+
+				&.ql-blank::before {
+					inset-inline: 12px;
+					font-style: italic;
+					color: var(--tm-text-3);
+				}
+			}
+		}
+
+		/* An empty Post: the editor says so instead of the button doing nothing. */
+		.comment-input-container.tm-nudge .frappe-control {
+			border-color: var(--tm-action-danger);
+			animation: tm-act-nudge 0.35s var(--tm-ease);
+		}
+
+		/* -- Formatting bar, New Email / New Event, Post -- */
+		.tm-composer-bar {
+			position: relative;
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--tm-space-2);
+			padding-inline-start: calc(var(--tm-act-lead) + var(--tm-space-3));
+		}
+
+		.tm-tools {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 2px;
+		}
+
+		.tm-tool {
+			display: inline-grid;
+			place-items: center;
+			inline-size: 28px;
+			block-size: 28px;
+			padding: 0;
+			border: 0;
+			border-radius: var(--tm-radius-lg);
+			background: none;
+			color: var(--tm-text-2);
+			cursor: pointer;
+			transition:
+				background-color var(--tm-dur-fast) var(--tm-ease),
+				color var(--tm-dur-fast) var(--tm-ease);
+
+			&:hover {
+				background-color: var(--tm-surface-active);
+				color: var(--tm-text);
+			}
+
+			&.is-active,
+			&.is-open {
+				background-color: var(--tm-surface-selected);
+				color: var(--tm-action-primary-fg);
+			}
+		}
+
+		.tm-composer-actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--tm-space-2);
+			margin-inline-start: auto;
+			padding-inline-start: var(--tm-space-3);
+			border-inline-start: 1px solid var(--tm-act-line);
+
+			&:empty {
+				display: none;
+			}
+		}
+
+		.tm-composer-actions:empty + .tm-split {
+			margin-inline-start: auto;
+		}
+
+		.tm-action {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--tm-space-2);
+			block-size: var(--tm-act-ctl);
+			margin: 0;
+			padding: 0 var(--tm-space-3);
+			border: 1px solid var(--tm-act-line);
+			border-radius: var(--tm-radius-lg);
+			background-color: var(--tm-surface);
+			box-shadow: none;
+			color: var(--tm-text);
+			font-size: var(--tm-text-sm);
+			font-weight: var(--tm-weight-medium);
+			line-height: 1;
+			white-space: nowrap;
+
+			svg {
+				flex: none;
+				color: var(--tm-text-2);
+			}
+
+			&:hover {
+				border-color: var(--tm-border-strong);
+				background-color: var(--tm-surface-hover);
+			}
+		}
+
+		.tm-split {
+			position: relative;
+			display: inline-flex;
+			border-radius: var(--tm-radius-lg);
+			background-color: var(--tm-action-primary);
+			color: var(--tm-action-primary-text);
+		}
+
+		.tm-post,
+		.tm-post-more {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			block-size: var(--tm-act-ctl);
+			border: 0;
+			background: none;
+			color: inherit;
+			font-size: var(--tm-text-sm);
+			font-weight: var(--tm-weight-medium);
+			cursor: pointer;
+			transition: background-color var(--tm-dur-fast) var(--tm-ease);
+
+			&:hover,
+			&[aria-expanded="true"] {
+				background-color: var(--tm-action-primary-hover);
+			}
+
+			&:active {
+				background-color: var(--tm-action-primary-active);
+			}
+		}
+
+		.tm-post {
+			gap: var(--tm-space-2);
+			padding: 0 var(--tm-space-3) 0 10px;
+			border-start-start-radius: var(--tm-radius-lg);
+			border-end-start-radius: var(--tm-radius-lg);
+		}
+
+		.tm-post-more {
+			inline-size: 30px;
+			border-inline-start: 1px solid color-mix(in srgb, var(--tm-action-primary-text) 28%, transparent);
+			border-start-end-radius: var(--tm-radius-lg);
+			border-end-end-radius: var(--tm-radius-lg);
+		}
+
+		.tm-menu {
+			position: absolute;
+			inset-block-start: calc(100% + 6px);
+			inset-inline-end: 0;
+			z-index: 20;
+			min-inline-size: 236px;
+			margin: 0;
+			padding: 4px;
+			list-style: none;
+			border: 1px solid var(--tm-act-line);
+			border-radius: var(--tm-radius-xl);
+			background-color: var(--tm-surface-raised);
+			box-shadow: var(--tm-shadow-lg);
+			color: var(--tm-text);
+
+			button {
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				inline-size: 100%;
+				padding: 6px 8px;
+				border: 0;
+				border-radius: var(--tm-radius-lg);
+				background: none;
+				color: inherit;
+				font-size: var(--tm-text-sm);
+				text-align: start;
+				cursor: pointer;
+
+				&:hover,
+				&:focus-visible {
+					background-color: var(--tm-surface-hover);
+				}
+
+				svg {
+					flex: none;
+					color: var(--tm-text-2);
+				}
+
+				span {
+					display: flex;
+					flex: 1;
+					flex-direction: column;
+					min-inline-size: 0;
+				}
+
+				small {
+					font-size: var(--tm-text-xs);
+					color: var(--tm-text-3);
+				}
+
+				kbd {
+					padding: 1px 6px;
+					border: 1px solid var(--tm-act-line);
+					border-radius: var(--tm-radius-sm);
+					background: none;
+					box-shadow: none;
+					color: var(--tm-text-3);
+					font-size: var(--tm-text-xs);
+				}
+			}
+		}
+
+		.tm-pop {
+			position: absolute;
+			inset-block-start: calc(100% + 6px);
+			z-index: 20;
+			padding: var(--tm-space-2);
+			border: 1px solid var(--tm-act-line);
+			border-radius: var(--tm-radius-xl);
+			background-color: var(--tm-surface-raised);
+			box-shadow: var(--tm-shadow-lg);
+		}
+
+		.tm-pop__form {
+			display: flex;
+			gap: var(--tm-space-2);
+			inline-size: min(320px, calc(100vw - 80px));
+			margin: 0;
+		}
+
+		.tm-pop__emoji {
+			display: grid;
+			grid-template-columns: repeat(8, 30px);
+			gap: 2px;
+		}
+
+		.tm-emoji {
+			inline-size: 30px;
+			block-size: 30px;
+			padding: 0;
+			border: 0;
+			border-radius: var(--tm-radius-md);
+			background: none;
+			font-size: 16px;
+			line-height: 1;
+			cursor: pointer;
+
+			&:hover,
+			&:focus-visible {
+				background-color: var(--tm-surface-active);
+			}
+		}
+
+		/* -- Tabs -- */
+		.tm-activity-toolbar {
+			flex: none;
+			padding: 0 var(--tm-act-gutter) var(--tm-space-3);
+		}
+
+		/* Wraps rather than hides what does not fit (Arabic labels are longer);
+		 * on a phone it is a swipeable row instead. */
+		.tm-activity-chips {
+			display: flex;
+			flex-wrap: wrap;
+			align-items: center;
+			gap: var(--tm-space-2);
+			padding-block: 2px;
+		}
+
+		.tm-chip {
+			display: inline-flex;
+			flex: none;
+			align-items: center;
+			gap: 6px;
+			block-size: 30px;
+			padding: 0 8px 0 8px;
+			border: 1px solid color-mix(in srgb, var(--tm-act-fg) 16%, var(--tm-border));
+			border-radius: var(--tm-radius-full);
+			background-color: color-mix(in srgb, var(--tm-act-bg) 50%, var(--tm-surface));
+			color: var(--tm-text);
+			font-size: var(--tm-text-sm);
+			font-weight: var(--tm-weight-medium);
+			line-height: 1;
+			white-space: nowrap;
+			cursor: pointer;
+			transition:
+				background-color var(--tm-dur-fast) var(--tm-ease),
+				border-color var(--tm-dur-fast) var(--tm-ease),
+				color var(--tm-dur-fast) var(--tm-ease);
+
+			.tm-chip-icon {
+				display: inline-flex;
+				color: var(--tm-act-fg);
+			}
+
+			.tm-chip-count {
+				display: inline-grid;
+				place-items: center;
+				min-inline-size: 18px;
+				block-size: 18px;
+				padding: 0 6px;
+				border-radius: var(--tm-radius-full);
+				background-color: var(--tm-surface-active);
+				color: var(--tm-text-2);
+				font-size: var(--tm-text-xs);
+				font-weight: var(--tm-weight-semibold);
+				font-variant-numeric: tabular-nums;
+			}
+
+			&:hover {
+				border-color: color-mix(in srgb, var(--tm-act-fg) 38%, var(--tm-border));
+			}
+
+			&.active {
+				border-color: color-mix(in srgb, var(--tm-act-fg) 45%, var(--tm-border));
+				background-color: var(--tm-act-bg);
+				color: var(--tm-act-fg);
+
+				.tm-chip-count {
+					background-color: var(--tm-act-fg);
+					color: var(--tm-surface);
+				}
+			}
+		}
+
+		/* -- Timeline -- */
+		.new-timeline {
+			position: relative;
+			margin: 0;
+			padding: var(--tm-space-1) var(--tm-act-gutter) var(--tm-space-5);
+			background: none;
+			--timeline-content-max-width: none;
+
+			/* Frappe's own rail */
+			&::before {
+				display: none;
+			}
+
+			/* "Activity" + "Show all activity" + New Email: the tabs replace the
+			 * toggle and the buttons moved into the composer. */
+			.activity-title {
+				display: none;
+			}
+
+			/* "Add to this activity by mailing to …" */
+			> .timeline-item:not(.activity-title) {
+				margin: 0 0 var(--tm-space-3);
+				padding: 10px 14px;
+				border: 1px dashed var(--tm-act-line);
+				border-radius: var(--tm-radius-lg);
+				background-color: var(--tm-surface);
+				font-size: var(--tm-text-sm);
+				color: var(--tm-text-2);
+
+				.timeline-dot {
+					display: none;
+				}
+
+				.timeline-content {
+					padding: 0;
+					border: 0;
+					background: none;
+					box-shadow: none;
+				}
+			}
+
+			.timeline-items {
+				position: relative;
+				margin: 0;
+				padding: 0;
+			}
+
+			/* The rail: one dashed line down the whole list, with the first
+			 * and last node masking what lies beyond them (sync() marks both). */
+			.timeline-items:not(.timeline-actions)::before {
+				content: "";
+				position: absolute;
+				inset-block: 0;
+				inset-inline-start: calc(var(--tm-act-node) / 2 - 1px);
+				border-inline-start: 1.5px dashed var(--tm-border-strong);
+			}
+
+			.tm-first::after,
+			.tm-last::after {
+				content: "";
+				position: absolute;
+				inset-inline-start: 0;
+				inline-size: var(--tm-act-node);
+				background-color: var(--tm-act-ground);
+			}
+
+			.tm-first::after {
+				inset-block: 0 auto;
+				block-size: calc(var(--tm-act-center) - var(--tm-act-node) / 2);
+			}
+
+			.tm-last::after {
+				inset-block: var(--tm-act-center) 0;
+			}
+
+			.tm-day {
+				position: relative;
+				display: flex;
+				align-items: center;
+				min-block-size: 24px;
+				margin-block: var(--tm-space-1) var(--tm-space-2);
+				padding-inline-start: var(--tm-act-rail);
+				color: var(--tm-text-2);
+				font-size: var(--tm-text-sm);
+				font-weight: var(--tm-weight-medium);
+
+				&[hidden] {
+					display: none;
+				}
+
+				.tm-day__dot {
+					position: absolute;
+					inset-inline-start: calc(var(--tm-act-node) / 2 - 8px);
+					inline-size: 16px;
+					block-size: 16px;
+					border: 1px solid var(--tm-act-line);
+					border-radius: var(--tm-radius-full);
+					background-color: var(--tm-surface);
+					box-shadow: 0 0 0 4px var(--tm-act-ground);
+
+					&::after {
+						content: "";
+						position: absolute;
+						inset: 5px;
+						border-radius: var(--tm-radius-full);
+						background-color: var(--tm-text-3);
+					}
+				}
+
+				/* the dot's own halo already hides the rail above it */
+				&.tm-first::after {
+					display: none;
+				}
+			}
+
+			.timeline-item {
+				position: relative;
+				margin: 0 0 var(--tm-space-2);
+				padding-inline-start: var(--tm-act-rail);
+				font-size: var(--tm-text-sm);
+
+				&.tm-hidden {
+					display: none;
+				}
+
+				&[data-tm-cat="comments"] {
+					@include tm-act-tone("brand");
+				}
+
+				&[data-tm-cat="updates"] {
+					@include tm-act-tone("orange");
+				}
+
+				&[data-tm-cat="emails"] {
+					@include tm-act-tone("green");
+				}
+
+				&[data-tm-cat="events"] {
+					@include tm-act-tone("pink");
+				}
+
+				&[data-tm-cat="system"] {
+					@include tm-act-tone("slate");
+				}
+
+				b {
+					color: var(--tm-text);
+					font-weight: var(--tm-weight-semibold);
+				}
+
+				.tm-node {
+					position: absolute;
+					z-index: 1; /* above the rail caps, which end at its centre */
+					inset-block-start: calc(var(--tm-act-center) - var(--tm-act-node) / 2);
+					inset-inline-start: 0;
+					display: grid;
+					place-items: center;
+					inline-size: var(--tm-act-node);
+					block-size: var(--tm-act-node);
+					border: 1px solid color-mix(in srgb, var(--tm-act-fg) 22%, var(--tm-act-bg));
+					border-radius: var(--tm-radius-full);
+					background-color: var(--tm-act-bg);
+					box-shadow: 0 0 0 4px var(--tm-act-ground);
+					color: var(--tm-act-fg);
+					font-size: var(--tm-text-xs);
+					font-weight: var(--tm-weight-bold, 700);
+				}
+			}
+
+			.timeline-item .timeline-content {
+				position: relative;
+				margin: 0;
+				padding: 0;
+				max-inline-size: none;
+				border: 1px solid var(--tm-act-line);
+				border-radius: var(--tm-radius-xl);
+				background-color: var(--tm-surface);
+				box-shadow: var(--tm-shadow-xs);
+				color: var(--tm-text);
+				transition: border-color var(--tm-dur-fast) var(--tm-ease);
+
+				&:hover {
+					border-color: var(--tm-border-strong);
+				}
+			}
+
+			/* A comment's header zone is a quiet tint; the text sits on the card. */
+			.timeline-item[data-doctype="Comment"] .timeline-content {
+				background-image: linear-gradient(
+					to bottom,
+					color-mix(in srgb, var(--tm-act-bg) 55%, var(--tm-surface)) 0,
+					color-mix(in srgb, var(--tm-act-bg) 55%, var(--tm-surface)) calc(var(--tm-act-pad) + var(--tm-act-lead) + 4px),
+					transparent calc(var(--tm-act-pad) + var(--tm-act-lead) + 4px)
+				);
+			}
+
+			.timeline-item.tm-flash .timeline-content {
+				animation: tm-act-flash 1.6s var(--tm-ease);
+			}
+
+			/* "Load more communications" */
+			.timeline-item.tm-load-more {
+				margin: var(--tm-space-2) 0 0;
+				padding: 0;
+
+				.timeline-load-more {
+					margin: 0;
+					inline-size: auto;
+				}
+			}
+
+			/* -- The card: lead (avatar / tile), title line, body -- */
+			.tm-msg {
+				display: grid;
+				grid-template-columns: var(--tm-act-lead) minmax(0, 1fr);
+				align-items: start;
+				column-gap: 10px;
+				margin: 0;
+				padding: var(--tm-act-pad) var(--tm-space-3);
+				border: 0;
+				border-radius: inherit;
+				background: none;
+			}
+
+			.tm-msg__lead {
+				grid-column: 1;
+				grid-row: 1 / -1;
+				display: flex;
+
+				.avatar {
+					inline-size: var(--tm-act-lead);
+					block-size: var(--tm-act-lead);
+					margin: 0;
+				}
+
+				.avatar .avatar-frame,
+				.avatar img {
+					inline-size: 100%;
+					block-size: 100%;
+					border-radius: var(--tm-radius-full);
+					font-size: var(--tm-text-lg);
+					font-weight: var(--tm-weight-semibold);
+				}
+			}
+
+			.tm-tile {
+				display: inline-grid;
+				place-items: center;
+				inline-size: var(--tm-act-lead);
+				block-size: var(--tm-act-lead);
+				border-radius: var(--tm-radius-full);
+				background-color: var(--tm-act-bg);
+				color: var(--tm-act-fg);
+			}
+
+			.tm-msg__main {
+				grid-column: 2;
+				min-inline-size: 0;
+			}
+
+			.tm-msg__head {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: var(--tm-space-3);
+				min-block-size: 22px;
+			}
+
+			.tm-msg--comment .tm-msg__head {
+				min-block-size: var(--tm-act-lead);
+			}
+
+			/* Replying to a calendar event is not a thing. */
+			.tm-msg--event .tm-msg__actions .custom-actions {
+				display: none;
+			}
+
+
+			.tm-msg__title {
+				min-inline-size: 0;
+				line-height: 1.45;
+				color: var(--tm-text-2);
+				overflow-wrap: anywhere;
+
+				.tm-who,
+				.tm-line-text {
+					color: var(--tm-text);
+				}
+
+				.tm-who {
+					font-weight: var(--tm-weight-semibold);
+				}
+
+				.tm-sep {
+					margin-inline: 2px;
+					color: var(--tm-text-3);
+				}
+
+				.tm-note {
+					font-size: var(--tm-text-sm);
+				}
+
+				.tm-line-text a,
+				.tm-who a {
+					color: inherit;
+				}
+			}
+
+			.tm-msg--line .tm-msg__title .tm-line-text {
+				font-weight: var(--tm-weight-medium);
+			}
+
+			.tm-msg__subject {
+				margin-block-start: 2px;
+				font-weight: var(--tm-weight-semibold);
+				line-height: 1.45;
+				color: var(--tm-text);
+				overflow-wrap: anywhere;
+			}
+
+			.tm-msg__desc {
+				margin-block-start: 2px;
+				line-height: 1.45;
+				color: var(--tm-text-2);
+			}
+
+			.tm-msg .content {
+				margin-block-start: var(--tm-act-pad);
+				padding: 0;
+				max-block-size: 500px;
+				overflow: auto;
+				font-size: var(--tm-text-sm);
+				line-height: 1.55;
+				color: var(--tm-text);
+				overflow-wrap: anywhere;
+
+				/* the native hairline above the body */
+				&::before {
+					content: none;
+				}
+
+				img {
+					max-inline-size: 100%;
+					block-size: auto;
+				}
+
+				.ql-editor.read-mode {
+					padding: 0;
+					min-block-size: 0;
+				}
+			}
+
+			/* Emails, events, notifications read as a preview: subject, then two
+			 * lines of the body, then "Show more" if there is more. */
+			.tm-msg--clamp .content {
+				margin-block-start: 2px;
+				font-size: var(--tm-text-sm);
+				max-block-size: calc(2 * 1.55em);
+				overflow: hidden;
+				color: var(--tm-text-2);
+			}
+
+			.tm-msg--clamp.is-open .content {
+				max-block-size: 500px;
+				overflow: auto;
+			}
+
+			.tm-more-btn {
+				margin-block-start: 4px;
+				padding: 0;
+				border: 0;
+				background: none;
+				color: var(--tm-text-link);
+				font-size: var(--tm-text-sm);
+				font-weight: var(--tm-weight-medium);
+				cursor: pointer;
+
+				&[hidden] {
+					display: none;
+				}
+
+				&:hover {
+					color: var(--tm-text-link-hover);
+				}
+
+				.tm-more-btn__less {
+					display: none;
+				}
+			}
+
+			.tm-msg.is-open .tm-more-btn {
+				.tm-more-btn__more {
+					display: none;
+				}
+
+				.tm-more-btn__less {
+					display: inline;
+				}
+			}
+
+			.tm-files {
+				display: none;
+				flex-wrap: wrap;
+				gap: var(--tm-space-2);
+				margin-block-start: var(--tm-space-3);
+			}
+
+			.tm-msg.has-files-open .tm-files {
+				display: flex;
+			}
+
+			.tm-file {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				max-inline-size: 100%;
+				padding: 3px 8px;
+				border: 1px solid var(--tm-act-line);
+				border-radius: var(--tm-radius-lg);
+				background-color: var(--tm-surface-sunken);
+				color: var(--tm-text-2);
+				font-size: var(--tm-text-sm);
+
+				&:hover {
+					color: var(--tm-text);
+					text-decoration: none;
+				}
+
+				svg {
+					flex: none;
+				}
+			}
+
+			/* -- Actions at the end of the title line -- */
+			.tm-msg__actions {
+				display: flex;
+				flex: none;
+				align-items: center;
+				gap: 4px;
+				margin: 0;
+				color: var(--tm-text-2);
+
+				> *:not(.indicator-pill) {
+					color: var(--tm-text-2);
+				}
+
+				.action-btn {
+					margin: 0;
+					padding: 0;
+					background: none;
+					--icon-stroke: currentColor;
+				}
+
+				/* Edit | Dismiss, or reply / reply-all: one group, one divider. */
+				.custom-actions {
+					display: flex;
+					align-items: center;
+					gap: 2px;
+
+					&:not(:empty) {
+						margin-inline-end: 4px;
+						padding-inline-end: 8px;
+						border-inline-end: 1px solid var(--tm-act-line);
+					}
+
+					.action-btn {
+						display: inline-flex;
+						align-items: center;
+						justify-content: center;
+						gap: 6px;
+						block-size: 28px;
+						min-inline-size: 28px;
+						border-radius: var(--tm-radius-lg);
+						color: var(--tm-text-2);
+						font-size: var(--tm-text-sm);
+						font-weight: var(--tm-weight-medium);
+						line-height: 1;
+						text-decoration: none;
+
+						&:hover {
+							background-color: var(--tm-surface-active);
+							color: var(--tm-text);
+						}
+					}
+
+					.btn-link.action-btn {
+						padding: 0 6px;
+
+						&:first-child::before {
+							content: "";
+							inline-size: 14px;
+							block-size: 14px;
+							background-color: currentColor;
+							-webkit-mask: #{$tm-act-pencil} center / contain no-repeat;
+							mask: #{$tm-act-pencil} center / contain no-repeat;
+						}
+					}
+				}
+
+				.tm-icon-btn {
+					display: inline-grid;
+					place-items: center;
+					inline-size: 28px;
+					block-size: 28px;
+					border-radius: var(--tm-radius-lg);
+
+					&:hover {
+						background-color: var(--tm-surface-active);
+						color: var(--tm-text);
+						text-decoration: none;
+					}
+				}
+
+				.tm-more {
+					border: 1px solid var(--tm-act-line);
+					background-color: var(--tm-surface);
+					color: var(--tm-text);
+
+					&:hover {
+						border-color: var(--tm-border-strong);
+						background-color: var(--tm-surface-hover);
+					}
+				}
+
+				.more-actions {
+					position: relative;
+				}
+
+				.dropdown-menu {
+					min-inline-size: 180px;
+					padding: 6px;
+					border: 1px solid var(--tm-act-line);
+					border-radius: var(--tm-radius-xl);
+					background-color: var(--tm-surface-raised);
+					box-shadow: var(--tm-shadow-lg);
+
+					.dropdown-item {
+						display: block;
+						padding: 8px 10px;
+						border-radius: var(--tm-radius-lg);
+						color: var(--tm-text);
+						font-size: var(--tm-text-sm);
+						cursor: pointer;
+
+						&:hover {
+							background-color: var(--tm-surface-hover);
+						}
+					}
+				}
+			}
+
+			/* While a comment is being edited Frappe hides the "…" and turns Edit
+			 * into Save: the icon follows, and the divider has nothing to divide. */
+			.tm-msg:has(.more-actions[style*="display: none"]) .custom-actions {
+				margin-inline-end: 0;
+				padding-inline-end: 0;
+				border-inline-end: 0;
+
+				.btn-link.action-btn:first-child::before {
+					-webkit-mask-image: #{$tm-act-check};
+					mask-image: #{$tm-act-check};
+				}
+			}
+
+			.tm-attach-pill {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				block-size: 24px;
+				margin-inline-end: 4px;
+				padding: 0 8px;
+				border: 0;
+				border-radius: var(--tm-radius-full);
+				background-color: var(--tm-surface-active);
+				color: var(--tm-text-2);
+				font-size: var(--tm-text-sm);
+				font-weight: var(--tm-weight-semibold);
+				cursor: pointer;
+
+				&:hover,
+				&[aria-expanded="true"] {
+					color: var(--tm-text);
+				}
+			}
+
+			/* The comment's own editor, while it is being edited. */
+			.comment-edit-box {
+				margin-block-start: var(--tm-space-3);
+				border: 1px solid var(--tm-border-strong);
+				border-radius: var(--tm-radius-lg);
+				background-color: var(--tm-surface-sunken);
+
+				--control-bg: transparent;
+			}
+		}
+
+		/* Nothing under this tab. */
+		.tm-empty {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: var(--tm-space-2);
+			padding: var(--tm-space-5) var(--tm-space-4);
+			color: var(--tm-text-3);
+			text-align: center;
+
+			&[hidden] {
+				display: none;
+			}
+		}
+	}
+
+	/* ---- Phones --------------------------------------------------------- */
+	@media (max-width: 575.98px) {
+		.tm-activity-dialog {
+			.modal-dialog {
+				margin: 0;
+				max-inline-size: 100vw;
+			}
+
+			.modal-content {
+				min-block-size: 100dvh;
+				max-block-size: 100dvh;
+				border-radius: 0;
+			}
+
+			.modal-header {
+				padding: var(--tm-space-4);
+			}
+
+			.after-save.tm-act {
+				--tm-act-gutter: 12px;
+			}
+		}
+
+		.after-save.tm-act {
+			--tm-act-rail: 36px;
+			--tm-act-node: 26px;
+			--tm-act-lead: 28px;
+
+			.comment-box {
+				padding: var(--tm-space-3);
+			}
+
+			/* The bar has no avatar column to line up with. */
+			.tm-composer-bar {
+				padding-inline-start: 0;
+			}
+
+			.tm-activity-chips {
+				flex-wrap: nowrap;
+				overflow-x: auto;
+				scrollbar-width: none;
+
+				&::-webkit-scrollbar {
+					display: none;
+				}
+			}
+
+			.tm-composer-actions {
+				order: 3;
+				flex: 1 1 100%;
+				margin-inline-start: 0;
+				padding-inline-start: 0;
+				border-inline-start: 0;
+			}
+
+			.tm-composer-actions:empty + .tm-split,
+			.tm-split {
+				margin-inline-start: auto;
+			}
+
+			.new-timeline .timeline-item .tm-node {
+				inset-block-start: 12px;
+			}
+
+			.new-timeline .tm-msg {
+				padding: var(--tm-space-3);
+				column-gap: var(--tm-space-2);
+			}
+
+			/* The title wraps inside its own column; the actions stay at the
+			 * top-right of the card instead of dropping to a row of their own. */
+			.new-timeline .tm-msg__head {
+				align-items: flex-start;
+			}
+		}
+
+		.form-footer > .after-save.tm-act {
+			padding: var(--tm-space-3);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.after-save.tm-act .tm-flash .timeline-content,
+		.after-save.tm-act .comment-input-container.tm-nudge .frappe-control {
+			animation: none;
+		}
+	}
+}
+
+@keyframes tm-act-flash {
+	from {
+		box-shadow: 0 0 0 3px color-mix(in srgb, var(--tm-action-primary) 40%, transparent);
+	}
+	to {
+		box-shadow: 0 0 0 3px transparent;
+	}
+}
+
+@keyframes tm-act-nudge {
+	25% {
+		transform: translateX(-4px);
+	}
+	75% {
+		transform: translateX(4px);
+	}
+}

@@ -1,0 +1,245 @@
+/* User profile page.
+ * Native source: frappe/desk/page/user_profile/user_profile.html,
+ *                .../user_profile_sidebar.html,
+ *                .../user_profile_controller.js
+ * Header built by js/core/user_profile.js.
+ *
+ * The native page leads with an activity heatmap and keeps the person in a
+ * narrow side column: picture, optional bio, four stat rows and three plain
+ * links. This puts the identity first — picture, name, status, the facts you
+ * look someone up for, roles, and the same four stats as a tile row — and
+ * retires the side column, whose whole content is now either in the header or
+ * duplicated by it. The charts below are Frappe's and are left alone apart
+ * from taking the theme's card. */
+
+#{$tm-on} {
+	/* The side column's job has moved into the header card, so the column
+	 * goes with it and the content takes the whole width. It stays in the DOM
+	 * because the controller re-renders it and fills `.user-stats` inside it
+	 * before js/core/user_profile.js moves that one element out — a hidden
+	 * ancestor does not stop that, and the stats become visible as soon as
+	 * they land in the card. */
+	#page-user-profile .layout-side-section {
+		display: none;
+	}
+
+	/* ---- Header card --------------------------------------------------- */
+	.tm-profile-head {
+		margin-block-end: var(--tm-space-4);
+		padding: var(--tm-space-4);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface);
+	}
+
+	.tm-profile-top {
+		display: flex;
+		align-items: flex-start;
+		gap: var(--tm-space-4);
+		flex-wrap: wrap;
+	}
+
+	.tm-profile-avatar {
+		flex: none;
+		inline-size: 88px;
+		block-size: 88px;
+		border-radius: var(--tm-radius-lg);
+		overflow: hidden;
+		background-color: var(--tm-surface-sunken);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: var(--tm-text-2);
+		font-size: var(--tm-text-2xl);
+		font-weight: var(--tm-weight-semibold);
+
+		img {
+			inline-size: 100%;
+			block-size: 100%;
+			object-fit: cover;
+		}
+	}
+
+	.tm-profile-id {
+		flex: 1 1 240px;
+		min-inline-size: 0;
+	}
+
+	.tm-profile-name {
+		display: flex;
+		align-items: center;
+		gap: var(--tm-space-2);
+		flex-wrap: wrap;
+
+		h2 {
+			margin: 0;
+			color: var(--tm-text);
+			font-size: var(--tm-text-xl);
+			font-weight: var(--tm-weight-semibold);
+			line-height: var(--tm-leading-dense);
+		}
+	}
+
+	.tm-profile-sub {
+		margin-block-start: 2px;
+		color: var(--tm-text-2);
+		font-size: var(--tm-text-sm);
+	}
+
+	.tm-profile-bio {
+		margin: var(--tm-space-2) 0 0;
+		color: var(--tm-text-2);
+		font-size: var(--tm-text-sm);
+		line-height: var(--tm-leading);
+	}
+
+	.tm-profile-actions {
+		display: flex;
+		align-items: center;
+		gap: var(--tm-space-2);
+		flex-wrap: wrap;
+		margin-inline-start: auto;
+	}
+
+	/* ---- Facts ---------------------------------------------------------- */
+	/* Three columns on a desk, two on a narrow one, one on a phone — the
+	 * labels are short and the values are not, so the grid is sized by the
+	 * values. */
+	.tm-profile-facts {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		gap: var(--tm-space-2) var(--tm-space-5);
+		margin: var(--tm-space-4) 0 0;
+		padding-block-start: var(--tm-space-4);
+		border-block-start: 1px solid var(--tm-border);
+	}
+
+	.tm-profile-fact {
+		display: flex;
+		align-items: baseline;
+		gap: var(--tm-space-2);
+		min-inline-size: 0;
+
+		dt {
+			flex: none;
+			inline-size: 96px;
+			margin: 0;
+			color: var(--tm-text-3);
+			font-size: var(--tm-text-xs);
+			font-weight: var(--tm-weight-regular);
+		}
+
+		dd {
+			margin: 0;
+			min-inline-size: 0;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			color: var(--tm-text);
+			font-size: var(--tm-text-sm);
+		}
+	}
+
+	/* ---- Roles ---------------------------------------------------------- */
+	.tm-profile-roles {
+		display: flex;
+		align-items: baseline;
+		gap: var(--tm-space-2);
+		margin-block-start: var(--tm-space-3);
+
+		dt {
+			flex: none;
+			inline-size: 96px;
+			margin: 0;
+			color: var(--tm-text-3);
+			font-size: var(--tm-text-xs);
+			font-weight: var(--tm-weight-regular);
+		}
+
+		dd {
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--tm-space-1);
+			margin: 0;
+		}
+	}
+
+	.tm-role-chip {
+		padding: 1px var(--tm-space-2);
+		border: 1px solid var(--tm-border-strong);
+		border-radius: var(--tm-radius-full);
+		color: var(--tm-text-2);
+		font-size: var(--tm-text-xs);
+		line-height: 18px;
+		white-space: nowrap;
+	}
+
+	.tm-role-more {
+		border-style: dashed;
+		cursor: default;
+	}
+
+	/* ---- Stat tiles ------------------------------------------------------ */
+	/* `.user-stats` is the controller's own element, moved here. Its children
+	 * keep their markup (icon + .stat-value + .stat-label); only the layout
+	 * changes, from a column in a 200px rail to a row of tiles. */
+	.tm-profile-stats:empty {
+		display: none;
+	}
+
+	.tm-profile-head .user-stats {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+		gap: var(--tm-space-2);
+		margin-block-start: var(--tm-space-4);
+		padding-block-start: var(--tm-space-4);
+		border-block-start: 1px solid var(--tm-border);
+
+		.user-stats-item {
+			display: flex;
+			align-items: center;
+			gap: var(--tm-space-2);
+			margin: 0 !important; /* native ships .mt-4 in the markup */
+			padding: var(--tm-space-2) var(--tm-space-3);
+			border: 1px solid var(--tm-border);
+			border-radius: var(--tm-radius-sm);
+			background-color: var(--tm-surface-sunken);
+		}
+
+		.stat-value {
+			color: var(--tm-text);
+			font-size: var(--tm-text-lg);
+			font-weight: var(--tm-weight-semibold);
+			line-height: var(--tm-leading-dense);
+			font-variant-numeric: tabular-nums;
+		}
+
+		.stat-label {
+			color: var(--tm-text-2);
+			font-size: var(--tm-text-xs);
+		}
+	}
+
+	/* ---- The charts Frappe already draws --------------------------------- */
+	.user-profile .frappe-card {
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface);
+		box-shadow: none;
+	}
+
+	.user-profile .recent-activity {
+		margin-block-start: var(--tm-space-4);
+		padding: var(--tm-space-4);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface);
+
+		.recent-activity-title {
+			color: var(--tm-text);
+			font-size: var(--tm-text-lg);
+			font-weight: var(--tm-weight-semibold);
+			margin-block-end: var(--tm-space-3);
+		}
+	}
+}

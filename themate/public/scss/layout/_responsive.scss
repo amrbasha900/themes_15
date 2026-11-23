@@ -1,0 +1,87 @@
+/* Responsive corrections.
+ *
+ * Density is a desktop concern. On narrow screens the contract requires touch
+ * spacing instead of forced desktop density (DESIGN_CONTRACT.md §6), so the
+ * dimension tokens are relaxed rather than each component being re-written.
+ *
+ * Frappe's own breakpoints (desk/variables.scss $container-max-widths):
+ *   sm 540 / md 840 / lg 1090 / xl 1290 */
+
+#{$tm-on} {
+	@media (max-width: 991px) {
+		/* `&` here is the guard selector itself — the tokens live on <html>.
+		 * Writing `:root` inside this block would compile to
+		 * `html:not(…) :root`, a descendant of html, which never matches. */
+		& {
+			/* Back to comfortable regardless of the density setting — a 28px
+			 * target is too small for a finger. */
+			--tm-control-h: 36px;
+			--tm-control-h-sm: 32px;
+			--tm-row-h: 44px;
+		}
+
+		.layout-main-section {
+			padding: var(--tm-space-3);
+			border-inline: none;
+			border-radius: 0;
+		}
+
+		/* Page actions wrap instead of overflowing off-screen, so Save and the
+		 * menu stay reachable. */
+		.page-actions {
+			flex-wrap: wrap;
+			gap: var(--tm-space-1);
+		}
+
+		/* Form columns stack; the side panel moves below the content. */
+		.form-column {
+			padding-inline: 0;
+		}
+
+		/* Dialogs become near-full-screen sheets. */
+		.modal .modal-dialog {
+			margin: var(--tm-space-2);
+			max-inline-size: calc(100vw - var(--tm-space-4));
+		}
+
+		.modal .modal-body {
+			max-block-size: calc(100vh - 160px);
+		}
+	}
+
+	@media (max-width: 767px) {
+		/* Wide data surfaces scroll inside their own container so the page body
+		 * never scrolls sideways. */
+		.form-grid-container,
+		.report-wrapper,
+		.datatable .dt-scrollable {
+			overflow-x: auto;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		/* List rows drop secondary columns rather than shrinking the type below
+		 * the readable floor — density is never bought with unreadable text. */
+		.list-row-col:not(.list-subject) {
+			display: none;
+		}
+
+		.list-row-activity .frappe-timestamp {
+			font-size: var(--tm-text-xs);
+		}
+
+		/* The sidebar becomes an overlay; its rail width no longer offsets
+		 * content. */
+		.modern-sidebar {
+			position: fixed;
+			inset-block: 0;
+			inset-inline-start: 0;
+			z-index: 1040;
+			box-shadow: var(--tm-shadow-lg);
+		}
+
+		.page-head .page-title .title-text {
+			font-size: var(--tm-text-lg);
+		}
+	}
+
+}

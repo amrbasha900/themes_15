@@ -1,0 +1,216 @@
+/* Report DataTable — a SEPARATE implementation from both the List View and the
+ * child-table Grid (brief §6: matching one is not evidence for the others).
+ *
+ * Native source: frappe/public/scss/desk/frappe_datatable.scss (skins the
+ * vendored `frappe-datatable` package), frappe/public/scss/desk/report.scss.
+ *
+ * Verified structure: .datatable > .dt-header > .dt-row-header
+ *                                > .dt-scrollable > .dt-row > .dt-cell
+ *                                                   > .dt-cell__content
+ *
+ * Not flag-scoped: a report is its own page and has no form/list flag. */
+
+#{$tm-on} {
+	.datatable {
+		font-size: var(--tm-text-sm);
+		color: var(--tm-text);
+
+		.dt-header {
+			background-color: var(--tm-surface-sunken);
+			border-block-end: 1px solid var(--tm-border-strong);
+
+			.dt-cell--header .dt-cell__content {
+				color: var(--tm-text-2);
+				font-size: var(--tm-text-xs);
+				font-weight: var(--tm-weight-medium);
+				background-color: transparent;
+			}
+		}
+
+		.dt-cell {
+			border-inline-end: 1px solid var(--tm-border);
+			border-block-end: 1px solid var(--tm-border);
+		}
+
+		/* The column menu is `position: fixed; z-index: 1` in the library's own
+		 * stylesheet. Frozen cells are painted above that — the header ones
+		 * carry a transform, which makes a stacking context whatever their
+		 * z-index says — so the menu opened over a pinned column and came out
+		 * with its start half missing. It belongs above everything in the
+		 * table. */
+		.dt-dropdown__list {
+			z-index: 100;
+			border: 1px solid var(--tm-border);
+			border-radius: var(--tm-radius-md);
+			background-color: var(--tm-surface-raised);
+			box-shadow: var(--tm-shadow-md);
+			padding: var(--tm-space-1) 0;
+			font-size: var(--tm-text-sm);
+			color: var(--tm-text);
+		}
+
+		.dt-dropdown__list-item {
+			padding: var(--tm-space-1) var(--tm-space-3);
+
+			&:hover {
+				background-color: var(--tm-surface-hover);
+			}
+		}
+
+		/* ---- Frozen columns (js/core/report_columns.js) -------------------
+		 * The offsets are written into a <style> element by that file, because
+		 * the body is virtualised and an inline style on a cell would be
+		 * thrown away on the next scroll. What belongs here is the part that
+		 * does not depend on column widths: a pinned cell has to be opaque,
+		 * since the cells sliding under it are the row's own, and the row is
+		 * what carries the background above. */
+		&.tm-freeze-on {
+			.dt-cell {
+				background-color: var(--tm-surface);
+			}
+
+			.dt-header .dt-cell {
+				background-color: var(--tm-surface-sunken);
+			}
+
+			.dt-row:hover .dt-cell {
+				background-color: var(--tm-surface-hover);
+			}
+
+			.dt-row--highlight .dt-cell,
+			.dt-cell--highlight {
+				background-color: var(--tm-surface-selected);
+			}
+		}
+
+		.dt-cell__content {
+			padding: var(--tm-space-1) var(--tm-space-2);
+			line-height: var(--tm-leading-dense);
+		}
+
+		.dt-row {
+			background-color: var(--tm-surface);
+
+			&:hover {
+				background-color: var(--tm-surface-hover);
+			}
+		}
+
+		/* Selected/focused cell — distinct from hover, per the contract. */
+		.dt-cell--focus .dt-cell__content {
+			border: 1px solid var(--tm-action-primary);
+			box-shadow: var(--tm-ring);
+		}
+
+		.dt-cell--highlight {
+			background-color: var(--tm-surface-selected);
+		}
+
+		/* Totals row */
+		.dt-row.dt-row-totalRow {
+			background-color: var(--tm-surface-sunken);
+			font-weight: var(--tm-weight-semibold);
+			border-block-start: 1px solid var(--tm-border-strong);
+		}
+
+		/* Inline filter row */
+		.dt-row-filter {
+			background-color: var(--tm-surface-sunken);
+
+			.dt-filter.dt-input {
+				height: var(--tm-control-h-sm);
+				border: 1px solid var(--tm-border-strong);
+				border-radius: var(--tm-radius-xs);
+				background-color: var(--tm-surface);
+				font-size: var(--tm-text-xs);
+				color: var(--tm-text);
+
+				&:focus {
+					border-color: var(--tm-action-primary);
+					box-shadow: var(--tm-ring);
+					outline: none;
+				}
+			}
+		}
+
+		/* Column resize affordance — native keeps this functional; only its colour
+		 * changes so it stays visible in both modes. */
+		.dt-cell__resize-handle {
+			background-color: var(--tm-border-strong);
+		}
+
+		.dt-cell__edit {
+			background-color: var(--tm-surface);
+			border: 1px solid var(--tm-action-primary);
+		}
+
+		/* Frozen first column reads as a header, not as data. */
+		.dt-cell__content--col-0 {
+			color: var(--tm-text-3);
+			font-size: var(--tm-text-xs);
+		}
+
+		.dt-scrollable {
+			background-color: var(--tm-surface);
+		}
+
+		/* Tree toggles inside grouped reports */
+		.dt-tree-node__toggle {
+			color: var(--tm-text-3);
+
+			&:hover {
+				color: var(--tm-action-primary-fg);
+			}
+		}
+	}
+
+	/* ---- Report chrome -------------------------------------------------------- */
+	/* Native: scss/desk/report.scss */
+	.report-wrapper {
+		background-color: var(--tm-surface);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		overflow: hidden;
+	}
+
+	.report-summary {
+		border-block-end: 1px solid var(--tm-border);
+		background-color: var(--tm-surface-sunken);
+		padding: var(--tm-space-3);
+
+		.summary-value {
+			font-size: var(--tm-text-lg);
+			font-weight: var(--tm-weight-semibold);
+			color: var(--tm-text);
+		}
+
+		.summary-label {
+			font-size: var(--tm-text-xs);
+			color: var(--tm-text-3);
+		}
+	}
+
+	.report-footer,
+	.tree-footer {
+		border-block-start: 1px solid var(--tm-border);
+		background-color: var(--tm-surface-sunken);
+		font-size: var(--tm-text-xs);
+		color: var(--tm-text-3);
+		padding: var(--tm-space-2) var(--tm-space-3);
+	}
+
+	.group-by-popover,
+	.column-picker-dialog {
+		border-radius: var(--tm-radius-md);
+	}
+
+	/* Report filters sit in .page-form; keep their controls on the shared height. */
+	.report-view .page-form,
+	.query-report .page-form {
+		.form-control {
+			height: var(--tm-control-h);
+			font-size: var(--tm-text-sm);
+		}
+	}
+
+}

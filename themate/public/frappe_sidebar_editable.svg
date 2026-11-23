@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1536" width="1024" height="1536" preserveAspectRatio="none" role="img" aria-labelledby="wall-title wall-desc">
+  <title id="wall-title">Frappe sidebar — editable vector background</title>
+  <desc id="wall-desc">Dark gradient wallpaper with flowing blue ribbons and cyan lighting. Colors are controlled by five CSS variables in the style block.</desc>
+  <style><![CDATA[
+    /* EDIT THESE SIX HEX COLORS TO RECOLOR THE ENTIRE SIDEBAR. */
+    svg {
+      --bg-top: #030F30;
+      --bg-bottom: #071E54;
+      --wave-dark: #0A347B;
+      --wave-light: #1065CF;
+      --accent: #14CCFF;
+    }
+    .s-bg-top { stop-color: var(--bg-top); }
+    .s-bg-bottom { stop-color: var(--bg-bottom); }
+    .s-wave-dark { stop-color: var(--wave-dark); }
+    .s-wave-light { stop-color: var(--wave-light); }
+    .s-accent { stop-color: var(--accent); }
+    .stroke-accent { stroke: var(--accent); }
+    .stroke-wave { stroke: var(--wave-light); }
+  ]]></style>
+  <defs>
+    <linearGradient id="base" x1="0" y1="0" x2="0.87" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" class="s-bg-top"/>
+      <stop offset="0.48" class="s-bg-bottom"/>
+      <stop offset="1" class="s-bg-top"/>
+    </linearGradient>
+    <radialGradient id="mid-shade" cx="46%" cy="48%" r="74%">
+      <stop offset="0" class="s-bg-top" stop-opacity="0.13"/>
+      <stop offset="0.6" class="s-bg-top" stop-opacity="0"/>
+      <stop offset="1" class="s-bg-top" stop-opacity="0.43"/>
+    </radialGradient>
+    <linearGradient id="top-glass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" class="s-wave-dark" stop-opacity="0.32"/>
+      <stop offset="0.36" class="s-wave-light" stop-opacity="0.60"/>
+      <stop offset="0.8" class="s-wave-dark" stop-opacity="0.72"/>
+      <stop offset="1" class="s-wave-light" stop-opacity="0.55"/>
+    </linearGradient>
+    <linearGradient id="edge-glass" x1="0" y1="0" x2="1" y2="0.92">
+      <stop offset="0" class="s-wave-dark" stop-opacity="0.16"/>
+      <stop offset="0.60" class="s-wave-light" stop-opacity="0.48"/>
+      <stop offset="1" class="s-wave-dark" stop-opacity="0.52"/>
+    </linearGradient>
+    <linearGradient id="bottom-glass" x1="0.07" y1="0.92" x2="1" y2="0.14">
+      <stop offset="0" class="s-wave-dark" stop-opacity="0.66"/>
+      <stop offset="0.56" class="s-wave-light" stop-opacity="0.80"/>
+      <stop offset="0.83" class="s-wave-dark" stop-opacity="0.54"/>
+      <stop offset="1" class="s-wave-light" stop-opacity="0.69"/>
+    </linearGradient>
+    <linearGradient id="bottom-front" x1="0" y1="0.8" x2="1" y2="0.12">
+      <stop offset="0" class="s-wave-dark" stop-opacity="0.58"/>
+      <stop offset="0.51" class="s-wave-light" stop-opacity="0.56"/>
+      <stop offset="1" class="s-wave-dark" stop-opacity="0.24"/>
+    </linearGradient>
+    <linearGradient id="top-highlight" x1="0" y1="0" x2="1" y2="0.95">
+      <stop offset="0" class="s-wave-light" stop-opacity="0.0"/>
+      <stop offset="0.35" class="s-wave-light" stop-opacity="0.85"/>
+      <stop offset="0.72" class="s-accent" stop-opacity="0.94"/>
+      <stop offset="1" class="s-accent" stop-opacity="0.06"/>
+    </linearGradient>
+    <linearGradient id="bottom-highlight" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" class="s-wave-light" stop-opacity="0"/>
+      <stop offset="0.42" class="s-wave-light" stop-opacity="0.55"/>
+      <stop offset="0.73" class="s-accent" stop-opacity="0.95"/>
+      <stop offset="1" class="s-wave-light" stop-opacity="0.16"/>
+    </linearGradient>
+    <radialGradient id="upper-halo" cx="68%" cy="35%" r="60%">
+      <stop offset="0" class="s-accent" stop-opacity="0.34"/>
+      <stop offset="0.37" class="s-wave-light" stop-opacity="0.18"/>
+      <stop offset="1" class="s-wave-light" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lower-halo" cx="63%" cy="60%" r="65%">
+      <stop offset="0" class="s-accent" stop-opacity="0.27"/>
+      <stop offset="0.32" class="s-wave-light" stop-opacity="0.18"/>
+      <stop offset="1" class="s-wave-light" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <rect width="1024" height="1536" fill="url(#base)"/>
+  <rect width="1024" height="1536" fill="url(#mid-shade)"/>
+
+  <!-- Upper flowing glass ribbon -->
+  <path d="M486 -72 C722 43 911 190 994 386 C1073 574 1032 793 912 962 C838 1067 776 1121 678 1159 C879 1109 1050 1029 1131 886 C1245 681 1200 261 1066 -38 Z" fill="url(#edge-glass)"/>
+  <path d="M472 -70 C690 21 905 189 991 378 C1074 565 1040 783 905 966 C1016 896 1110 736 1116 535 C1123 280 976 54 854 -68 Z" fill="url(#top-glass)" opacity="0.78"/>
+  <path d="M475 -54 C710 57 911 201 988 385" fill="none" stroke="url(#top-highlight)" stroke-width="13" opacity="0.53" stroke-linecap="round"/>
+  <path d="M475 -54 C710 57 911 201 988 385" fill="none" stroke="url(#top-highlight)" stroke-width="2.8" stroke-linecap="round"/>
+  <ellipse cx="924" cy="284" rx="215" ry="187" fill="url(#upper-halo)" opacity="0.67"/>
+  <path d="M1005 394 C1027 640 929 863 676 1158" fill="none" class="stroke-wave" stroke-width="1.7" opacity="0.39"/>
+
+  <!-- Bottom glass swells, drawn beneath the fine illuminated edge -->
+  <path d="M-78 1539 C112 1367 288 1249 492 1184 C701 1116 879 1072 1098 893 L1099 1599 L-78 1599 Z" fill="url(#bottom-glass)" opacity="0.86"/>
+  <path d="M-110 1548 C171 1357 312 1304 531 1271 C757 1236 918 1139 1098 1009 L1128 1591 L-110 1591 Z" fill="url(#bottom-front)" opacity="0.90"/>
+  <path d="M-44 1489 C139 1359 323 1302 543 1271 C764 1240 913 1147 1077 1037" fill="none" stroke="url(#bottom-highlight)" stroke-width="19" opacity="0.42" stroke-linecap="round"/>
+  <path d="M-44 1489 C139 1359 323 1302 543 1271 C764 1240 913 1147 1077 1037" fill="none" stroke="url(#bottom-highlight)" stroke-width="3.2" opacity="0.93" stroke-linecap="round"/>
+  <ellipse cx="767" cy="1226" rx="354" ry="155" fill="url(#lower-halo)" opacity="0.57"/>
+  <path d="M30 1525 C192 1396 338 1300 569 1244" fill="none" class="stroke-wave" opacity="0.20" stroke-width="1.5"/>
+</svg>

@@ -1,0 +1,67 @@
+/* Raw palette. Literal colour values are permitted ONLY in this file and in
+ * tokens/_dark.scss. Every other file consumes the semantic tokens defined in
+ * tokens/_semantic.scss. See DESIGN_CONTRACT.md §3. */
+
+#{$tm-on} {
+	--tm-white: #ffffff;
+	--tm-black: #000000;
+
+	/* Accent ramp built around #1677ff.
+	 * 400 / 500 / 600 are the contract's hover / base / pressed triple, so a
+	 * runtime brand override keeps the same relationships (core/bootstrap.js). */
+	--tm-brand-50: #e6f4ff;
+	--tm-brand-100: #bae0ff;
+	--tm-brand-200: #91caff;
+	--tm-brand-300: #69b1ff;
+	--tm-brand-400: #4096ff;
+	--tm-brand-500: #1677ff;
+	--tm-brand-600: #0958d9;
+	--tm-brand-700: #003eb3;
+	--tm-brand-800: #002c8c;
+	--tm-brand-900: #001d66;
+
+	/* Neutral ramp. 200 is the input border, 100 the subtle divider. */
+	--tm-gray-25: #ffffff;
+	--tm-gray-50: #fafafa;
+	--tm-gray-100: #f0f0f0;
+	--tm-gray-200: #d9d9d9;
+	--tm-gray-300: #bfbfbf;
+	--tm-gray-400: #8c8c8c;
+	--tm-gray-500: #707070;
+	--tm-gray-600: #595959;
+	--tm-gray-700: #434343;
+	--tm-gray-800: #262626;
+	--tm-gray-900: #1f1f1f;
+
+	/* App ground. Frappe ships white here; the contract introduces a distinct
+	 * app background so surfaces read as panels. */
+	--tm-gray-app: #f5f5f5;
+
+	/* Status. Text/background pairs are fixed together — see DESIGN_CONTRACT.md §3. */
+	--tm-green-50: #f6ffed;
+	--tm-green-600: #389e0d;
+	--tm-green-700: #237804;
+	--tm-gold-50: #fffbe6;
+	--tm-gold-600: #d46b08;
+	--tm-gold-700: #ad4e00;
+	--tm-red-50: #fff2f0;
+	--tm-red-500: #ff4d4f;
+	--tm-red-600: #cf1322;
+	--tm-red-700: #a8071a;
+
+	/* Decorative tones for workspace card icon chips ONLY. These are not
+	 * status colours and must never be used to signal state — the six rotate
+	 * purely so neighbouring cards differ (js/workspace/cards.js TONES). */
+	--tm-tone-blue-bg: #e6f4ff;
+	--tm-tone-blue-fg: #0958d9;
+	--tm-tone-green-bg: #f6ffed;
+	--tm-tone-green-fg: #389e0d;
+	--tm-tone-purple-bg: #f9f0ff;
+	--tm-tone-purple-fg: #722ed1;
+	--tm-tone-orange-bg: #fff7e6;
+	--tm-tone-orange-fg: #d46b08;
+	--tm-tone-teal-bg: #e6fffb;
+	--tm-tone-teal-fg: #08979c;
+	--tm-tone-pink-bg: #fff0f6;
+	--tm-tone-pink-fg: #c41d7f;
+}

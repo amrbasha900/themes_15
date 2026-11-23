@@ -1,0 +1,566 @@
+Log in to your Account,تسجيل الدخول إلى حسابك
+Welcome back! Select method to log in:,أهلاً بعودتك! اختر طريقة تسجيل الدخول:
+Connect with every application.,اربط كل تطبيقاتك في مكان واحد.
+"Sales, inventory, accounting and people — one customizable dashboard.",المبيعات والمخزون والحسابات والموارد البشرية — لوحة تحكم واحدة قابلة للتخصيص.
+Remember me,تذكرني
+Log in,تسجيل الدخول
+Back to Sign in,العودة لتسجيل الدخول
+Font Size,حجم الخط
+Site default: {0},الافتراضي للموقع: {0}
+Accent Color,لون التمييز
+Reset to default,إعادة الافتراضي
+Accent color updated,تم تحديث لون التمييز
+Accent color reset,تمت إعادة لون التمييز
+Reload to see the theme changes,أعد تحميل الصفحة لرؤية تغييرات المظهر
+Theme Settings,إعدادات المظهر
+Brand Color,لون العلامة
+App Logo,شعار التطبيق
+Enable Theme,تفعيل المظهر
+Theme Customizer,مخصّص المظهر
+Changes preview instantly. Apply to keep them.,التغييرات تظهر فوراً. اضغط تطبيق لحفظها.
+Appearance,المظهر
+"Buttons, links, active items",الأزرار والروابط والعناصر النشطة
+Site brand,لون الموقع
+Custom,مخصص
+Custom color,لون مخصص
+Typography,الخطوط
+Font,الخط
+Base font size,حجم الخط الأساسي
+Site default: {0}px,الافتراضي للموقع: {0} بكسل
+Shape & Density,الشكل والكثافة
+Corners,الزوايا
+Density,الكثافة
+Icons,الأيقونات
+Themate Business set,مجموعة Themate للأعمال
+Style,النمط
+Size,الحجم
+Duotone,ثنائي اللون
+Outline,مفرّغ
+Sidebar,الشريط الجانبي
+Expanded,موسّع
+Rail,مضغوط
+Smaller,أصغر
+Larger,أكبر
+Save as site default for everyone,حفظ كافتراضي للموقع للجميع
+Reset,إعادة الضبط
+Saved as the site default,تم الحفظ كافتراضي للموقع
+Theme preferences saved,تم حفظ تفضيلات المظهر
+Back to the site defaults,تمت العودة لإعدادات الموقع الافتراضية
+Open Theme Customizer,فتح مخصّص المظهر
+"Font size, font, corners, density and icons — with live preview.",حجم الخط والخط والزوايا والكثافة والأيقونات — بمعاينة فورية.
+Sharp,حادة
+Round,دائرية
+Comfortable,مريح
+Compact,مضغوط
+Inter,Inter
+Cairo,Cairo
+System,النظام
+Blue,أزرق
+Indigo,نيلي
+Violet,بنفسجي
+Teal,تركوازي
+Gold,ذهبي
+Volcano,برتقالي
+Rose,وردي
+Icon Style,نمط الأيقونات
+Icon Weight,سماكة الأيقونات
+Icon Size (px),حجم الأيقونات (بكسل)
+Icon Color,لون الأيقونات
+Base Font Size (px),حجم الخط الأساسي (بكسل)
+Language,اللغة
+You are already using this language.,أنت تستخدم هذه اللغة بالفعل.
+Switching to {0}…,جارٍ التبديل إلى {0}…
+Show Language Switcher,إظهار مبدّل اللغة
+Show Theme Customizer Button,إظهار زر مخصّص المظهر
+Languages,اللغات
+Workspace,مساحة العمل
+Operations,العمليات
+Administration,الإدارة
+Activity,النشاط
+Document,المستند
+{0} Overview,نظرة عامة على {0}
+Basic Information,البيانات الأساسية
+Stock & Valuation,المخزون والتقييم
+Toggle Sidebar,طي الشريط الجانبي
+Filters,الفلاتر
+Collapse,طي
+Select,اختر
+{0} records,{0} سجل
+Save,حفظ
+Theme,المظهر
+Background,الخلفية
+Dark theme only,للمظهر الداكن فقط
+Site default,افتراضي الموقع
+State,الحالة
+Navy,كحلي
+Slate,رمادي مزرق
+Graphite,جرافيت
+Forest,أخضر داكن
+Plum,برقوقي
+Ink,أسود
+Workspace,مساحة العمل
+Reports & Masters,التقارير والملفات الرئيسية
+Quick Access,الوصول السريع
+Shortcuts,الاختصارات
+App Name,اسم التطبيق
+Text Styles,أنماط النصوص
+"Size, weight, italic, colour",الحجم والسماكة والمائل واللون
+Element,العنصر
+Page title,عنوان الصفحة
+Sub-title,العنوان الفرعي
+Section titles,عناوين الأقسام
+Tabs,التبويبات
+Field labels,عناوين الحقول
+Body text,نص المحتوى
+Menu items,عناصر القائمة
+Weight,السماكة
+Regular,عادي
+Medium,متوسط
+Semibold,شبه عريض
+Bold,عريض
+Italic,مائل
+Reset element,إعادة العنصر
+Colour,اللون
+Text,النص
+Muted,باهت
+Brand,لون العلامة
+Whitelabel,علامة خاصة
+Others,أخرى
+Series,سلسلة
+Chart Engine,محرك الرسوم البيانية
+Hide Workspace Shortcuts,إخفاء اختصارات مساحة العمل
+Records,السجلات
+Start Tour,ابدأ الجولة
+Chart Detail,تفاصيل الرسوم البيانية
+Rich,غني
+Simple,بسيط
+No data to show,لا توجد بيانات للعرض
+Save as image,حفظ كصورة
+Line,خطي
+Bar,أعمدة
+Avg,المتوسط
+Max,الأعلى
+Total,الإجمالي
+Overview,نظرة عامة
+My Workspaces,مساحات عملي
+New Workspace,مساحة عمل جديدة
+Rename Workspace,إعادة تسمية مساحة العمل
+Delete Workspace,حذف مساحة العمل
+Edit Workspace,تعديل مساحة العمل
+Smart Widget,عنصر ذكي
+Themate Widget,عنصر ذكي
+Expected by today,المتوقع حتى اليوم
+from previous,من المرحلة السابقة
+100% of total,100% من الإجمالي
+Area,مساحة
+Stacked Bar,أعمدة متراكمة
+Horizontal Bar,أعمدة أفقية
+Scatter,نقاط
+Radar,رادار
+Gauge,عدّاد
+Treemap,خريطة شجرية
+Sunburst,شمسي
+Rose,وردة
+Good morning,صباح الخير
+Good afternoon,مساء الخير
+Good evening,مساء الخير
+Log out,تسجيل الخروج
+Go back,رجوع
+Page not found,الصفحة غير موجودة
+Not permitted,غير مسموح
+You do not have permission to view this page.,ليس لديك صلاحية لعرض هذه الصفحة.
+There's nothing here,لا يوجد شيء هنا
+The page you are looking for has gone missing.,الصفحة التي تبحث عنها غير موجودة.
+Back to Home,العودة للرئيسية
+Page {0} of {1},صفحة {0} من {1}
+Open in new tab,فتح في تبويب جديد
+Actions,إجراءات
+Hidden Groups,مجموعات مخفية
+Show My Workspaces,إظهار مساحات عملي
+Show User Card,إظهار بطاقة المستخدم
+Groups and Hidden Items,المجموعات والعناصر المخفية
+Hide,إخفاء
+Page {0},صفحة {0}
+No match,لا نتائج
+No {0} yet,لا يوجد {0} بعد
+Chart Palette,لوحة ألوان الرسوم
+Series colours in charts and widgets,ألوان السلاسل في الرسوم والعناصر
+Brand,العلامة
+Ocean,محيط
+Sunset,غروب
+Forest,غابة
+Slate,رمادي
+Pastel,باستيل
+Colour {0},اللون {0}
+Custom Chart Colours,ألوان رسوم مخصصة
+"One number, its change and a sparkline",رقم واحد مع تغيّره وخط اتجاه صغير
+Progress ring against a target with the pace marker,حلقة تقدم مقابل الهدف مع علامة الوتيرة المتوقعة
+A percentage on a gauge: part of the records out of all,نسبة مئوية على عداد: جزء من السجلات من الإجمالي
+Per day / week / month as columns with the average,لكل يوم / أسبوع / شهر كأعمدة مع خط المتوسط
+"Top groups by value, medals for the first three",أعلى المجموعات بالقيمة مع ميداليات لأول ثلاثة
+The value split by a field on a donut,توزيع القيمة حسب حقل على شكل دونات
+Ordered stages and the drop between them,مراحل مرتبة ونسبة التسرب بينها
+"Records needing attention, the overdue ones flagged",سجلات تحتاج انتباهًا مع تمييز المتأخر منها
+"What is due in the next days, on date tiles",ما يستحق خلال الأيام القادمة على بطاقات تاريخ
+The latest records on a timeline,أحدث السجلات على خط زمني
+"The value bucketed by age, colour by severity",القيمة موزعة على شرائح عمرية بألوان حسب الخطورة
+This period,هذه الفترة
+Previous,السابق
+Themate Layout,تخطيط Themate
+Introduction,المقدمة
+One paragraph shown above the cards: what this dashboard answers and for whom.,فقرة واحدة تظهر فوق الكروت: ما الذي تجيب عنه هذه اللوحة ولمن.
+"Order among the workspace's dashboards: 1 comes first, then 2; blank or 0 goes after them.",الترتيب بين لوحات مساحة العمل: 1 يأتي أولًا ثم 2؛ الفارغ أو 0 يأتي بعدها.
+Layout,التخطيط
+"When filled, this layout is drawn instead of the plain cards and charts: headings with a note, Business Overview widgets, charts and number cards, in this order and width.",عند ملئه يُرسم هذا التخطيط بدل الكروت والشارتس العادية: عناوين مع ملاحظة، وعناصر Business Overview، وشارتس وبطاقات أرقام، بهذا الترتيب والعرض.
+Business Overview Widget,عنصر Business Overview
+A section title: the question this row of cards answers.,عنوان القسم: السؤال الذي تجيب عنه كروت هذا الصف.
+One line under the heading: how to read the cards that follow.,سطر تحت العنوان: كيف تقرأ الكروت التالية.
+Of the row. Headings always take the full row.,من عرض الصف. العناوين تأخذ الصف كاملًا دائمًا.
+Two Thirds,ثلثان
+Third,ثلث
+Edit Dashboard,تعديل اللوحة
+Edit Dashboard: {0},تعديل اللوحة: {0}
+Segment,تقسيم
+Mine,الخاص بي
+Only the records you created or are assigned to,السجلات التي أنشأتها أو المسندة إليك فقط
+Clear,مسح
+TV mode,وضع الشاشة
+Exit TV mode (Esc),الخروج من وضع الشاشة (Esc)
+Annotate…,تعليم حدث…
+Mark an event on the chart,علّم حدثًا على الشارت
+What happened,ما الذي حدث
+"Short: a price change, a campaign, a new branch.",باختصار: تغيير سعر، حملة، فرع جديد.
+Show on,يظهر على
+This chart only,هذا الشارت فقط
+Every time-series chart,كل الشارتات الزمنية
+Mark,تعليم
+Marked,تم التعليم
+Useful,مفيد
+Not useful,غير مفيد
+Thanks — noted,شكرًا — تم التسجيل
+Muted for you,لن يظهر لك مجددًا
+Only yours,الخاص بك فقط
+Manage annotations,إدارة التعليقات
+Could not load {0},تعذر تحميل {0}
+Open list,فتح القائمة
+{0} documents,{0} مستند
+docs,مستند
+Not set,غير محدد
+Not found,غير موجود
+You are not allowed to view this dashboard,لا تملك صلاحية عرض لوحة القيادة هذه
+"Group Order","ترتيب المجموعات"
+"Sidebar sections top to bottom, one per line, e.g. Workspace / Operations / Governance / Setup. Sections not listed follow in their usual order (Workspace, My Workspaces, Operations, Administration, then the custom ones). Matches the section title.","أقسام الشريط الجانبي من أعلى لأسفل، قسم في كل سطر، مثل Workspace / Operations / Governance / Setup. الأقسام غير المذكورة تأتي بعدها بترتيبها المعتاد (Workspace، My Workspaces، Operations، Administration، ثم المخصصة). يطابق عنوان القسم."
+"A view with this name exists.","يوجد عرض بهذا الاسم بالفعل."
+"Add an “any of” group","إضافة مجموعة «أيٌّ من»"
+"Add condition","إضافة شرط"
+"Any of","أيٌّ من"
+"Assigned to me","مسندة إليّ"
+"Clear all","مسح الكل"
+"Created","الإنشاء"
+"Created by me","أنشأتها"
+"Delete the view {0}?","حذف العرض {0}؟"
+"Delete view","حذف العرض"
+"Everyone","الجميع"
+"Explore","استكشاف"
+"Liked","أعجبتني"
+"Liked By","أعجب بها"
+"Only you","أنت فقط"
+"Quick picks","اختيارات سريعة"
+"Remove group","إزالة المجموعة"
+"Save view","حفظ العرض"
+"Search {0}…","بحث في {0}…"
+"Set a filter first, then save it as a view.","ضع فلترًا أولًا ثم احفظه كعرض."
+"Share with everyone","مشاركة مع الجميع"
+"Show all {0}","عرض الكل ({0})"
+"This month","هذا الشهر"
+"This quarter","هذا الربع"
+"This week","هذا الأسبوع"
+"This year","هذا العام"
+"Time","الوقت"
+"View name","اسم العرض"
+"Where","حيث"
+"And","و"
+"above","أعلى من"
+"any of the following are true","أيٌّ مما يلي صحيح"
+"between","بين"
+"contains","يحتوي"
+"does not contain","لا يحتوي"
+"is","هو"
+"is any of","أيٌّ من"
+"is none of","ليس أيًّا من"
+"is not","ليس"
+"not above","ليس أعلى من"
+"not within","ليس ضمن"
+"or","أو"
+"within","ضمن"
+"{0} in {1} records","{0} في {1} سجل"
+"Tag","وسم"
+"Choose…","اختر…"
+"Print settings","إعدادات الطباعة"
+"Print format","نموذج الطباعة"
+"Letter head","الترويسة"
+"Open in tab","فتح في تبويب"
+"Copy link","نسخ الرابط"
+"Open the page on its own","فتح الصفحة وحدها"
+"{0} pages","{0} صفحات"
+"1 page","صفحة واحدة"
+"Fit","ملائم"
+"Portrait","طولي"
+"Letter","Letter"
+"Designer","مصمّم"
+"Jinja","Jinja"
+"Builder","منشئ"
+"Raw","خام"
+"Default","افتراضي"
+"Next","التالي"
+"Fit width","ملء العرض"
+"Zoom in","تكبير"
+"Zoom out","تصغير"
+Sort by,ترتيب حسب
+Calendar Layout,تخطيط التقويم
+Calendar Layouts,تخطيطات التقويم
+Calendar Layout Field,حقل تخطيط التقويم
+Saved Calendar,تقويم محفوظ
+Event Style,شكل الحدث
+Card,بطاقة
+Single Line,سطر واحد
+Shown on Each Event,ما يظهر على كل حدث
+Color Events By,تلوين الأحداث حسب
+Calendar Default,افتراضي التقويم
+Fixed Color,لون ثابت
+Event Color,لون الحدث
+Event Fields,حقول الحدث
+Starts On,يبدأ في
+Ends On,ينتهي في
+Weekend,عطلة نهاية الأسبوع
+Use a Weekend of Its Own,عطلة أسبوعية خاصة بهذا التقويم
+Show As,العرض كـ
+Number,رقم
+Progress Bar,شريط تقدم
+Badge,شارة
+Hide If Empty,إخفاء إن كان فارغًا
+Shade Weekend Days,تظليل أيام العطلة
+Look,المظهر
+Event Layouts,تخطيطات الأحداث
+Open Calendar Layouts,فتح تخطيطات التقويم
+The document type whose calendar this lays out.,نوع المستند الذي يُنظَّم تقويمه بهذا التخطيط.
+Leave empty to lay out every calendar of the document type: its own one and any saved one without a layout of its own. Pick a saved calendar to give only that one this layout.,اتركه فارغًا ليُطبَّق على كل تقاويم نوع المستند: تقويمه الأساسي وأي تقويم محفوظ ليس له تخطيط خاص. اختر تقويمًا محفوظًا ليُطبَّق عليه وحده.
+"Card: the title on its own line, each field below it. Single Line: the title and the fields on one line, for busy months.",بطاقة: العنوان في سطر وكل حقل تحته. سطر واحد: العنوان والحقول في سطر واحد، للأشهر المزدحمة.
+"The fields drawn under the title, top to bottom, e.g. the grand total and the percentage billed.",الحقول التي تظهر تحت العنوان من أعلى لأسفل، مثل الإجمالي ونسبة الفوترة.
+Calendar Default: as the document type's calendar colours it. Status: the colour of the record's status in its list. Fixed Color: every event in one colour.,افتراضي التقويم: كما يلوّنه تقويم نوع المستند. الحالة: لون حالة السجل كما في قائمته. لون ثابت: كل الأحداث بلون واحد.
+Which fields name the event and place it on the calendar. Leave them empty to keep what the calendar already uses. A document type that has no calendar of its own needs Starts On; setting it makes the calendar read the dates straight from these fields.,"الحقول التي تسمّي الحدث وتضعه على التقويم. اتركها فارغة للإبقاء على ما يستخدمه التقويم. نوع المستند الذي ليس له تقويم يحتاج ""يبدأ في""؛ وتحديده يجعل التقويم يقرأ التواريخ من هذه الحقول مباشرة."
+Leave empty for events that last a single day.,اتركه فارغًا للأحداث التي تستمر يومًا واحدًا.
+Otherwise the weekend set in Theme Settings > Calendar applies.,وإلا تُطبَّق العطلة المحددة في إعدادات الثيم > التقويم.
+"A field of the document type, drawn under the event's title.",حقل من نوع المستند يظهر تحت عنوان الحدث.
+"Written before the value, e.g. Total. Leave empty for the value alone.",يُكتب قبل القيمة، مثل: الإجمالي. اتركه فارغًا لعرض القيمة وحدها.
+"Value: formatted as in the form (an amount with its currency). Number: the figure alone. Progress Bar: a bar for a percentage from 0 to 100. Badge: a small tag, for a status or a type.",قيمة: بتنسيق النموذج (المبلغ بعملته). رقم: الرقم وحده. شريط تقدم: شريط لنسبة من 0 إلى 100. شارة: وسم صغير لحالة أو نوع.
+The days every calendar shades as the weekend and hides with its Hide Weekends button. The week starts on the day set in System Settings > First Day of the Week. A calendar can have a weekend of its own in its Calendar Layout.,"الأيام التي يظللها كل تقويم كعطلة أسبوعية ويخفيها زر ""إخفاء عطلات نهاية الأسبوع"". يبدأ الأسبوع باليوم المحدد في إعدادات النظام > أول يوم في الأسبوع. ويمكن لأي تقويم أن تكون له عطلة خاصة في تخطيط التقويم الخاص به."
+Hatch the weekend columns so a working day and a day off read differently at a glance.,تظليل أعمدة العطلة بخطوط خفيفة ليتميّز يوم العمل عن يوم الراحة من أول نظرة.
+"What each calendar's events show — fields under the title such as an amount or a percentage, their format and the colour — is set per document type.",ما تعرضه أحداث كل تقويم — حقول تحت العنوان مثل مبلغ أو نسبة، وتنسيقها ولونها — يُضبط لكل نوع مستند.
+"What a calendar's events show — fields under the title, their format, the colour — and, if it needs one, its own weekend.",ما تعرضه أحداث التقويم — الحقول تحت العنوان وتنسيقها واللون — وعطلته الأسبوعية الخاصة إن احتاج.
+"{0} has no list of records, so it has no calendar.",{0} ليس له قائمة سجلات، لذا لا يوجد له تقويم.
+"The saved calendar {0} belongs to {1}, not {2}.",التقويم المحفوظ {0} يخص {1} وليس {2}.
+{0} must be a date field.,{0} يجب أن يكون حقل تاريخ.
+{0}: {1} is not a field of {2}.,{0}: {1} ليس حقلًا في {2}.
+Set Starts On as well as Ends On.,"حدد ""يبدأ في"" مع ""ينتهي في""."
+A weekend cannot be every day of the week.,لا يمكن أن تكون العطلة كل أيام الأسبوع.
+Row {0},الصف {0}
+Linked documents,مستندات مرتبطة
++{0} more,+{0} أخرى
+{0}: more than {1} matching {2}. The first {1} are used; narrow the condition to see every match.,{0}: أكثر من {1} من {2} تطابق الشرط. تم استخدام أول {1} فقط؛ ضيّق الشرط لرؤية كل النتائج.
+Collapse panel,طي اللوحة
+Expand panel,توسيع اللوحة
+Updates,التحديثات
+Post,نشر,Post a comment
+Post comment,نشر التعليق
+Post and close,نشر وإغلاق
+Post and publish,نشر وإتاحته في البوابة
+Discard draft,تجاهل المسودة
+More ways to post,خيارات النشر
+Paste a link,ألصق رابطًا
+Insert link,إدراج رابط
+Bulleted list,قائمة نقطية
+Numbered list,قائمة مرقّمة
+Emoji,رمز تعبيري
+Attach a file,إرفاق ملف
+Formatting,التنسيق
+Show more,عرض المزيد
+Copy text,نسخ النص
+View version history,عرض سجل الإصدارات
+{0} “{1}” was created.,تم إنشاء {0} “{1}”.
+{0} details were updated.,تم تحديث بيانات {0}.
+sent an email,أرسل رسالة بريد إلكتروني
+scheduled an event,جدول فعالية
+logged a call,سجّل مكالمة
+logged a meeting,سجّل اجتماعًا
+logged a visit,سجّل زيارة
+sent an SMS,أرسل رسالة نصية
+sent a chat message,أرسل رسالة دردشة
+added an activity,أضاف نشاطًا
+today at {0},اليوم الساعة {0}
+yesterday at {0},أمس الساعة {0}
+tomorrow at {0},غدًا الساعة {0}
+{0} at {1},{0} الساعة {1}
+No activity yet.,لا يوجد نشاط بعد.
+No {0} yet.,لا يوجد {0} بعد.
+Comment published,تم نشر التعليق
+You,أنت
+Form Side Panel,اللوحة الجانبية للنموذج
+"Overview, attachments, tags, share",نظرة عامة، المرفقات، الوسوم، المشاركة
+Panel position,موضع اللوحة
+Auto follows the language,تلقائي: حسب اللغة
+Left,يسار,Side panel position
+Right,يمين,Side panel position
+Form Activity,نشاط السجل
+Comments and timeline placement,مكان التعليقات والسجل الزمني
+Dialog,نافذة منبثقة
+Inline,أسفل النموذج
+Themate Theme,ثيم Themate
+Off: original Frappe look,الإيقاف: شكل Frappe الأصلي
+On,تشغيل,Theme switch
+Off,إيقاف,Theme switch
+Reloading with the new theme setting…,جارٍ إعادة تحميل الصفحة بإعداد الثيم الجديد…
+Turn on Themate theme,تشغيل ثيم Themate
+"Search or type a command ({0})",ابحث أو اكتب أمرًا ({0})
+Add group,إضافة تصنيف
+{0} items,{0} عناصر
+Reports & Masters,التقارير والبيانات الأساسية
+"<span class=""h4""><b>Reports &amp; Masters</b></span>",<span class="h4"><b>التقارير والبيانات الأساسية</b></span>
+Filter this page…,فلترة محتوى هذه الصفحة…
+Best match,أفضل نتيجة
+Recent,الأحدث
+Frequently visited,الأكثر زيارة
+Create new,إنشاء جديد
+"↑↓ to move, Enter to open, Esc to close",↑↓ للتنقل، Enter للفتح، Esc للإغلاق
+Company Tax ID,الرقم الضريبي للشركة
+Update Outstanding for Self,تحديث المبلغ المستحق لهذا المستند
+"Credit Note will update it's own outstanding amount, even if 'Return Against' is specified.",سيحدّث إشعار الدائن المبلغ المستحق الخاص به، حتى لو تم تحديد مستند المرتجع.
+Update Billed Amount in Delivery Note,تحديث المبلغ المفوتر في إذن التسليم
+Is Rate Adjustment Entry (Debit Note),قيد تعديل سعر (إشعار مدين)
+Issue a debit note with 0 qty against an existing Sales Invoice,إصدار إشعار مدين بكمية صفر على فاتورة مبيعات موجودة
+Is Export Invoice,فاتورة تصدير
+Check if the invoice is an tax export invoice.,حدد هذا الخيار إذا كانت الفاتورة فاتورة تصدير ضريبية.
+For ETA Service Delivery Date.,تاريخ تقديم الخدمة لمصلحة الضرائب.
+ETA Details,بيانات مصلحة الضرائب
+Last Scanned Warehouse,آخر مخزن تم مسحه
+Named Place,المكان المحدد
+Use Company default Cost Center for Round off,استخدام مركز التكلفة الافتراضي للشركة في التقريب
+Is Cash or Non Trade Discount,خصم نقدي أو غير تجاري
+Total Billing Hours,إجمالي الساعات المفوترة
+Changes,التغييرات
+Only Include Allocated Payments,تضمين المدفوعات المخصصة فقط
+Dispatch Address Name,اسم عنوان الشحن
+Dispatch Address,عنوان الشحن
+Company Contact Person,مسؤول الاتصال بالشركة
+Unrealized Profit / Loss Account,حساب الأرباح / الخسائر غير المحققة
+Unrealized Profit / Loss account for intra-company transfers,حساب الأرباح / الخسائر غير المحققة للتحويلات بين الشركات
+Company which internal customer represents,الشركة التي يمثلها العميل الداخلي
+Background image,صورة الخلفية
+Dashboards,لوحات المتابعة
+Open the numbers behind this area,افتح الأرقام وراء هذا القسم
+Continue where you left off,تابع من حيث توقفت
+Last opened,آخر ما فتحته
+View all,عرض الكل
+Back to {0},الرجوع إلى {0}
+Management,الإدارة
+Desk,المكتب
+Nothing on this dashboard is available to you yet.,لا يوجد في هذه اللوحة ما يمكنك الاطلاع عليه حاليًا.
+Open dashboard,افتح اللوحة
+Its charts are on the dashboard's own page.,رسومها في صفحة اللوحة نفسها.
+1 dashboard,لوحة واحدة
+{0} dashboards,{0} لوحات
+1 shortcut,اختصار واحد
+{0} shortcuts,{0} اختصارات
+Updated {0},تم التحديث {0}
+Could not load. Try refreshing.,تعذر التحميل. جرّب التحديث.
+{0} Dashboard,لوحة {0}
+Standard,قياسية
+Nothing to chart yet,لا يوجد ما يُرسم بعد
+The report has no rows for these filters.,التقرير لا يحتوي على صفوف لهذه الفلاتر.
+No {0} records in {1}.,لا توجد سجلات {0} في {1}.
+No {0} records match this chart.,لا توجد سجلات {0} تطابق هذا الرسم.
+Show {0},اعرض {0}
+You do not have access to this chart's data,ليست لديك صلاحية على بيانات هذا الرسم
+Refresh,تحديث
+{0} open,{0} مفتوح
+{0} pending,{0} معلق
+{0} active,{0} نشط
+{0} draft,{0} مسودة
+Connections,الارتباطات
+{0} Records,سجلات {0}
+{0} Summary,ملخص {0}
+Configure dashboards,إعداد اللوحات
+Workspace Panel,لوحة مساحة العمل
+A dashboard is listed twice,لوحة مكررة في القائمة
+Only one dashboard can be the default,لوحة واحدة فقط يمكن أن تكون الافتراضية
+Row {0}: {1} is not one of this workspace's dashboards,الصف {0}: {1} ليست من لوحات مساحة العمل هذه
+{0}: at most {1} rows of {2},{0}: {1} صفوف على الأكثر من {2}
+Row {0}: a list that needs attention is an InnoDash Widget,الصف {0}: قائمة ما يحتاج انتباهك يجب أن تكون عنصر InnoDash
+Figure,رقم
+Attention,يحتاج انتباه
+Chart Type,نوع الرسم
+Background tasks,المهام في الخلفية
+Working…,جارٍ العمل…
+Running in background,تعمل في الخلفية
+{0} is done,انتهت {0}
+"Welcome back, {0}",أهلاً بعودتك يا {0}
+Welcome back,أهلاً بعودتك
+Select an app to continue to your workspace,اختر تطبيقاً لتتابع إلى مساحة عملك
+Opens after you log in,يفتح بعد تسجيل الدخول
+Set as default,اجعله الافتراضي
+Enterprise Resource Planning,تخطيط موارد المؤسسة
+"People, Attendance and Payroll",الموظفون والحضور والرواتب
+Advanced HR & Workforce Management,إدارة متقدمة للموارد البشرية والقوى العاملة
+Point of Sale (Retail · Distribution · F&B),نقاط البيع (تجزئة · توزيع · مطاعم ومقاهٍ)
+Loans and Credit Management,إدارة القروض والائتمان
+"Leads, Deals and Customers",العملاء المحتملون والصفقات والعملاء
+Customer Support Tickets,تذاكر دعم العملاء
+Reports and Data Exploration,التقارير واستكشاف البيانات
+Courses and Learning,الدورات والتعلّم
+Surveys and Feedback,الاستبيانات والآراء
+Human Resource Web Portal,بوابة الموارد البشرية
+Open your workspace,افتح مساحة عملك
+{0} workspace,مساحة عمل {0}
+"Everything your company runs on, in one place",كل ما تدير به شركتك، في مكان واحد
+"Accounts, sales, stock, people and more, with one sign-in for the whole team.",الحسابات والمبيعات والمخزون والموظفون وأكثر، بتسجيل دخول واحد للفريق كله.
+Log in to your workspace,سجّل الدخول إلى مساحة عملك
+Arabic and English,بالعربية والإنجليزية
+"Phone, tablet or desk",على الهاتف أو اللوحي أو المكتب
+Each person sees what their role allows,كل شخص يرى ما يسمح به دوره
+All departments,كل الأقسام
+Switch department,تبديل القسم
+Themate Department,قسم الشريط الجانبي
+Workspaces Outside Departments,مساحات العمل خارج الأقسام
+Who sees it,من يراه
+Opens on,يفتح على
+A workspace is listed twice,مساحة عمل مذكورة مرتين
+{0} is not one of this department's workspaces,{0} ليست من مساحات عمل هذا القسم
+Lower comes first in the department switcher.,الأصغر يظهر أولاً في مبدّل الأقسام.
+"Its title in the sidebar, e.g. Human Resources or Supply Chain.",اسمه في الشريط الجانبي، مثل الموارد البشرية أو سلاسل الإمداد.
+People with any of these roles get this department. No roles: everyone. A department never grants access: it only shows the workspaces a person may already open.,من لديه أي دور من هذه الأدوار يحصل على هذا القسم. بلا أدوار: الجميع. القسم لا يمنح صلاحية أبداً؛ يعرض فقط مساحات العمل المسموح للشخص بفتحها.
+"The department's workspaces, in sidebar order. A workspace's child workspaces come with it.",مساحات عمل القسم بترتيبها في الشريط الجانبي. المساحات الفرعية تأتي مع مساحتها الأم.
+The workspace that opens when someone switches to this department. Blank: the first one above.,مساحة العمل التي تُفتح عند التبديل إلى هذا القسم. فارغ: الأولى في القائمة.
+Departments are set in the Themate Department list. For someone who has departments: Show in their groups keeps the workspaces no department lists in their usual groups below; Hide leaves them out of the sidebar (still reachable by URL and search).,تُضبط الأقسام من قائمة قسم الشريط الجانبي. لمن لديه أقسام: «تظهر في مجموعاتها» يُبقي مساحات العمل التي لا يذكرها أي قسم في مجموعاتها المعتادة أسفلها؛ «إخفاء» يُخرجها من الشريط الجانبي (وتبقى متاحة بالرابط والبحث).
+Done,تم,Background task
+Completed,اكتملت,Background task
+Expand,توسيع,Background task
+Logout,تسجيل الخروج,Apps page
+Switcher Order,الترتيب في المبدّل
+Show in their groups,تظهر في مجموعاتها
+Overall progress,التقدم الإجمالي
+1 task running,مهمة واحدة قيد التنفيذ
+{0} tasks running,{0} مهام قيد التنفيذ
+All tasks done,اكتملت كل المهام
+1 task,مهمة واحدة
+{0} tasks,{0} مهام
+Show details,إظهار التفاصيل
++{0} more,{0} رسائل أخرى,Toasts
+Show less,عرض أقل
+1 page,صفحة واحدة
+about {0} pages,{0} صفحة تقريبًا
+Measuring…,جارٍ القياس…
+Exact pages,صفحات دقيقة
+Fast preview,معاينة سريعة
+Exact pages — from the PDF,صفحات دقيقة — من ملف PDF
+Rendering the PDF…,جارٍ إنشاء ملف PDF…
+"The PDF did not open here. Your browser may be set to download PDFs — check your downloads, or go back to Fast preview.","لم يُفتح ملف PDF هنا. قد يكون متصفحك مضبوطًا على تنزيل ملفات PDF — راجع التنزيلات، أو ارجع إلى المعاينة السريعة."

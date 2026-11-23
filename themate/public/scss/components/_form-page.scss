@@ -1,0 +1,793 @@
+/* Form page layout: sections, tabs, columns, side panel, footer.
+ * Native source: frappe/public/scss/desk/form.scss
+ *
+ * Controls themselves live in components/_forms.scss; this file is structure. */
+
+#{$tm-on}[data-tm-form="on"] {
+	/* ---- Page layout ------------------------------------------------------- */
+	/* The design: wide content column, and the document panel (assignments,
+	 * attachments, tags, share, timestamps) on the INLINE-END edge — right in
+	 * English, left in Arabic. Frappe renders the side section first in the
+	 * markup (col-lg-2, then col); flex `order` moves it without touching the
+	 * DOM, so every Frappe handler keeps finding its elements. Under 992px
+	 * Frappe turns the side section into an off-canvas drawer, which is left
+	 * alone. */
+	--tm-panel-w: 300px;
+
+	/* The fold chevron: pointing at the screen edge the panel sits against
+	 * while it is open, back at the form while it is a rail. Panel on the
+	 * right (English, end of the line) → mirrored when open. rtlcss mirrors
+	 * translate and rotate, never scale, so the four cases are spelled out. */
+	--tm-panel-chevron: scaleX(-1);
+	--tm-panel-chevron-back: none;
+
+	&[dir="rtl"],
+	&[data-tm-panel="start"] {
+		--tm-panel-chevron: none;
+		--tm-panel-chevron-back: scaleX(-1);
+	}
+
+	&[data-tm-panel="start"][dir="rtl"] {
+		--tm-panel-chevron: scaleX(-1);
+		--tm-panel-chevron-back: none;
+	}
+
+	@media (max-width: 1199px) {
+		--tm-panel-w: 240px;
+	}
+
+	@media (min-width: 992px) {
+		.page-container .layout-main {
+			display: flex;
+			flex-wrap: nowrap; /* Bootstrap .row wraps; the panel must stay beside */
+			align-items: flex-start;
+			gap: var(--tm-space-4);
+			margin: 0;
+		}
+
+		.page-container .layout-main-section-wrapper {
+			order: 1;
+			flex: 1 1 auto;
+			min-inline-size: 0;
+			max-inline-size: none;
+			padding: 0;
+		}
+
+		.page-container .layout-side-section {
+			order: 2;
+			flex: 0 0 var(--tm-panel-w);
+			inline-size: var(--tm-panel-w);
+			max-inline-size: var(--tm-panel-w);
+			padding: 0;
+			/* Under the page head while it shows, under the navbar once
+			 * scrolling down tucks it away (core/scroll_chrome.js) — the tab
+			 * bar's two stops. A fixed navbar offset left the panel's top, its
+			 * name and fold chevron, behind the head on every scroll back up.
+			 * The same offset caps the card's height (see .form-sidebar). */
+			--tm-panel-top: calc(var(--navbar-height) + var(--page-head-height) + var(--tm-space-4));
+			position: sticky;
+			inset-block-start: var(--tm-panel-top);
+			transition: inset-block-start 0.5s;
+		}
+
+		.page-container.tm-head-tucked .layout-side-section {
+			--tm-panel-top: calc(var(--navbar-height) + var(--tm-space-4));
+		}
+
+		/* Theme Customizer > Form Side Panel: the panel on the other edge. Flex
+		 * order again — the markup is not touched. html[data-tm-panel] is
+		 * "start" / "end" of the line, settled in core/bootstrap.js from the
+		 * Left / Right / Auto choice and the page's direction. */
+		&[data-tm-panel="start"] .page-container .layout-side-section {
+			order: 0;
+		}
+
+		/* The panel is always visible at this width: the page-head "toggle
+		 * sidebar" burger next to the title has nothing left to do. */
+		.page-head .sidebar-toggle-btn {
+			display: none;
+		}
+	}
+
+	/* The form's main section is no longer one white slab: sections are
+	 * cards on the ground (see below). Lists keep their card in _list.scss.
+	 * Frappe also paints .form-page with --card-bg (desk/form.scss); left
+	 * alone, the gap between two section cards is a white band with a
+	 * border above and below it — the "white separators". */
+	.layout-main-section:has(.form-layout) {
+		background: none;
+		border: 0;
+		box-shadow: none;
+		padding: 0;
+	}
+
+	.form-layout,
+	.form-page,
+	.form-page .form-tabs-list + * {
+		background: none;
+	}
+
+	/* Frappe's .std-form-layout > .form-layout > .form-page carries a card
+	 * border + radius + shadow (desk/form.scss). The sections are the cards
+	 * now, so the outer frame around all of them goes. Same selector depth
+	 * as Frappe's so it wins by source order. */
+	.form-page,
+	.std-form-layout > .form-layout > .form-page {
+		padding: 0;
+		border: 0;
+		border-radius: 0;
+		box-shadow: none;
+	}
+
+	/* ---- Sections --------------------------------------------------------- */
+	.form-section,
+	.form-dashboard-section {
+		margin: 0;
+		padding-block: var(--tm-space-3);
+
+		/* desk/form.scss:104 — Frappe's card-style section wrapper. */
+		&.card-section {
+			background-color: var(--tm-surface);
+			border: 1px solid var(--tm-border);
+			border-radius: var(--tm-radius-md);
+			box-shadow: var(--tm-shadow-sm);
+			margin-block-end: var(--tm-space-4);
+			padding: var(--tm-space-3) var(--tm-space-4) var(--tm-space-4);
+		}
+
+		&.hide-border {
+			border: none;
+		}
+
+		/* Section header as a bar across the card: sunken ground, a rule
+		 * under it while open. Collapsed, the bar IS the card, so a closed
+		 * section still reads as a section and not as a stray title. The
+		 * negative margins undo the card padding so the bar reaches the
+		 * card's edges. */
+		.section-head {
+			display: flex;
+			align-items: center;
+			/* native width:100% is measured before the negative margins; this
+			 * spans the card's full inner width plus both gutters. */
+			inline-size: calc(100% + 2 * var(--tm-space-4));
+			font-size: var(--tm-ts-section-size, var(--tm-text-lg));
+			font-weight: var(--tm-ts-section-weight, var(--tm-weight-semibold));
+			font-style: var(--tm-ts-section-style, normal);
+			color: var(--tm-ts-section-color, var(--tm-text));
+			letter-spacing: 0;
+			margin: calc(-1 * var(--tm-space-3)) calc(-1 * var(--tm-space-4)) var(--tm-space-4);
+			padding: var(--tm-space-3) var(--tm-space-4);
+			background-color: var(--tm-surface);
+			border-block-end: 1px solid var(--tm-border);
+			border-start-start-radius: var(--tm-radius-md);
+			border-start-end-radius: var(--tm-radius-md);
+
+			&.collapsible:hover {
+				background-color: var(--tm-surface-hover);
+			}
+
+			&.collapsed {
+				margin-block-end: calc(-1 * var(--tm-space-4));
+				border-block-end: 0;
+				border-end-start-radius: var(--tm-radius-md);
+				border-end-end-radius: var(--tm-radius-md);
+			}
+
+			/* The collapse chevron sits at the end, like a disclosure row. */
+			.collapse-indicator {
+				margin-inline-start: auto;
+				color: var(--tm-text-2);
+			}
+
+			&.collapsed .octicon,
+			.octicon {
+				color: var(--tm-text-3);
+			}
+		}
+
+		/* Sections without a card wrapper keep a lighter version. */
+		&:not(.card-section) .section-head {
+			margin: 0 0 var(--tm-space-2);
+			padding: var(--tm-space-2) 0;
+			background: none;
+			border-radius: 0;
+		}
+
+		.form-section-description {
+			font-size: var(--tm-text-xs);
+			color: var(--tm-text-3);
+			margin-block-end: var(--tm-space-2);
+		}
+	}
+
+	.empty-section {
+		display: none;
+	}
+
+	/* ---- Columns ---------------------------------------------------------- */
+	.form-column {
+		padding-inline: var(--tm-space-2);
+
+		.frappe-control {
+			margin-block-end: var(--tm-space-3);
+		}
+	}
+
+	/* ---- Tabs -------------------------------------------------------------- */
+	/* desk/form.scss:419-463. Native already uses --primary for the active
+	 * underline, which the bridge points at the accent. Only weight and
+	 * density change here. */
+	.form-tabs-list {
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface);
+		box-shadow: var(--tm-shadow-sm);
+		padding-inline: var(--tm-space-2);
+		margin-block-end: var(--tm-space-4);
+
+		/* Frappe makes this `position: sticky` but gives it a `top` only
+		 * through .form-tabs-sticky-up / -down, which a window scroll handler
+		 * adds (desk/form.scss:458, form/layout.js:500). Sticky with
+		 * `top: auto` is not sticky at all, so until that handler has run —
+		 * and, before core/scroll_chrome.js, whenever it ran against another
+		 * form's bar — the tabs scrolled away. The resting offset lives here
+		 * instead; the two classes only move the bar between it and the
+		 * navbar. */
+		inset-block-start: calc(var(--navbar-height) + var(--page-head-height) - 1px);
+
+		/* The two states, restated here because the rule above outranks
+		 * Frappe's flat `.form-tabs-sticky-*` selectors. A card also needs
+		 * its top edge exactly at the sticky offset, not 1px above. */
+		&.form-tabs-sticky-up,
+		&.form-tabs-sticky-down {
+			border-start-start-radius: 0;
+			border-start-end-radius: 0;
+		}
+
+		&.form-tabs-sticky-up {
+			inset-block-start: calc(var(--navbar-height) - 1px);
+		}
+
+		&.form-tabs-sticky-down {
+			inset-block-start: calc(var(--navbar-height) + var(--page-head-height) - 1px);
+		}
+
+		/* a plain form that core/form_tabs.js split into Details + Connections:
+		 * with the dashboard empty only Details is left, and a bar with one
+		 * tab is noise (Frappe hides a lone tab the same way) */
+		&.tm-tabs-single {
+			display: none;
+		}
+
+		.form-tabs .nav-item .nav-link {
+			font-size: var(--tm-ts-tab-size, var(--tm-text-sm));
+			font-weight: var(--tm-ts-tab-weight, var(--tm-weight-regular));
+			font-style: var(--tm-ts-tab-style, normal);
+			color: var(--tm-ts-tab-color, var(--tm-text-2));
+			padding-block: var(--tm-space-3);
+			margin-inline: var(--tm-space-3);
+			border-block-end: 2px solid transparent;
+
+			&:hover {
+				color: var(--tm-action-primary-fg);
+			}
+
+			&.active {
+				color: var(--tm-ts-tab-color, var(--tm-action-primary));
+				font-weight: var(--tm-ts-tab-weight, var(--tm-weight-medium));
+				border-block-end: 2px solid var(--tm-action-primary);
+			}
+		}
+	}
+
+	/* ---- Page head and actions --------------------------------------------- */
+	.form-message {
+		border-radius: var(--tm-radius-md);
+		font-size: var(--tm-text-sm);
+		padding: var(--tm-space-2) var(--tm-space-3);
+		border: 1px solid transparent;
+	}
+
+	/* Activity: in Dialog mode (the default) the slab comes off the form and
+	 * lives in a dialog; in Inline mode ([data-tm-activity="inline"], set by
+	 * core/bootstrap.js) it stays under the form. The panel is MOVED into the
+	 * dialog (core/form_activity.js), which takes it out from under .form-footer —
+	 * that is what makes the first rule enough to hide it here and show it there,
+	 * with no class to toggle and no inline style to undo. How it looks, in
+	 * either place, is components/_activity.scss. */
+	.form-footer > .after-save {
+		display: none;
+	}
+
+	&[data-tm-activity="inline"] .form-footer > .after-save {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.form-footer {
+		border-block-start: 0;
+		padding-block: 0;
+	}
+
+	.form-inner-toolbar {
+		border-block-end: 1px solid var(--tm-border);
+		padding-block: var(--tm-space-2);
+		gap: var(--tm-space-2);
+	}
+
+	/* ---- Side panel --------------------------------------------------------- */
+	/* Native: scss/desk/sidebar.scss `.form-sidebar`. Rendered as a card:
+	 * an overview block (core/form_overview.js) then the document rows. */
+	.form-sidebar {
+		font-size: var(--tm-text-sm);
+
+		@media (min-width: 992px) {
+			background-color: var(--tm-surface);
+			border: 1px solid var(--tm-border);
+			border-radius: var(--tm-radius-md);
+			box-shadow: var(--tm-shadow-sm);
+			padding: var(--tm-space-4);
+			margin: 0;
+
+			/* Sticky, and never taller than what is left of the screen: with
+			 * many attachments the panel scrolls inside itself, so Reviews,
+			 * Tags and Share are one wheel turn away wherever the page is.
+			 * Left to its full height a sticky panel shows only its top
+			 * until the page — the whole long Activity — is scrolled to the
+			 * end. Past its own end the wheel goes on to the page. */
+			max-block-size: calc(100vh - var(--tm-panel-top, 0px) - var(--tm-space-4));
+			max-block-size: calc(100dvh - var(--tm-panel-top, 0px) - var(--tm-space-4));
+			overflow: hidden auto;
+			transition: max-block-size 0.5s;
+		}
+
+		/* The native image block is adopted by the overview's picture box
+		 * (core/form_overview.js); anywhere else it stays out of the flow. */
+		> .sidebar-image-section {
+			display: none;
+		}
+
+		.tm-panel-label {
+			font-size: var(--tm-text-xs);
+			font-weight: var(--tm-weight-semibold);
+			letter-spacing: 0.06em;
+			text-transform: uppercase;
+			color: var(--tm-text-3);
+			margin: 0 0 var(--tm-space-3);
+		}
+
+		.tm-overview {
+			padding-block-end: var(--tm-space-4);
+			margin-block-end: var(--tm-space-4);
+			border-block-end: 1px solid var(--tm-border);
+		}
+
+		.tm-overview-head {
+			display: flex;
+			align-items: center;
+			gap: var(--tm-space-3);
+			margin-block-end: var(--tm-space-3);
+		}
+
+		.tm-overview-icon {
+			position: relative;
+			flex: none;
+			inline-size: 72px;
+			block-size: 72px;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			border: 1px solid var(--tm-border);
+			border-radius: var(--tm-radius-md);
+			background-color: var(--tm-surface-sunken);
+			color: var(--tm-text-2);
+
+			> .icon {
+				inline-size: 30px;
+				block-size: 30px;
+			}
+
+			/* Frappe's image block, adopted. The <li> is the click target
+			 * user_image.js listens on: clicking the box opens Upload/Remove. */
+			.sidebar-image-section {
+				position: absolute;
+				inset: 0;
+				margin: 0;
+				cursor: pointer;
+
+				&.hide {
+					display: none;
+				}
+			}
+
+			.sidebar-image-wrapper {
+				position: relative;
+				inline-size: 100%;
+				block-size: 100%;
+				border-radius: inherit;
+			}
+
+			.sidebar-image {
+				inline-size: 100%;
+				block-size: 100%;
+				object-fit: cover;
+				border-radius: inherit;
+				display: block;
+
+				&.hide {
+					display: none;
+				}
+			}
+
+			/* No photo yet: the module icon shows; the abbreviation block stays
+			 * as an invisible full-size target — user_image.js delegates the
+			 * click to DESCENDANTS of the wrapper, so something must be there
+			 * to click. Frappe adds .hide to it once a photo exists. */
+			.sidebar-standard-image {
+				position: absolute;
+				inset: 0;
+				opacity: 0;
+
+				&.hide {
+					display: none;
+				}
+			}
+
+			/* A small camera badge says "click to change". */
+			&.tm-overview-icon-uploadable::after {
+				content: "";
+				position: absolute;
+				inset-inline-end: -6px;
+				inset-block-end: -6px;
+				inline-size: 22px;
+				block-size: 22px;
+				border-radius: 50%;
+				border: 2px solid var(--tm-surface);
+				background: var(--tm-brand-500) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z'/><circle cx='12' cy='13' r='3'/></svg>") center / 12px no-repeat;
+				pointer-events: none;
+			}
+
+			/* The Change ▾ text link is redundant with the badge; the menu
+			 * it opens (Upload / Remove) is kept and drops under the box. */
+			.sidebar-image-actions {
+				position: absolute;
+				inset-block-start: 100%;
+				inset-inline-start: 0;
+				margin-block-start: var(--tm-space-1);
+				z-index: 5;
+
+				/* Native shows this row on hover only; keep it up while the
+				 * menu is open so a click that opened it does not lose it. */
+				&:has(.dropdown.open) {
+					display: block;
+				}
+
+				> .dropdown > .dropdown-toggle {
+					display: none;
+				}
+
+				.dropdown.open > .dropdown-menu,
+				.dropdown.show > .dropdown-menu {
+					display: block;
+				}
+			}
+		}
+
+		/* When a photo is shown, the icon behind it is not. */
+		.tm-overview-icon:has(.sidebar-image:not(.hide)) > .icon {
+			display: none;
+		}
+
+		.tm-overview-name {
+			font-size: var(--tm-text-md);
+			font-weight: var(--tm-weight-semibold);
+			color: var(--tm-text);
+			margin-block-end: var(--tm-space-1);
+			word-break: break-all;
+		}
+
+		.tm-overview-field {
+			margin-block-end: var(--tm-space-2);
+
+			.tm-overview-label {
+				font-size: var(--tm-text-xs);
+				color: var(--tm-text-2);
+			}
+
+			.tm-overview-value {
+				font-size: var(--tm-text-sm);
+				color: var(--tm-text);
+				font-weight: var(--tm-weight-medium);
+			}
+		}
+
+		/* FOLLOW as a small outlined button, like the design. */
+		.form-sidebar-stats .form-follow {
+			border: 1px solid var(--tm-border-strong);
+			border-radius: var(--tm-radius-sm);
+			padding: 2px var(--tm-space-2);
+			text-transform: none;
+			font-size: var(--tm-text-xs);
+			color: var(--tm-text);
+		}
+
+		.sidebar-label {
+			font-size: var(--tm-text-xs);
+			font-weight: var(--tm-weight-medium);
+			color: var(--tm-text-3);
+			text-transform: uppercase;
+			letter-spacing: 0.02em;
+		}
+
+		.sidebar-menu {
+			margin-block-end: 0;
+
+			/* Each action row (Assigned To, Attachments, Tags, Share) is a
+			 * divided line: icon + label at the start, the "+" at the end.
+			 * Keyed on .sidebar-label: the same <ul> also holds a dozen
+			 * helper <li>s (rating icons, follow state, page views) that are
+			 * empty or a few px tall and must not draw a rule each. */
+			> li:has(> .sidebar-label) {
+				padding-block: var(--tm-space-2);
+				border-block-end: 1px solid var(--tm-border);
+			}
+		}
+
+		.form-sidebar-stats,
+		.form-sidebar-stats > li {
+			border-block-end: 0;
+		}
+
+		/* Likes · comments · FOLLOW on one line. The col-lg-2 panel is 143px
+		 * inside at 1440 and this row measured 135px, so the counter and the
+		 * FOLLOW label touched. Let the row wrap under pressure and keep a
+		 * real gap between the two groups; never let the label break mid-word. */
+		.form-sidebar-stats li:first-child {
+			flex-wrap: wrap;
+			gap: var(--tm-space-1) var(--tm-space-3);
+
+			.form-follow {
+				white-space: nowrap;
+				letter-spacing: 0.04em;
+			}
+		}
+
+		.add-assignment-btn,
+		.add-attachment-btn,
+		.add-tags-btn,
+		.add-review-btn,
+		.share-doc-btn {
+			font-size: var(--tm-text-xs);
+			color: var(--tm-action-primary-fg);
+
+			&:hover {
+				color: var(--tm-action-primary-active);
+			}
+		}
+	}
+
+	/* ---- Folding the panel (core/form_overview.js) -------------------------- */
+	/* A chevron in the panel's corner folds it to a rail beside the form; the
+	 * rail keeps the chevron and the panel's name, read sideways, and opens
+	 * on a click. Beside the form only — the narrow drawer does not fold. */
+	.form-sidebar > .tm-panel-fold {
+		display: none;
+	}
+
+	@media (min-width: 992px) {
+		.form-sidebar {
+			position: relative;
+		}
+
+		.form-sidebar > .tm-panel-fold {
+			position: absolute;
+			inset-block-start: calc(var(--tm-space-4) - 4px);
+			inset-inline-end: calc(var(--tm-space-4) - 6px); /* the outer corner */
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			inline-size: 24px;
+			block-size: 24px;
+			border-radius: var(--tm-radius-sm);
+			color: var(--tm-text-3);
+
+			&:hover,
+			&:focus-visible {
+				background: var(--tm-surface-hover);
+				color: var(--tm-text);
+			}
+
+			/* the chevron points at the screen edge the panel folds to */
+			svg {
+				transform: var(--tm-panel-chevron);
+			}
+		}
+
+		/* the corner is the chevron's */
+		.form-sidebar > .tm-overview > .tm-panel-label {
+			padding-inline-end: 24px;
+		}
+
+		/* On the start edge the outer corner is the other one. */
+		&[data-tm-panel="start"] .form-sidebar > .tm-panel-fold {
+			inset-inline-end: auto;
+			inset-inline-start: calc(var(--tm-space-4) - 6px);
+		}
+
+		&[data-tm-panel="start"] .form-sidebar > .tm-overview > .tm-panel-label {
+			padding-inline: 24px 0;
+		}
+
+		.page-container .layout-side-section.tm-panel-rail {
+			--tm-panel-w: 44px;
+
+			.form-sidebar {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: var(--tm-space-3);
+				padding: var(--tm-space-2) 0 var(--tm-space-3);
+				cursor: pointer;
+
+				> :not(.tm-panel-fold):not(.tm-overview) {
+					display: none !important;
+				}
+
+				> .tm-panel-fold {
+					position: static;
+					order: -1;
+
+					svg {
+						transform: var(--tm-panel-chevron-back);
+					}
+				}
+			}
+
+			.tm-overview {
+				margin: 0;
+				padding: 0;
+				border: 0;
+
+				> :not(.tm-panel-label) {
+					display: none;
+				}
+
+				> .tm-panel-label {
+					writing-mode: vertical-rl;
+					margin: 0;
+					padding: 0;
+					max-block-size: 260px;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+			}
+		}
+
+	}
+
+	/* Attachments and tags rows in the side panel. */
+	.attachment-row,
+	.form-tag-row {
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-sm);
+		background-color: var(--tm-surface);
+		font-size: var(--tm-text-xs);
+		padding: var(--tm-space-1) var(--tm-space-2);
+		margin-block-end: var(--tm-space-1);
+	}
+
+	/* Attachment rows: a type badge from the file's extension (the link's
+	 * href — form/sidebar/attachments.js), the private-file lock kept small
+	 * beside it. Frappe's markup: .data-pill > .flex > a(lock) + .pill-label > a[href]. */
+	.attachment-row {
+		.data-pill {
+			inline-size: 100%;
+			padding: var(--tm-space-1) 0;
+			background: none;
+			border: 0;
+		}
+
+		.data-pill > .flex {
+			gap: var(--tm-space-2);
+			min-inline-size: 0;
+		}
+
+		.data-pill > .flex > a:first-child {
+			order: 2;
+			flex: none;
+			color: var(--tm-text-3);
+			opacity: 0.8;
+
+			svg.icon {
+				inline-size: 12px;
+				block-size: 12px;
+				margin: 0;
+			}
+		}
+
+		.pill-label {
+			order: 1;
+			flex: 1 1 auto;
+			min-inline-size: 0;
+			display: flex;
+			align-items: center;
+
+			> a {
+				display: inline-flex;
+				align-items: center;
+				gap: var(--tm-space-2);
+				max-inline-size: 100% !important;
+				color: var(--tm-text);
+				font-size: var(--tm-text-sm);
+
+				&::before {
+					content: "FILE";
+					flex: none;
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					inline-size: 32px;
+					block-size: 22px;
+					border-radius: 4px;
+					background-color: var(--tm-surface-sunken);
+					color: var(--tm-text-2);
+					font-size: 9px;
+					font-weight: var(--tm-weight-semibold);
+					letter-spacing: 0.03em;
+				}
+
+				&[href$=".pdf" i]::before { content: "PDF"; background-color: var(--tm-danger-bg); color: var(--tm-danger-text); }
+				&[href$=".xlsx" i]::before, &[href$=".xls" i]::before, &[href$=".csv" i]::before { content: "XLS"; background-color: var(--tm-success-bg); color: var(--tm-success-text); }
+				&[href$=".csv" i]::before { content: "CSV"; }
+				&[href$=".docx" i]::before, &[href$=".doc" i]::before { content: "DOC"; background-color: var(--tm-brand-50); color: var(--tm-brand-600); }
+				&[href$=".pptx" i]::before, &[href$=".ppt" i]::before { content: "PPT"; background-color: var(--tm-tone-orange-bg); color: var(--tm-tone-orange-fg); }
+				&[href$=".png" i]::before, &[href$=".jpg" i]::before, &[href$=".jpeg" i]::before, &[href$=".gif" i]::before, &[href$=".webp" i]::before, &[href$=".svg" i]::before { content: "IMG"; background-color: var(--tm-tone-purple-bg); color: var(--tm-tone-purple-fg); }
+				&[href$=".zip" i]::before, &[href$=".rar" i]::before, &[href$=".7z" i]::before { content: "ZIP"; background-color: var(--tm-tone-teal-bg); color: var(--tm-tone-teal-fg); }
+				&[href$=".txt" i]::before, &[href$=".md" i]::before { content: "TXT"; }
+				&[href$=".json" i]::before, &[href$=".xml" i]::before { content: "XML"; }
+				&[href$=".mp4" i]::before, &[href$=".mov" i]::before, &[href$=".mp3" i]::before { content: "AV"; background-color: var(--tm-tone-pink-bg); color: var(--tm-tone-pink-fg); }
+			}
+		}
+
+		.remove-btn {
+			order: 3;
+			color: var(--tm-text-3);
+
+			&:hover {
+				color: var(--tm-danger-text);
+			}
+		}
+	}
+
+	/* ---- Dashboard / links section ------------------------------------------ */
+	.form-links {
+		.document-link {
+			border: 1px solid var(--tm-border);
+			border-radius: var(--tm-radius-sm);
+
+			.badge-link {
+				font-size: var(--tm-text-xs);
+			}
+		}
+	}
+
+	/* ---- Progress / workflow ------------------------------------------------- */
+	.progress-area .progress {
+		block-size: 4px;
+		border-radius: var(--tm-radius-full);
+		background-color: var(--tm-surface-sunken);
+
+		.progress-bar {
+			background-color: var(--tm-action-primary);
+			border-radius: var(--tm-radius-full);
+		}
+	}
+
+	/* ---- Help box ------------------------------------------------------------ */
+	.help-box,
+	.form-group .help-box {
+		font-size: var(--tm-text-xs);
+		color: var(--tm-text-3);
+	}
+}

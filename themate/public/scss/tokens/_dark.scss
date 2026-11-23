@@ -1,0 +1,159 @@
+/* Dark mode.
+ *
+ * Targets [data-theme="dark"] — the NATIVE effective-theme attribute set by
+ * frappe.ui.set_theme() (ui/theme_switcher.js:162) and server-rendered in
+ * frappe/www/app.html:2. This is the single effective theme state; Themate's
+ * former data-tm-mode attribute is gone (FRAPPE_UI_MAP.md §1).
+ *
+ * Equal specificity with Frappe's own [data-theme="dark"] block in
+ * scss/desk/dark.scss — themate.bundle.css loads later, so order decides.
+ *
+ * Only tokens are redefined here. Component rules never reference a mode. */
+
+#{$tm-on}[data-theme="dark"] {
+	/* Native scrollbars, date pickers and form controls follow the mode. */
+	color-scheme: dark;
+	/* Accent stays recognisable but is lifted for contrast on dark ground. */
+	--tm-brand-50: #111a2c;
+	--tm-brand-100: #112545;
+	--tm-brand-200: #15325b;
+	--tm-brand-300: #15417e;
+	--tm-brand-400: #1554ad;
+	--tm-brand-500: #1668dc;
+	--tm-brand-600: #3c89e8;
+	--tm-brand-700: #65a9f3;
+	--tm-brand-800: #8dc5f8;
+	--tm-brand-900: #b7dcfa;
+
+	/* Neutral ramp inverted: 900 is now the lightest (text), 50 the darkest. */
+	--tm-gray-25: #141b2b;
+	--tm-gray-50: #1e2739;
+	--tm-gray-100: #27324a;
+	--tm-gray-200: #33415c;
+	--tm-gray-300: #445370;
+	--tm-gray-400: #64748b;
+	--tm-gray-500: #7c8aa5;
+	--tm-gray-600: #a3adc2;
+	--tm-gray-700: #cbd3e1;
+	--tm-gray-800: #e2e8f0;
+	--tm-gray-900: #f1f5f9;
+
+	--tm-gray-app: #141b2b;
+
+	--tm-green-50: #162312;
+	--tm-green-600: #6abe39;
+	--tm-green-700: #8fd460;
+	--tm-gold-50: #2b2111;
+	--tm-gold-600: #d89614;
+	--tm-gold-700: #e8b339;
+	--tm-red-50: #2c1618;
+	--tm-red-500: #dc4446;
+	--tm-red-600: #e84749;
+	--tm-red-700: #f37370;
+
+	/* Surfaces: a slate-navy dark, not flat black. Pure #000 ground with
+	 * #141414 cards read as "switched off" and had no depth; these keep a
+	 * hint of the brand's blue in every neutral so cards, borders and text
+	 * separate without glare. Text is solid, not white-at-opacity, so it
+	 * does not shift tone over tinted surfaces. */
+	--tm-surface-app: #141b2b;
+	--tm-surface: #1c2536;
+	--tm-surface-raised: #232e42;
+	--tm-surface-sunken: #171f30;
+	--tm-surface-hover: #263248;
+	--tm-surface-active: #2e3b54;
+	/* Follows the brand like light does (_semantic.scss:61); a frozen value
+	 * here kept the selected row default-blue after a custom brand colour. */
+	/* A tint OF the surface: brand-50 sits darker than these lifted surfaces, so
+	 * a selected row looked sunken instead of highlighted. */
+	--tm-surface-selected: color-mix(in srgb, var(--tm-brand-500) 20%, var(--tm-surface));
+	--tm-surface-disabled: #212b3e;
+	/* Board surfaces, from @atlaskit/tokens 18.2.0 artifacts/themes/
+	 * atlassian-dark.js — the same six roles as light:
+	 *   --ds-background-neutral #CECED912 · -hovered #E3E4F21F
+	 *   --ds-surface-raised #242528 · --ds-surface-hovered #2B2C2F
+	 *   --ds-shadow-raised · --ds-shadow-overlay
+	 * Atlassian's dark shadows lead with a 1px light hairline, because a
+	 * drop shadow alone is invisible against a dark ground. The neutrals
+	 * stay Themate's slate-navy (DESIGN_CONTRACT.md §7); only the board
+	 * relationships are Atlassian's. */
+	--tm-board-column: rgb(206 206 217 / 0.07);
+	--tm-board-column-hover: rgb(227 228 242 / 0.12);
+	--tm-board-card: var(--tm-surface-raised);
+	--tm-board-card-hover: var(--tm-surface-hover);
+	--tm-board-shadow: 0 0 0 1px rgb(189 189 189 / 0.12), 0 1px 1px rgb(1 4 4 / 0.5);
+	--tm-board-shadow-drag: 0 0 0 1px rgb(189 189 189 / 0.12), 0 8px 12px rgb(1 4 4 / 0.36);
+
+	--tm-chart-2: #36cfc9;
+	--tm-chart-3: #ffc53d;
+	--tm-chart-4: #9254de;
+	--tm-chart-5: #73d13d;
+	--tm-chart-6: #f759ab;
+	--tm-chart-7: #ff9c6e;
+	--tm-chart-8: #597ef7;
+
+	/* Navy rail: keeps its colour in dark mode, a step apart from the navbar. */
+	--tm-sidebar-bg: #121b36;
+	--tm-sidebar-bg-raised: #192444;
+	--tm-sidebar-border: rgb(255 255 255 / 0.08);
+
+	--tm-border: #2f3b52;
+	--tm-border-strong: #3f4d68;
+
+	--tm-text: #e6ebf5;
+	--tm-text-2: #aab4c8;
+	--tm-text-3: #8d98af;
+	--tm-text-disabled: #667290;
+	--tm-text-inverse: #141b2b;
+
+	--tm-action-primary: var(--tm-brand-500);
+	--tm-action-primary-hover: var(--tm-brand-600);
+	--tm-action-primary-active: var(--tm-brand-400);
+	--tm-action-primary-text: #ffffff;
+	--tm-action-primary-fg: var(--tm-brand-700);
+
+	--tm-action-default-bg: transparent;
+	--tm-action-default-hover-bg: color-mix(in srgb, var(--tm-brand-500) 14%, var(--tm-surface));
+	--tm-action-default-active-bg: color-mix(in srgb, var(--tm-brand-500) 24%, var(--tm-surface));
+	--tm-action-default-border: var(--tm-gray-200);
+	--tm-action-default-hover-border: var(--tm-brand-500);
+	--tm-action-default-text: var(--tm-text);
+
+	--tm-action-danger: var(--tm-red-500);
+	--tm-action-danger-hover: #e86e6b;
+	--tm-action-danger-active: #c4383a;
+
+	--tm-success-bg: var(--tm-green-50);
+	--tm-success-text: var(--tm-green-600);
+	--tm-warning-bg: var(--tm-gold-50);
+	--tm-avatar-bg-sl: 35% 24%;
+	--tm-avatar-fg-sl: 65% 78%;
+	--tm-warning-text: var(--tm-gold-600);
+	--tm-danger-bg: var(--tm-red-50);
+	--tm-danger-text: var(--tm-red-500);
+	--tm-info-bg: var(--tm-brand-50);
+	--tm-info-text: var(--tm-brand-600);
+
+	/* Shadows read as depth against black, so they go darker, not lighter. */
+	--tm-shadow-xs: 0 1px 2px rgb(0 0 0 / 0.3);
+	--tm-shadow-sm: 0 2px 6px rgb(0 0 0 / 0.4);
+	--tm-shadow-md: 0 6px 16px rgb(0 0 0 / 0.5), 0 3px 6px -4px rgb(0 0 0 / 0.6);
+	--tm-shadow-lg: 0 9px 28px rgb(0 0 0 / 0.45), 0 6px 16px rgb(0 0 0 / 0.5);
+	--tm-shadow-xl: 0 12px 48px rgb(0 0 0 / 0.5), 0 9px 28px rgb(0 0 0 / 0.45);
+
+	--tm-ring-color: rgb(22 104 220 / 0.25);
+
+	/* Tone chips on dark: muted fills, lifted foregrounds. */
+	--tm-tone-blue-bg: #111a2c;
+	--tm-tone-blue-fg: #3c89e8;
+	--tm-tone-green-bg: #162312;
+	--tm-tone-green-fg: #6abe39;
+	--tm-tone-purple-bg: #1a1325;
+	--tm-tone-purple-fg: #b37feb;
+	--tm-tone-orange-bg: #2b1d11;
+	--tm-tone-orange-fg: #e89a3c;
+	--tm-tone-teal-bg: #112123;
+	--tm-tone-teal-fg: #33bcb7;
+	--tm-tone-pink-bg: #291321;
+	--tm-tone-pink-fg: #e0529c;
+}

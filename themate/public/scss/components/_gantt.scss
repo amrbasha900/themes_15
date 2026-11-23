@@ -1,0 +1,275 @@
+/* Gantt / timeline view.
+ * Native source: frappe/node_modules/frappe-gantt@0.6.1/dist/frappe-gantt.css,
+ *                frappe/public/scss/desk/frappe_gantt.scss (`.gantt-modern`),
+ *                frappe/public/js/frappe/views/gantt/gantt_view.js
+ *
+ * The chart is one SVG, so everything here is `fill` and `stroke` on shapes —
+ * custom properties resolve in presentation contexts exactly as they do in CSS.
+ *
+ * Four native facts drive this file:
+ *  1. `.gantt-modern` (frappe_gantt.scss) repaints the library's bars WHITE
+ *     with a gray outline and a gray progress fill, so a timeline reads as an
+ *     empty table: nothing distinguishes a bar from the row it sits on. Bars
+ *     take the accent here, and progress is a darker step of it.
+ *  2. set_colors() (gantt_view.js:198) INJECTS a <style> block of
+ *     `.gantt .bar-wrapper.color-<hex> .bar { fill: … }` rules for every row
+ *     whose document carries a colour. Those are (0,4,0); anything written
+ *     here is more specific and would silently erase per-document colours.
+ *     Every bar-fill rule below therefore excludes `[class*="color-"]`.
+ *     `.bar-milestone` is the other custom class and is not matched by that,
+ *     so milestones keep a rule of their own.
+ *  3. The label is drawn INSIDE the bar (`.bar-label`) and only moves outside
+ *     (`.bar-label.big`) when the text does not fit. It sits over the progress
+ *     fill, which is why progress stops at brand-400: darker steps drop
+ *     `--tm-text` on it below 4.5:1.
+ *  4. The view-mode switch is not part of the chart — setup_view_mode_buttons()
+ *     appends a `.btn-group.gantt-view-mode` into the list's paging area and
+ *     marks the active one `btn-info`. It is styled here, with the chart it
+ *     belongs to, as a segmented control.
+ *
+ * Scoped to the list kill-switch: Gantt is a List View (gantt_view.js:3). */
+
+#{$tm-on}[data-tm-list="on"] {
+	/* ---- Frame ------------------------------------------------------------- */
+	.gantt-container {
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface);
+		font-size: var(--tm-text-xs);
+		overflow: auto;
+		scrollbar-width: thin;
+
+		&::-webkit-scrollbar {
+			inline-size: 8px;
+			block-size: 8px;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background-color: var(--tm-border-strong);
+			border-radius: var(--tm-radius-full);
+		}
+
+		&::-webkit-scrollbar-track {
+			background-color: transparent;
+		}
+	}
+
+	/* ---- Grid -------------------------------------------------------------- */
+	.gantt {
+		.grid-background {
+			fill: none;
+		}
+
+		.grid-header {
+			fill: var(--tm-surface-sunken);
+			stroke: var(--tm-border);
+			stroke-width: 1;
+		}
+
+		.grid-row {
+			fill: var(--tm-surface);
+		}
+
+		/* Banding, not striping: just enough to follow a row across months. */
+		.grid-row:nth-child(even) {
+			fill: var(--tm-surface-sunken);
+		}
+
+		.row-line {
+			stroke: var(--tm-border);
+		}
+
+		.tick {
+			stroke: var(--tm-border);
+			stroke-width: 1;
+		}
+
+		.tick.thick {
+			stroke: var(--tm-border-strong);
+			stroke-width: 1;
+		}
+
+		.today-highlight {
+			fill: var(--tm-surface-selected);
+			opacity: 1;
+		}
+
+		/* Dependency arrows are structure, not emphasis. */
+		.arrow {
+			fill: none;
+			stroke: var(--tm-text-3);
+			stroke-width: 1.2;
+		}
+
+		/* ---- Header dates --------------------------------------------------- */
+		.upper-text {
+			fill: var(--tm-text-2);
+			font-size: var(--tm-text-xs);
+			font-weight: 600;
+		}
+
+		.lower-text {
+			fill: var(--tm-text-3);
+			font-size: var(--tm-text-xs);
+			font-weight: 500;
+		}
+
+		/* ---- Bars (facts 1-3) ----------------------------------------------- */
+		.bar-wrapper {
+			cursor: pointer;
+			outline: none;
+		}
+
+		.bar-wrapper:not([class*="color-"]):not(.bar-milestone) {
+			/* A timeline bar is SOLID. The pale-bar-with-a-darker-fill reading
+			 * makes an unstarted task (progress 0) look like an empty slot on
+			 * the grid, which is the opposite of what a timeline is for. */
+			.bar {
+				fill: var(--tm-action-primary);
+				stroke: none;
+				stroke-width: 0;
+			}
+
+			.bar-progress {
+				fill: var(--tm-action-primary-active);
+			}
+
+			&:hover .bar,
+			&.active .bar {
+				fill: var(--tm-action-primary-hover);
+			}
+		}
+
+		/* A milestone is a point, not a span — it gets the warning hue so it
+		 * cannot be mistaken for a task bar. */
+		.bar-wrapper.bar-milestone {
+			.bar {
+				fill: var(--tm-gold-50);
+				stroke: var(--tm-gold-600);
+				stroke-width: 1;
+			}
+
+			.bar-progress {
+				fill: var(--tm-gold-600);
+			}
+		}
+
+		.bar-invalid {
+			fill: transparent;
+			stroke: var(--tm-border-strong);
+			stroke-width: 1;
+			stroke-dasharray: 4 3;
+		}
+
+		/* The label sits ON the bar, so it takes the accent's own text colour —
+		 * the one role in the token set that is guaranteed legible on
+		 * --tm-action-primary in both modes AND on the darker
+		 * --tm-action-primary-active the progress fill paints over it. */
+		.bar-label {
+			fill: var(--tm-action-primary-text);
+			font-size: var(--tm-text-xs);
+			font-weight: 500;
+		}
+
+		/* `.big` is the library's "the text did not fit" state: the label is
+		 * outside the bar, on the row, so it takes the row's text colour. */
+		.bar-label.big,
+		.bar-invalid ~ .bar-label {
+			fill: var(--tm-text-2);
+		}
+
+		/* Resize grips: hidden until the bar is pointed at, then unmistakable.
+		 * `.gantt-modern` hides them on hover and shows them only on .active,
+		 * which means the drag target appears only after the drag starts. */
+		.handle {
+			fill: var(--tm-brand-600);
+			opacity: 0;
+			visibility: hidden;
+			cursor: ew-resize;
+			transition: opacity var(--tm-dur) var(--tm-ease);
+		}
+
+		.bar-wrapper:hover .handle,
+		.bar-wrapper.active .handle {
+			visibility: visible;
+			opacity: 1;
+		}
+	}
+
+	/* ---- Hover card --------------------------------------------------------- */
+	/* The library's popup is black at 80% with gray text; Frappe keeps the
+	 * white title on it. Both become the theme's floating surface. */
+	.gantt-container .popup-wrapper {
+		min-inline-size: 168px;
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background: var(--tm-surface-raised);
+		box-shadow: var(--tm-shadow-md);
+		color: var(--tm-text-2);
+		font-size: var(--tm-text-sm);
+
+		.title {
+			padding: var(--tm-space-2) var(--tm-space-3) 0;
+			border: none;
+			color: var(--tm-text);
+			font-weight: var(--tm-weight-medium);
+			line-height: var(--tm-leading-dense);
+		}
+
+		.subtitle {
+			padding: var(--tm-space-1) var(--tm-space-3) var(--tm-space-2);
+			color: var(--tm-text-2);
+			font-size: var(--tm-text-xs);
+			font-variant-numeric: tabular-nums;
+		}
+
+		.pointer {
+			border-top-color: var(--tm-surface-raised);
+		}
+	}
+
+	/* ---- Today (js/core/board.js) -------------------------------------------- */
+	.list-paging-area .tm-gantt-today {
+		block-size: var(--tm-control-h);
+		margin-inline-end: var(--tm-space-2);
+		padding-inline: var(--tm-space-3);
+		font-size: var(--tm-text-sm);
+		font-weight: var(--tm-weight-medium);
+	}
+
+	/* ---- View-mode switch (fact 4) ------------------------------------------ */
+	.list-paging-area .gantt-view-mode {
+		display: inline-flex;
+		gap: 2px;
+		padding: 2px;
+		border-radius: var(--tm-radius-sm);
+		background-color: var(--tm-surface-sunken);
+		box-shadow: inset 0 0 0 1px var(--tm-border);
+
+		> .btn,
+		> .btn-view-mode {
+			block-size: calc(var(--tm-control-h) - 4px);
+			padding-inline: var(--tm-space-3);
+			border: none;
+			border-radius: calc(var(--tm-radius-sm) - 1px);
+			background-color: transparent;
+			box-shadow: none;
+			color: var(--tm-text-2);
+			font-size: var(--tm-text-sm);
+			font-weight: var(--tm-weight-medium);
+			white-space: nowrap;
+
+			&:hover {
+				background-color: var(--tm-surface-hover);
+				color: var(--tm-text);
+			}
+
+			/* gantt_view.js marks the current mode `btn-info` */
+			&.btn-info {
+				background-color: var(--tm-surface);
+				box-shadow: var(--tm-shadow-xs);
+				color: var(--tm-text);
+			}
+		}
+	}
+}

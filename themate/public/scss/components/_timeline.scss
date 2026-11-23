@@ -1,0 +1,63 @@
+/* Form timeline (comments, edits, communications).
+ * Native source: frappe/public/scss/desk/timeline.scss */
+
+#{$tm-on}[data-tm-form="on"] {
+	.timeline-item {
+		font-size: var(--tm-text-sm);
+		color: var(--tm-text);
+
+		/* The connecting line between entries. */
+		&::before {
+			background-color: var(--tm-border);
+		}
+
+		.timeline-content {
+			border: 1px solid var(--tm-border);
+			border-radius: var(--tm-radius-md);
+			background-color: var(--tm-surface);
+			padding: var(--tm-space-3);
+			box-shadow: none;
+		}
+
+		.timeline-dot {
+			background-color: var(--tm-surface);
+			border: 2px solid var(--tm-border-strong);
+		}
+
+		&.timeline-item-highlight .timeline-dot {
+			border-color: var(--tm-action-primary);
+		}
+	}
+
+	.timeline-message-box {
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface);
+	}
+
+	/* Metadata (author, timestamp) is the one place 12px is allowed. */
+	.timeline-item .timeline-content .text-muted,
+	.timeline-item .frappe-timestamp {
+		font-size: var(--tm-text-xs);
+		color: var(--tm-text-3);
+	}
+
+	.comment-box {
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		background-color: var(--tm-surface);
+
+		.ql-editor {
+			font-size: var(--tm-text-sm);
+			min-block-size: 80px;
+		}
+	}
+
+	/* Activity/comment tab switcher above the timeline. */
+	.timeline-actions {
+		.btn {
+			height: var(--tm-control-h-sm);
+			font-size: var(--tm-text-xs);
+		}
+	}
+}

@@ -1,0 +1,229 @@
+{
+ "actions": [],
+ "creation": "2026-09-30 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "description": "What a calendar's events show — fields under the title, their format, the colour — and, if it needs one, its own weekend.",
+ "field_order": [
+  "reference_doctype",
+  "calendar_view",
+  "column_break_main",
+  "enabled",
+  "event_style",
+  "fields_section",
+  "fields",
+  "color_section",
+  "color_by",
+  "column_break_color",
+  "event_color",
+  "event_section",
+  "title_field",
+  "column_break_event",
+  "start_date_field",
+  "end_date_field",
+  "weekend_section",
+  "own_weekend",
+  "weekend_sunday",
+  "weekend_monday",
+  "weekend_tuesday",
+  "weekend_wednesday",
+  "column_break_weekend",
+  "weekend_thursday",
+  "weekend_friday",
+  "weekend_saturday"
+ ],
+ "fields": [
+  {
+   "fieldname": "reference_doctype",
+   "fieldtype": "Link",
+   "label": "Document Type",
+   "options": "DocType",
+   "reqd": 1,
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "description": "The document type whose calendar this lays out."
+  },
+  {
+   "fieldname": "calendar_view",
+   "fieldtype": "Link",
+   "label": "Saved Calendar",
+   "options": "Calendar View",
+   "in_list_view": 1,
+   "description": "Leave empty to lay out every calendar of the document type: its own one and any saved one without a layout of its own. Pick a saved calendar to give only that one this layout."
+  },
+  {
+   "fieldname": "column_break_main",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "label": "Enabled",
+   "default": "1",
+   "in_list_view": 1
+  },
+  {
+   "fieldname": "event_style",
+   "fieldtype": "Select",
+   "label": "Event Style",
+   "options": "Card\nSingle Line",
+   "default": "Card",
+   "in_list_view": 1,
+   "description": "Card: the title on its own line, each field below it. Single Line: the title and the fields on one line, for busy months."
+  },
+  {
+   "fieldname": "fields_section",
+   "fieldtype": "Section Break",
+   "label": "Shown on Each Event",
+   "description": "The fields drawn under the title, top to bottom, e.g. the grand total and the percentage billed."
+  },
+  {
+   "fieldname": "fields",
+   "fieldtype": "Table",
+   "label": "Fields",
+   "options": "Calendar Layout Field"
+  },
+  {
+   "fieldname": "color_section",
+   "fieldtype": "Section Break",
+   "label": "Color"
+  },
+  {
+   "fieldname": "color_by",
+   "fieldtype": "Select",
+   "label": "Color Events By",
+   "options": "Calendar Default\nStatus\nFixed Color",
+   "default": "Calendar Default",
+   "description": "Calendar Default: as the document type's calendar colours it. Status: the colour of the record's status in its list. Fixed Color: every event in one colour."
+  },
+  {
+   "fieldname": "column_break_color",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "event_color",
+   "fieldtype": "Color",
+   "label": "Event Color",
+   "depends_on": "eval:doc.color_by=='Fixed Color'",
+   "mandatory_depends_on": "eval:doc.color_by=='Fixed Color'"
+  },
+  {
+   "fieldname": "event_section",
+   "fieldtype": "Section Break",
+   "label": "Event Fields",
+   "collapsible": 1,
+   "description": "Which fields name the event and place it on the calendar. Leave them empty to keep what the calendar already uses. A document type that has no calendar of its own needs Starts On; setting it makes the calendar read the dates straight from these fields."
+  },
+  {
+   "fieldname": "title_field",
+   "fieldtype": "Select",
+   "label": "Title"
+  },
+  {
+   "fieldname": "column_break_event",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "start_date_field",
+   "fieldtype": "Select",
+   "label": "Starts On"
+  },
+  {
+   "fieldname": "end_date_field",
+   "fieldtype": "Select",
+   "label": "Ends On",
+   "description": "Leave empty for events that last a single day."
+  },
+  {
+   "fieldname": "weekend_section",
+   "fieldtype": "Section Break",
+   "label": "Weekend",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "own_weekend",
+   "fieldtype": "Check",
+   "label": "Use a Weekend of Its Own",
+   "default": "0",
+   "description": "Otherwise the weekend set in Theme Settings > Calendar applies."
+  },
+  {
+   "fieldname": "weekend_sunday",
+   "fieldtype": "Check",
+   "label": "Sunday",
+   "default": "0",
+   "depends_on": "eval:doc.own_weekend"
+  },
+  {
+   "fieldname": "weekend_monday",
+   "fieldtype": "Check",
+   "label": "Monday",
+   "default": "0",
+   "depends_on": "eval:doc.own_weekend"
+  },
+  {
+   "fieldname": "weekend_tuesday",
+   "fieldtype": "Check",
+   "label": "Tuesday",
+   "default": "0",
+   "depends_on": "eval:doc.own_weekend"
+  },
+  {
+   "fieldname": "weekend_wednesday",
+   "fieldtype": "Check",
+   "label": "Wednesday",
+   "default": "0",
+   "depends_on": "eval:doc.own_weekend"
+  },
+  {
+   "fieldname": "column_break_weekend",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "weekend_thursday",
+   "fieldtype": "Check",
+   "label": "Thursday",
+   "default": "0",
+   "depends_on": "eval:doc.own_weekend"
+  },
+  {
+   "fieldname": "weekend_friday",
+   "fieldtype": "Check",
+   "label": "Friday",
+   "default": "0",
+   "depends_on": "eval:doc.own_weekend"
+  },
+  {
+   "fieldname": "weekend_saturday",
+   "fieldtype": "Check",
+   "label": "Saturday",
+   "default": "0",
+   "depends_on": "eval:doc.own_weekend"
+  }
+ ],
+ "links": [],
+ "modified": "2026-09-30 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Themate",
+ "name": "Calendar Layout",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "role": "System Manager",
+   "read": 1,
+   "write": 1,
+   "create": 1,
+   "delete": 1,
+   "export": 1,
+   "report": 1,
+   "print": 1,
+   "email": 1,
+   "share": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "title_field": "reference_doctype",
+ "track_changes": 1
+}

@@ -1,0 +1,673 @@
+/* Kanban board — the drag surface.
+ * Native source: frappe/public/scss/desk/kanban.scss,
+ *                frappe/public/js/frappe/views/kanban/kanban_board.bundle.js,
+ *                .../kanban_column.html, .../kanban_card.html
+ *
+ * Reference: a board-tracker layout — fixed-width columns on the app ground,
+ * a count beside each column name, compact cards, one scroll region per
+ * column rather than one for the whole page.
+ *
+ * Four native facts drive this file:
+ *  1. kanban_column.html writes `style="background-color: var(--bg-{{indicator}})"`
+ *     INLINE on every column, so the column is tinted by its status colour and
+ *     no stylesheet rule can win without !important. Columns are neutral here
+ *     and the status colour stays where it reads as a signal — the dot in the
+ *     header — so the !important is deliberate and is the only one in the file.
+ *  2. `.add-card` and `.kanban-card.new-card-area` are siblings ABOVE the card
+ *     list in the template, and bind_add_card() (kanban_board.bundle.js:615)
+ *     toggles them as a pair — one is always hidden. Ordering both to the end
+ *     of the flex column puts "add" under the last card and opens the compose
+ *     box in the same place, with no markup change.
+ *  3. Native sizes the column `min-height: calc(100vh - 150px)` and the card
+ *     list `max-height: calc(100vh - 250px)`: two independent guesses that do
+ *     not add up, so the list stops short of the column's foot. One height
+ *     (--tm-board-h) is set on the column and the list flexes into it.
+ *  4. onStart() writes an inline `height: 100vh` on `.kanban-cards` while a
+ *     card is dragged (kanban_board.bundle.js:591). `flex: 1 1 0` sets the
+ *     flex base size from the basis, not from `height`, so the inline value
+ *     cannot stretch the column — do not replace it with `height: 100%`.
+ *
+ * Scoped to the list kill-switch: Kanban is a List View (kanban_view.js
+ * extends frappe.views.ListView). */
+
+#{$tm-on}[data-tm-list="on"] {
+	/* ---- Board ------------------------------------------------------------ */
+	/* The page panel is tightened around the board — its 16px inset plus the
+	 * column's own 8px read as a 24px margin no column needed. */
+	.layout-main-section:has(.kanban) {
+		padding: var(--tm-space-2);
+	}
+
+	.kanban {
+		--tm-board-h: calc(100vh - 200px);
+
+		display: flex;
+		align-items: flex-start;
+		gap: var(--tm-space-2);
+		padding-block-end: var(--tm-space-2);
+		overflow-x: auto;
+		overflow-y: hidden;
+
+		/* Native hides the board scrollbar outright. A board scrolls sideways
+		 * and nothing else says so, so it keeps a thin one. */
+		scrollbar-width: thin;
+
+		&::-webkit-scrollbar {
+			display: block;
+			block-size: 8px;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background-color: var(--tm-border-strong);
+			border-radius: var(--tm-radius-full);
+		}
+
+		&::-webkit-scrollbar-track {
+			background-color: transparent;
+		}
+	}
+
+	/* ---- Column ----------------------------------------------------------- */
+	.kanban .kanban-column {
+		display: flex;
+		flex-direction: column;
+		flex: 0 0 272px;
+		max-inline-size: 272px;
+
+		/* A DEFINITE height, not a max: `.kanban-cards` below is `flex: 1 1 0`
+		 * with `min-block-size: 0`, and against an auto-height column that
+		 * resolves to zero — the card list collapses behind the "+ Add" row.
+		 * The column is the board's height and the list fills what is left. */
+		block-size: var(--tm-board-h);
+		padding: var(--tm-space-2);
+		border: none;
+		border-radius: var(--tm-radius-sm);
+		transition: flex-basis var(--tm-dur) var(--tm-ease),
+			max-inline-size var(--tm-dur) var(--tm-ease);
+
+		/* see file header, fact 1. A translucent wash, not a flat gray — that
+		 * is what --ds-background-neutral is, and it is why the column reads
+		 * the same on the white page and on a tinted one. */
+		background-color: var(--tm-board-column) !important;
+
+		/* ---- Column header ------------------------------------------------ */
+		.kanban-column-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			gap: var(--tm-space-1);
+			order: 0;
+			flex: none;
+			margin: 0 0 var(--tm-space-2);
+			padding: 0 var(--tm-space-1) var(--tm-space-2);
+			border-block-end: 1px solid var(--tm-board-column-hover);
+			min-block-size: 28px;
+		}
+
+		.kanban-column-title {
+			display: flex;
+			align-items: center;
+			gap: var(--tm-space-2);
+			min-inline-size: 0;
+			padding-inline-end: 0;
+			color: var(--tm-text-2);
+			font-size: var(--tm-text-xs);
+			font-weight: var(--tm-weight-medium);
+			letter-spacing: 0.04em;
+			text-transform: uppercase;
+
+			.kanban-title {
+				margin: 0;
+				min-inline-size: 0;
+				color: inherit;
+				font-size: inherit;
+				font-weight: inherit;
+				letter-spacing: inherit;
+				cursor: grab;
+			}
+
+			/* The status colour, reduced to a dot. The column header renders an
+			 * EMPTY `.indicator-pill` (kanban_column.html:4), so native draws a
+			 * 20px tinted capsule around nothing. Only the ::before dot carries
+			 * the strong colour (--indicator-dot-<colour>, indicator.scss:52) —
+			 * the capsule's own tint is dropped and the dot is the pill. */
+			.indicator-pill {
+				flex: none;
+				block-size: auto;
+				min-inline-size: 0;
+				padding: 0;
+				background-color: transparent;
+
+				&::before {
+					inline-size: 8px;
+					block-size: 8px;
+					margin-inline-end: 0;
+				}
+			}
+		}
+
+		/* Card count (js/core/board.js). Tabular figures so a column does not
+		 * jump width between 9 and 10. */
+		.tm-kanban-count {
+			flex: none;
+			min-inline-size: 20px;
+			padding: 0 var(--tm-space-1);
+			border-radius: var(--tm-radius-full);
+			background-color: var(--tm-board-column-hover);
+			color: var(--tm-text-2);
+			font-size: var(--tm-text-xs);
+			font-weight: var(--tm-weight-medium);
+			line-height: 18px;
+			text-align: center;
+			letter-spacing: 0;
+			font-variant-numeric: tabular-nums;
+		}
+
+		/* The … menu: always present, quiet until the column is pointed at. */
+		.column-options {
+			flex: none;
+
+			> a {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				inline-size: 24px;
+				block-size: 24px;
+				border-radius: var(--tm-radius-sm);
+				color: var(--tm-text-3);
+				opacity: 0;
+				transition: opacity var(--tm-dur-fast) var(--tm-ease),
+					background-color var(--tm-dur-fast) var(--tm-ease);
+
+				&:hover,
+				&[aria-expanded="true"] {
+					background-color: var(--tm-board-column-hover);
+					color: var(--tm-text);
+				}
+			}
+		}
+
+		&:hover .column-options > a,
+		.column-options > a:focus-visible,
+		.column-options.show > a {
+			opacity: 1;
+		}
+
+		/* ---- Card list ---------------------------------------------------- */
+		.kanban-cards {
+			order: 1;
+			flex: 1 1 0; /* see file header, fact 4 */
+			block-size: auto;
+			max-block-size: none;
+			min-block-size: 0;
+			margin: 0;
+			padding: 0 2px;
+			overflow-y: auto;
+			overflow-x: hidden;
+			scrollbar-width: thin;
+
+			&::-webkit-scrollbar {
+				display: block;
+				inline-size: 6px;
+			}
+
+			&::-webkit-scrollbar-thumb {
+				background-color: var(--tm-border-strong);
+				border-radius: var(--tm-radius-full);
+			}
+
+			&::-webkit-scrollbar-track {
+				background-color: transparent;
+			}
+
+			.kanban-card-wrapper:last-child .kanban-card {
+				margin-block-end: 0;
+			}
+		}
+
+		/* ---- Compose / add, pinned under the list (fact 2) ----------------- */
+		.kanban-card.new-card-area {
+			order: 2;
+		}
+
+		.add-card {
+			order: 3;
+			flex: none;
+			justify-content: flex-start;
+			gap: var(--tm-space-1);
+			block-size: 30px;
+			margin: var(--tm-space-1) 0 0;
+			padding-inline: var(--tm-space-2);
+			border-radius: var(--tm-radius-sm);
+			background-color: transparent;
+			color: var(--tm-text-2);
+			font-size: var(--tm-text-sm);
+			font-weight: var(--tm-weight-medium);
+
+			&:hover {
+				background-color: var(--tm-board-column-hover);
+				color: var(--tm-text);
+			}
+		}
+	}
+
+	/* ---- Card ------------------------------------------------------------- */
+	.kanban .kanban-cards .kanban-card-wrapper .kanban-card {
+		min-block-size: 0; /* native 100px — an empty box under every title */
+		margin-block: 0 var(--tm-space-2);
+		border: none;
+		border-radius: var(--tm-radius-sm);
+		background-color: var(--tm-board-card);
+		box-shadow: var(--tm-board-shadow);
+		transition: background-color var(--tm-dur-fast) var(--tm-ease),
+			box-shadow var(--tm-dur-fast) var(--tm-ease);
+
+		.kanban-card-body {
+			padding: var(--tm-space-2) var(--tm-space-3);
+		}
+
+		.kanban-image {
+			block-size: 108px;
+
+			img {
+				border-radius: var(--tm-radius-sm) var(--tm-radius-sm) 0 0;
+			}
+		}
+
+		/* Title wraps to two lines and then clips. Native puts `ellipsis` on
+		 * it (nowrap + overflow hidden), which cuts most card titles at the
+		 * column's 272px — the one line a card exists to show. */
+		.kanban-title-area {
+			margin-block-end: var(--tm-space-2);
+			max-inline-size: 100%;
+			font-size: var(--tm-text-sm);
+			font-weight: var(--tm-weight-regular);
+
+			/* the template emits a bare <br> between title and fields */
+			> br {
+				display: none;
+			}
+
+			a {
+				color: inherit;
+				text-decoration: none;
+			}
+
+			/* A card's summary is content, not a dense table row: it takes the
+			 * base size, which is also the one thing on the card a reader
+			 * scans from three columns away. */
+			.kanban-card-title {
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+				white-space: normal;
+				color: var(--tm-text);
+				font-size: var(--tm-text-md);
+				font-weight: var(--tm-weight-medium);
+				line-height: var(--tm-leading-dense);
+			}
+
+			.kanban-card-doc {
+				margin-block-start: var(--tm-space-1);
+				color: var(--tm-text-2);
+				font-size: var(--tm-text-xs);
+				line-height: var(--tm-leading-dense);
+
+				> div {
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
+				}
+			}
+
+			.kanban-card-creation {
+				margin-block-start: var(--tm-space-1);
+				color: var(--tm-text-3);
+				font-size: var(--tm-text-xs);
+			}
+		}
+
+		/* ---- Card footer: labels on their own line, then the actions row --- */
+		.kanban-card-meta {
+			display: flex;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: var(--tm-space-2);
+			min-block-size: 22px;
+
+			&:empty {
+				display: none;
+			}
+
+			.kanban-tags {
+				order: 0;
+				flex: 0 0 100%;
+				margin: 0;
+				display: flex;
+				flex-wrap: wrap;
+				gap: var(--tm-space-1);
+
+				.tag-pill {
+					block-size: 20px;
+					margin: 0;
+					padding: 0 var(--tm-space-2);
+					border-radius: var(--tm-radius-full);
+					font-size: var(--tm-text-xs);
+					line-height: 18px;
+				}
+			}
+
+			.list-comment-count {
+				order: 2;
+				display: inline-flex;
+				align-items: center;
+				gap: 2px;
+				inline-size: auto;
+				color: var(--tm-text-3);
+				font-size: var(--tm-text-xs);
+				font-variant-numeric: tabular-nums;
+			}
+
+			/* Like and assign are affordances, not content. Shown faintly so the
+			 * footer of a card with no labels, comments or assignees does not
+			 * read as two stray icons; full strength once the card is pointed
+			 * at, and a like that is ON is always at full strength. */
+			.like-action {
+				order: 3;
+				display: inline-flex;
+				align-items: center;
+				color: var(--tm-text-3);
+				opacity: 0.45;
+				transition: opacity var(--tm-dur-fast) var(--tm-ease);
+
+				&.liked {
+					opacity: 1;
+				}
+			}
+
+			/* Assignees sit on the far edge, as they do in the list row. */
+			.kanban-assignments {
+				order: 4;
+				float: none;
+				margin-inline-start: auto;
+				gap: 2px;
+
+				.avatar,
+				.avatar-action {
+					inline-size: 22px;
+					block-size: 22px;
+				}
+
+				/* Overlapping avatars need a ring in the CARD's colour to read
+				 * as separate heads. */
+				.avatar-frame {
+					box-shadow: 0 0 0 2px var(--tm-surface);
+				}
+
+				/* "assign someone": an empty seat, not a filled button. */
+				.avatar-action {
+					border: 1px dashed var(--tm-border-strong);
+					border-radius: var(--tm-radius-full);
+					background-color: transparent;
+					color: var(--tm-text-3);
+					opacity: 0.45;
+					transition: opacity var(--tm-dur-fast) var(--tm-ease);
+
+					&:hover {
+						border-color: var(--tm-action-primary);
+						color: var(--tm-action-primary-fg);
+					}
+				}
+			}
+		}
+	}
+
+	/* ---- The record's own status (js/core/board.js) ------------------------
+	 * The one piece of colour on the board that means something: it is the
+	 * same pill, in the same status colour, that the list view shows for the
+	 * same record, so a board and a list never disagree about a document. */
+	.kanban .kanban-card .tm-card-status {
+		order: 0;
+		flex: none;
+		max-inline-size: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/* ---- Empty column (js/core/board.js) -----------------------------------
+	 * A child of the column, ordered with the header, so it sits under it and
+	 * stays out of the list Sortable counts drop positions in. */
+	.kanban .kanban-column > .tm-column-empty {
+		order: 0;
+		flex: none;
+		margin-block-start: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-block-size: 72px;
+		padding: var(--tm-space-3);
+		border: 1px dashed var(--tm-board-column-hover);
+		border-radius: var(--tm-radius-sm);
+		color: var(--tm-text-3);
+		font-size: var(--tm-text-xs);
+		line-height: var(--tm-leading-dense);
+		text-align: center;
+	}
+
+	/* ---- The document name, as Jira shows the issue key (js/core/board.js) --
+	 * Tabular figures and a fixed inline size: a column of keys that do not
+	 * line up is worse than no keys. It is quiet until the card is pointed
+	 * at — it identifies the card, it is not what the card is about. */
+	.kanban .kanban-card .tm-card-key {
+		order: 1;
+		max-inline-size: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		color: var(--tm-text-3);
+		font-size: var(--tm-text-xs);
+		font-weight: var(--tm-weight-medium);
+		font-variant-numeric: tabular-nums;
+		/*! rtl:ignore */
+		direction: ltr;
+		unicode-bidi: isolate;
+		opacity: 0.7;
+		transition: opacity var(--tm-dur-fast) var(--tm-ease);
+	}
+
+	/* ---- Collapsible columns (js/core/board.js) --------------------------- */
+	.kanban .kanban-column .tm-column-toggle {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex: none;
+		inline-size: 20px;
+		block-size: 20px;
+		padding: 0;
+		border: none;
+		border-radius: var(--tm-radius-xs);
+		background: transparent;
+		color: var(--tm-text-3);
+		opacity: 0;
+		transition: opacity var(--tm-dur-fast) var(--tm-ease);
+
+		&:hover {
+			background-color: var(--tm-board-column-hover);
+			color: var(--tm-text);
+		}
+	}
+
+	.kanban .kanban-column:hover .tm-column-toggle,
+	.kanban .kanban-column .tm-column-toggle:focus-visible {
+		opacity: 1;
+	}
+
+	/* Collapsed: the column becomes one tall button. Its name runs down it,
+	 * the count stays readable at the top, and everything that can only be
+	 * used at full width is gone rather than squeezed. */
+	.kanban .kanban-column.tm-column-collapsed {
+		flex: 0 0 44px;
+		max-inline-size: 44px;
+		min-inline-size: 44px;
+		padding-block: var(--tm-space-2);
+		cursor: pointer;
+
+		.kanban-cards,
+		.add-card,
+		.new-card-area,
+		.column-options {
+			display: none;
+		}
+
+		.kanban-column-header {
+			flex-direction: column;
+			align-items: center;
+			gap: var(--tm-space-2);
+			margin: 0;
+			padding: 0;
+			block-size: 100%;
+		}
+
+		.kanban-column-title {
+			flex-direction: column;
+			align-items: center;
+			gap: var(--tm-space-2);
+			min-block-size: 0;
+			flex: 1 1 auto;
+		}
+
+		.kanban-title {
+			writing-mode: vertical-rl;
+			max-block-size: 100%;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			cursor: inherit;
+		}
+
+		.tm-column-toggle {
+			opacity: 1;
+			transform: rotate(180deg);
+		}
+	}
+
+	/* A card with no labels, no comments and nobody assigned has nothing in
+	 * its footer but the two affordances, so the 8px that separates the
+	 * summary from real metadata is dead space. `.avatar` appears only once
+	 * somebody IS assigned — `.avatar-action` (the empty seat) is always
+	 * there, which is why it is not in this list. */
+	.kanban .kanban-card .kanban-card-meta:not(:has(.kanban-tags, .list-comment-count, .avatar)) {
+		min-block-size: 20px;
+	}
+
+	.kanban
+		.kanban-card
+		.kanban-title-area:has(
+			+ .kanban-card-meta:not(:has(.kanban-tags, .list-comment-count, .avatar))
+		) {
+		margin-block-end: 0;
+	}
+
+	/* Hover tints the card's own surface — --ds-surface-hovered — and leaves
+	 * the elevation alone. The accent stays reserved for selection
+	 * (DESIGN_CONTRACT.md §4). */
+	.kanban .kanban-card-wrapper:hover .kanban-card {
+		background-color: var(--tm-board-card-hover);
+
+		.like-action,
+		.tm-card-key,
+		.kanban-assignments .avatar-action {
+			opacity: 1;
+		}
+	}
+
+	/* ---- Drag states ------------------------------------------------------ */
+	/* The placeholder is an outline of the gap the card will land in; the card
+	 * under the cursor is the only thing that floats. */
+	.kanban .kanban-cards .sortable-ghost > .kanban-card {
+		background-color: var(--tm-board-column-hover) !important;
+		box-shadow: none;
+	}
+
+	.kanban .kanban-cards .sortable-chosen:not(.sortable-ghost) > .kanban-card,
+	.kanban .kanban-cards .sortable-drag > .kanban-card {
+		box-shadow: var(--tm-board-shadow-drag);
+		cursor: grabbing;
+	}
+
+	/* ---- Compose boxes ----------------------------------------------------- */
+	.kanban .new-card-area,
+	.kanban .edit-card-area {
+		margin-block-end: var(--tm-space-1);
+		padding: var(--tm-space-2) var(--tm-space-3);
+		border: none;
+		border-radius: var(--tm-radius-sm);
+		background-color: var(--tm-board-card);
+		box-shadow: var(--tm-board-shadow), 0 0 0 2px var(--tm-action-primary);
+
+		textarea {
+			display: block;
+			min-block-size: 40px;
+			color: var(--tm-text);
+			font-size: var(--tm-text-md);
+			font-weight: var(--tm-weight-medium);
+			line-height: var(--tm-leading-dense);
+
+			&::placeholder {
+				color: var(--tm-text-3);
+				font-weight: var(--tm-weight-regular);
+			}
+		}
+	}
+
+	/* ---- Add column -------------------------------------------------------- */
+	.kanban .kanban-column.add-new-column {
+		flex: 0 0 272px;
+		max-inline-size: 272px;
+		/* Not a column — a button. It must not inherit the board height and
+		 * hold 700px of invisible hit area beside the real columns. */
+		block-size: auto;
+		min-block-size: 0;
+		padding: 0;
+		border: none;
+		background-color: transparent !important;
+
+		.kanban-column-title.compose-column {
+			min-block-size: 40px;
+			border: 1px dashed var(--tm-border-strong);
+			border-radius: var(--tm-radius-md);
+			color: var(--tm-text-2);
+			font-size: var(--tm-text-sm);
+			font-weight: var(--tm-weight-medium);
+			letter-spacing: 0;
+			text-transform: none;
+
+			&:hover {
+				border-color: var(--tm-action-primary);
+				background-color: var(--tm-surface-selected);
+				color: var(--tm-action-primary-fg);
+			}
+		}
+
+		.compose-column-form .new-column-title {
+			block-size: 40px;
+			padding-inline: var(--tm-space-3);
+			border: 1px solid var(--tm-action-primary);
+			border-radius: var(--tm-radius-md);
+			background-color: var(--tm-surface);
+			color: var(--tm-text);
+			font-size: var(--tm-text-sm);
+			text-transform: none;
+			letter-spacing: 0;
+		}
+	}
+
+	/* ---- Empty board -------------------------------------------------------- */
+	.kanban .kanban-empty-state {
+		line-height: var(--tm-leading); /* native 400px */
+		padding-block: var(--tm-space-6);
+		color: var(--tm-text-3);
+		font-size: var(--tm-text-sm);
+	}
+}

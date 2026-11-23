@@ -1,0 +1,14 @@
+.DS_Store
+*.pyc
+*.egg-info
+*.swp
+tags
+node_modules
+__pycache__
+themate/public/dist/
+
+# dev-only test tooling
+package-lock.json
+tests/css/themate.bundle.css
+tests/visual/shots/
+.claude/

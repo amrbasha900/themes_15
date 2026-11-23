@@ -1,0 +1,241 @@
+/* Sidebar departments (js/sidebar/modern_sidebar.js, Themate Department):
+ * the switcher under the sidebar header and its menu, a popover on <body>.
+ * The switcher takes the sidebar's own colours (--sidebar-*), so it follows
+ * Dark / Light sidebar themes; the menu is a desk surface (--tm-*). */
+
+#{$tm-on} {
+	.tm-dept {
+		flex: none;
+		padding: var(--tm-space-2) var(--tm-space-2) 0;
+	}
+
+	.tm-dept__btn {
+		display: flex;
+		align-items: center;
+		gap: var(--tm-space-2);
+		inline-size: 100%;
+		padding: 6px var(--tm-space-2);
+		border: 1px solid var(--sidebar-border-color);
+		border-radius: var(--tm-radius-md);
+		background: var(--sidebar-hover-bg);
+		color: var(--sidebar-text);
+		text-align: start;
+		cursor: pointer;
+		transition: border-color 0.15s ease, background-color 0.15s ease;
+
+		&:hover,
+		&[aria-expanded="true"] {
+			border-color: var(--sidebar-primary);
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--sidebar-primary);
+			outline-offset: 1px;
+		}
+	}
+
+	/* a department's colour, else the brand's */
+	.tm-dept__icon {
+		--tm-dept-c: var(--tm-action-primary);
+		flex: none;
+		display: inline-grid;
+		place-items: center;
+		inline-size: 30px;
+		block-size: 30px;
+		border-radius: var(--tm-radius-sm);
+		background: color-mix(in srgb, var(--tm-dept-c) 18%, transparent);
+		color: var(--tm-dept-c);
+
+		.icon {
+			stroke: currentColor;
+			fill: none;
+		}
+	}
+
+	.tm-dept__text {
+		flex: 1 1 auto;
+		min-inline-size: 0;
+		display: flex;
+		flex-direction: column;
+		line-height: 1.2;
+	}
+
+	.tm-dept__kicker {
+		font-size: 11px;
+		color: var(--sidebar-text-muted);
+	}
+
+	.tm-dept__name {
+		font-size: var(--tm-text-sm);
+		font-weight: var(--tm-weight-semibold);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.tm-dept__chev {
+		flex: none;
+		display: inline-flex;
+		color: var(--sidebar-text-muted);
+
+		.icon {
+			stroke: currentColor;
+		}
+	}
+
+	/* a lone department with labels: the switcher names it (modern_sidebar.js) */
+	.modern-sidebar-section.tm-untitled > .modern-sidebar-section-title {
+		display: none;
+	}
+
+	/* a label inside a department over its rows (row Category) */
+	.tm-dept-label {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		padding: 10px 16px 2px;
+		font-size: var(--sidebar-section-font-size);
+		font-weight: 600;
+		color: var(--sidebar-text-muted);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+
+		&::after {
+			content: "";
+			flex: 1;
+			min-inline-size: 12px;
+			block-size: 1px;
+			background: var(--sidebar-border-color, rgba(255, 255, 255, 0.14));
+		}
+	}
+
+	/* the rail: the department's icon alone */
+	.modern-sidebar.collapsed {
+		/* the label shrinks to its line */
+		.tm-dept-label {
+			padding: 8px 12px 2px;
+			font-size: 0;
+			gap: 0;
+		}
+
+		.tm-dept {
+			padding-inline: 0;
+			display: flex;
+			justify-content: center;
+		}
+
+		.tm-dept__btn {
+			inline-size: auto;
+			padding: 4px;
+			border-color: transparent;
+			background: transparent;
+		}
+
+		.tm-dept__text,
+		.tm-dept__chev {
+			display: none;
+		}
+	}
+
+	.tm-dept-menu {
+		position: fixed;
+		z-index: 1070;
+		inline-size: max-content;
+		min-inline-size: 240px;
+		max-inline-size: min(320px, calc(100vw - 16px));
+		max-block-size: calc(100vh - 16px);
+		overflow-y: auto;
+		padding: var(--tm-space-2);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-lg);
+		background: var(--tm-surface-raised);
+		box-shadow: var(--tm-shadow-lg);
+		color: var(--tm-text);
+		animation: tm-dept-in 0.14s ease-out;
+	}
+
+	.tm-dept-menu__title {
+		padding: 4px var(--tm-space-2) 6px;
+		font-size: var(--tm-text-xs);
+		color: var(--tm-text-3);
+	}
+
+	.tm-dept-menu__item {
+		display: flex;
+		align-items: center;
+		gap: var(--tm-space-2);
+		inline-size: 100%;
+		padding: 6px var(--tm-space-2);
+		border-radius: var(--tm-radius-md);
+		color: var(--tm-text);
+		text-align: start;
+		cursor: pointer;
+
+		.tm-dept__icon {
+			inline-size: 26px;
+			block-size: 26px;
+		}
+
+		&:hover,
+		&:focus-visible {
+			background: var(--tm-surface-hover);
+			outline: none;
+		}
+
+		&.is-on {
+			font-weight: var(--tm-weight-semibold);
+		}
+	}
+
+	.tm-dept-menu__name {
+		flex: 1 1 auto;
+		min-inline-size: 0;
+		font-size: var(--tm-text-sm);
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.tm-dept-menu__count {
+		flex: none;
+		min-inline-size: 20px;
+		padding: 0 6px;
+		border-radius: var(--tm-radius-full);
+		background: var(--tm-surface-hover);
+		font-size: 11px;
+		color: var(--tm-text-2);
+		text-align: center;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.tm-dept-menu__check {
+		flex: none;
+		display: inline-flex;
+		inline-size: 16px;
+		color: var(--tm-action-primary);
+		visibility: hidden;
+
+		.icon {
+			stroke: currentColor;
+		}
+	}
+
+	.tm-dept-menu__item.is-on .tm-dept-menu__check {
+		visibility: visible;
+	}
+
+	.tm-dept-menu__rule {
+		block-size: 1px;
+		margin: 6px var(--tm-space-2);
+		background: var(--tm-border);
+	}
+
+	@keyframes tm-dept-in {
+		from { opacity: 0; transform: translateY(-4px); }
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.tm-dept-menu { animation: none; }
+	}
+}

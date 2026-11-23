@@ -1,0 +1,242 @@
+/* Form dashboard sections that are NOT the Connections block.
+ * Native source: frappe/public/js/frappe/form/dashboard.js make_section /
+ * add_section, frappe/public/scss/desk/form.scss.
+ *
+ * js/core/form_360.js replaces the links block and hides it; everything else
+ * Frappe and the apps put on the dashboard stays below the panel and was
+ * never styled:
+ *
+ *   .progress-area        Frappe's progress bars
+ *   .form-heatmap         the year-long activity heatmap (frappe-charts)
+ *   .form-graph           the dashboard graph
+ *   .form-dashboard-section.custom   whatever an app renders with
+ *                         frm.dashboard.add_section(html, label) — ERPNext's
+ *                         Stock Levels on Item, HRMS's Allocated Leaves
+ *                         table on Leave Application, and dozens more
+ *
+ * A custom section is arbitrary app HTML: Bootstrap tables, .row/.col grids,
+ * .inline-graph bars, buttons. This file gives those primitives the theme's
+ * surfaces, borders and type WITHOUT touching their structure, so an app that
+ * adds a section tomorrow lands inside the design rather than beside it.
+ *
+ * Loaded after components/_form-360.scss (see themate.bundle.scss). */
+
+#{$tm-on}[data-tm-form="on"] {
+	/* ---- Every dashboard section ------------------------------------------ */
+	/* _form-page.scss already gives .form-dashboard-section the card. Only the
+	 * body needs room and a readable type scale. */
+	.form-dashboard-section {
+		/* The section wrapper is a Bootstrap .row and the body is a bare flex
+		 * item in it, so it is shrink-to-fit by default: a wide child (the
+		 * heatmap, a six-column table) pushed the row instead of scrolling
+		 * inside it. One full-width, shrinkable item fixes both. */
+		> .section-body {
+			flex: 1 1 100%;
+			min-inline-size: 0;
+			font-size: var(--tm-text-sm);
+			color: var(--tm-text);
+		}
+
+		/* App templates hard-code Bootstrap's .text-right for numeric columns.
+		 * Right is the wrong edge in Arabic; end is the right edge in both. */
+		.text-right {
+			text-align: end;
+		}
+
+		> .section-body > p:last-child {
+			margin-block-end: 0;
+		}
+	}
+
+	/* ---- Heatmap ----------------------------------------------------------
+	 * A year of squares is ~750px wide and does not shrink: in a panel narrower
+	 * than that, native (desk/form.scss:377 — overflow only under md) simply
+	 * cut it off. It scrolls at every width here, and stays centred while it
+	 * fits. `safe` keeps the start edge reachable once it does not. */
+	.form-heatmap {
+		.heatmap {
+			display: flex;
+			justify-content: safe center;
+			overflow-x: auto;
+			overflow-y: hidden;
+			padding-block-end: var(--tm-space-2);
+			/* The chart is a calendar: its months read left to right in Arabic
+			 * too, and frappe-charts lays the squares out in document order.
+			 * rtlcss would flip this to `rtl` and mirror the year. */
+			/*! rtl:ignore */
+			direction: ltr;
+		}
+
+		.heatmap-message {
+			margin-block-start: var(--tm-space-2);
+			font-size: var(--tm-text-xs);
+			color: var(--tm-text-3);
+			text-align: center;
+		}
+
+		/* frappe-charts writes the GitHub ramp as literal fill attributes, so
+		 * there is no class or variable to aim at — Frappe recolours the empty
+		 * square the same way in dark.scss:232. The ramp becomes the brand's,
+		 * which also makes the squares legible on a dark surface. */
+		rect[fill="#ebedf0"] { fill: var(--tm-surface-sunken); }
+		rect[fill="#c6e48b"] { fill: var(--tm-brand-100); }
+		rect[fill="#7bc96f"] { fill: var(--tm-brand-400); }
+		rect[fill="#239a3b"] { fill: var(--tm-brand-500); }
+		rect[fill="#196127"] { fill: var(--tm-brand-700); }
+
+		text {
+			fill: var(--tm-text-3);
+			font-size: var(--tm-text-xs);
+		}
+	}
+
+	/* ---- Graph ------------------------------------------------------------- */
+	.form-graph .chart-container {
+		margin: 0;
+	}
+
+	/* ---- Progress ---------------------------------------------------------- */
+	.progress-area {
+		.progress {
+			block-size: 6px;
+			border-radius: var(--tm-radius-full);
+			background-color: var(--tm-surface-sunken);
+			overflow: hidden;
+		}
+
+		.progress-message {
+			font-size: var(--tm-text-xs);
+			color: var(--tm-text-3);
+			margin-block-start: var(--tm-space-1);
+		}
+	}
+
+	/* ---- Tables inside an app's custom section ------------------------------
+	 * HRMS renders Allocated Leaves as <table class="table table-bordered
+	 * small">; many apps do the same. Bootstrap's default is a grey-bordered
+	 * table with no radius that reads as a different product. */
+	.form-dashboard-section .section-body > table,
+	.form-dashboard-section .section-body table.table {
+		inline-size: 100%;
+		margin: 0;
+		border-collapse: separate;
+		border-spacing: 0;
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		overflow: hidden;
+		font-size: var(--tm-text-sm);
+
+		> thead > tr > th {
+			background-color: var(--tm-surface-sunken);
+			color: var(--tm-text-2);
+			font-size: var(--tm-text-xs);
+			font-weight: var(--tm-weight-medium);
+			text-transform: none;
+			border: 0;
+			border-block-end: 1px solid var(--tm-border);
+			padding: var(--tm-space-2) var(--tm-space-3);
+			vertical-align: middle;
+		}
+
+		> tbody > tr > td {
+			border: 0;
+			border-block-start: 1px solid var(--tm-border);
+			padding: var(--tm-space-2) var(--tm-space-3);
+			color: var(--tm-text);
+			vertical-align: middle;
+		}
+
+		> tbody > tr:first-child > td {
+			border-block-start: 0;
+		}
+
+		> tbody > tr:hover > td {
+			background-color: var(--tm-surface-hover);
+		}
+
+		/* a column of numbers lines up only with one figure width */
+		> thead > tr > th.text-right,
+		> tbody > tr > td.text-right {
+			font-variant-numeric: tabular-nums;
+		}
+
+		/* templates colour the remaining/overdue cell with the CSS keywords
+		 * `green` and `red`, which are neither the palette's nor readable on a
+		 * dark surface */
+		> tbody > tr > td[style*="green"] { color: var(--tm-success-text) !important; }
+		> tbody > tr > td[style*="red"] { color: var(--tm-danger-text) !important; }
+	}
+
+	/* ---- Row lists inside an app's custom section ---------------------------
+	 * ERPNext's Stock Levels (stock/dashboard/item_dashboard_list.html) and the
+	 * same pattern elsewhere: one .dashboard-list-item per row, a Bootstrap
+	 * .row of columns inside, action buttons at the end. */
+	.form-dashboard-section .dashboard-list-item {
+		padding: var(--tm-space-2) var(--tm-space-3);
+		border-block-start: 1px solid var(--tm-border);
+		font-size: var(--tm-text-sm);
+		color: var(--tm-text);
+
+		&:first-child {
+			border-block-start: 0;
+		}
+
+		&:hover {
+			background-color: var(--tm-surface-hover);
+		}
+
+		> .row {
+			align-items: center;
+			margin: 0;
+		}
+
+		a {
+			color: var(--tm-text-link);
+
+			&:hover {
+				color: var(--tm-text-link-hover);
+			}
+		}
+
+		.btn {
+			block-size: var(--tm-control-h-sm);
+			font-size: var(--tm-text-xs);
+		}
+	}
+
+	.form-dashboard-section .stock-levels {
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-md);
+		overflow: hidden;
+
+		> .more {
+			border-block-start: 1px solid var(--tm-border);
+			background-color: var(--tm-surface-sunken);
+			padding: var(--tm-space-2) var(--tm-space-3) !important;
+		}
+	}
+
+	/* The quantity bars beside those rows (desk/form.scss:238). Native paints
+	 * them with --gray-* directly, which the dark theme never reaches. */
+	.form-dashboard-section .inline-graph {
+		.inline-graph-count {
+			font-size: var(--tm-text-xs);
+			color: var(--tm-text-2);
+			font-variant-numeric: tabular-nums;
+		}
+
+		.inline-graph-bar {
+			background-color: var(--tm-surface-sunken);
+			border-radius: var(--tm-radius-full);
+			overflow: hidden;
+		}
+
+		.inline-graph-bar-inner {
+			background-color: var(--tm-brand-400);
+
+			&.dark {
+				background-color: var(--tm-action-primary);
+			}
+		}
+	}
+}

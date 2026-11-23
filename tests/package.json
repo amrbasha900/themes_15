@@ -1,0 +1,42 @@
+{
+  "name": "themate-dev-tests",
+  "private": true,
+  "description": "Dev-only tooling for the Themate theme. Deliberately NOT at the app root: Frappe's esbuild runs `yarn build` in any app whose package.json defines a build script (frappe/esbuild/esbuild.js:447), and a package.json at the app root also invites `yarn install` to pull these dev dependencies onto a production bench. The Frappe app itself has no npm dependencies.",
+  "scripts": {
+    "test": "npm run test:flags && npm run test:linked-fields && npm run test:arabic-pdf && npm run test:palette && npm run test:build && npm run test:css && npm run test:js && npm run test:icons && npm run test:form-tabs && npm run test:grid-text && npm run test:list-row && npm run test:page-head && npm run test:workspace-cards && npm run test:sidebar-art && npm run test:loading && npm run test:calendar && npm run test:flicker && npm run test:linked-filters && npm run test:list-pager && npm run test:form-panel && npm run test:print && npm run test:search && npm run test:workspace-race && npm run test:integration",
+    "test:flags": "python3 flags.test.py",
+    "test:linked-fields": "python3 linked_fields.test.py",
+    "test:arabic-pdf": "python3 arabic_pdf.test.py",
+    "test:palette": "node palette.test.js",
+    "test:css": "node css/contract.test.js",
+    "test:js": "node adapters.test.js",
+    "test:icons": "node icons.test.js",
+    "test:form-tabs": "node form-tabs.test.js",
+    "test:grid-text": "node grid-text.test.js",
+    "test:list-row": "node list-row.test.js",
+    "test:page-head": "node page-head.test.js",
+    "test:workspace-cards": "node workspace-cards.test.js",
+    "test:sidebar-art": "node sidebar-art.test.js",
+    "test:loading": "node loading.test.js",
+    "test:calendar": "node calendar.test.js",
+    "test:flicker": "node flicker.test.js",
+    "test:linked-filters": "node linked-filters.test.js",
+    "test:list-pager": "node list-pager.test.js",
+    "test:form-panel": "node form-panel.test.js",
+    "test:print": "node print.test.js",
+    "test:integration": "node integration.test.js",
+    "test:search": "node search.test.js",
+    "test:workspace-race": "node workspace-race.test.js",
+    "capture": "node visual/capture.js",
+    "test:build": "node build.test.js"
+  },
+  "devDependencies": {
+    "@tabler/icons": "^3.46.0",
+    "autoprefixer": "^10.4.0",
+    "esbuild": "^0.14.29",
+    "esbuild-sass-plugin": "^2.4.0",
+    "playwright": "^1.55.0",
+    "postcss": "^8.4.0",
+    "sass": "^1.63.0"
+  }
+}

@@ -1,0 +1,521 @@
+<title>Business Overview في INNOMATE</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --ground: #f6f7fa;
+    --surface: #ffffff;
+    --sunken: #eef1f6;
+    --line: #dde3ec;
+    --ink: #16213a;
+    --ink-2: #3e4a63;
+    --muted: #6b7690;
+    --accent: #1677ff;
+    --accent-ink: #0b57d0;
+    --accent-soft: #e8f1ff;
+    --good: #1f8f4e;
+    --good-soft: #e3f5ea;
+    --bad: #cf3535;
+    --bad-soft: #fde8e8;
+    --navy: #0f1b3d;
+    --navy-ink: #d9e0f0;
+    --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    --latin: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --arabic: "IBM Plex Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0b1220; --surface: #151d2e; --sunken: #1c2638; --line: #2a3650;
+      --ink: #e8ecf5; --ink-2: #c3cbdb; --muted: #8e9ab3;
+      --accent: #5b9cff; --accent-ink: #8fbbff; --accent-soft: #1a2a47;
+      --good: #4fc57f; --good-soft: #143221; --bad: #ff6b6b; --bad-soft: #3a1c1c;
+      --navy: #0b1220; --navy-ink: #d9e0f0;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #0b1220; --surface: #151d2e; --sunken: #1c2638; --line: #2a3650;
+    --ink: #e8ecf5; --ink-2: #c3cbdb; --muted: #8e9ab3;
+    --accent: #5b9cff; --accent-ink: #8fbbff; --accent-soft: #1a2a47;
+    --good: #4fc57f; --good-soft: #143221; --bad: #ff6b6b; --bad-soft: #3a1c1c;
+    --navy: #0b1220; --navy-ink: #d9e0f0;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--arabic);
+    font-size: 15px;
+    line-height: 1.75;
+    direction: rtl;
+    -webkit-font-smoothing: antialiased;
+  }
+  .latin, code, kbd, .field { font-family: var(--latin); }
+  code, .field { font-family: var(--mono); font-size: 0.86em; direction: ltr; unicode-bidi: isolate; }
+  code { background: var(--sunken); padding: 1px 6px; border-radius: 4px; color: var(--ink-2); }
+  .field { color: var(--accent-ink); }
+  a { color: var(--accent-ink); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  h1, h2, h3, h4 { text-wrap: balance; margin: 0; line-height: 1.3; font-weight: 600; }
+  h1 { font-size: 30px; }
+  h2 { font-size: 22px; padding-top: 8px; }
+  h3 { font-size: 17px; }
+  h4 { font-size: 15px; }
+  p { margin: 0; max-width: 68ch; }
+  ul, ol { margin: 0; padding-inline-start: 22px; max-width: 68ch; }
+  li + li { margin-top: 4px; }
+  .eyebrow { font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-family: var(--latin); font-weight: 600; }
+
+  .topbar {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    background: var(--navy); color: var(--navy-ink);
+    padding: 12px 20px;
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  }
+  .topbar .brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--latin); font-weight: 600; letter-spacing: 0.04em; color: #fff; }
+  .topbar .brand svg { width: 26px; height: 26px; }
+  .topbar .sub { color: var(--navy-ink); opacity: 0.85; font-size: 14px; }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 20px 64px; display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 36px; align-items: start; }
+  nav.toc { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 64px); display: flex; flex-direction: column; gap: 2px; font-size: 14px; }
+  nav.toc a { color: var(--ink-2); padding: 6px 10px; border-radius: 4px; border-inline-start: 2px solid transparent; }
+  nav.toc a:hover { background: var(--sunken); text-decoration: none; color: var(--ink); }
+  nav.toc .eyebrow { padding: 0 10px 6px; }
+  main { display: flex; flex-direction: column; gap: 40px; min-width: 0; }
+  section { display: flex; flex-direction: column; gap: 14px; scroll-margin-top: 80px; }
+
+  .lead { font-size: 17px; color: var(--ink-2); max-width: 62ch; }
+  .hero { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 24px; align-items: center; }
+  @media (max-width: 900px) { .hero { grid-template-columns: 1fr; } }
+
+  /* the card, drawn as it appears on the desk */
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+    padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0;
+  }
+  .card .head { display: flex; align-items: center; gap: 8px; }
+  .card .chip { width: 30px; height: 30px; border-radius: 6px; background: var(--accent-soft); color: var(--accent-ink); display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  .card .chip svg { width: 15px; height: 15px; }
+  .card .title { font-size: 13px; font-weight: 500; }
+  .card .period { font-size: 12px; color: var(--muted); }
+  .card .value { font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; text-align: end; }
+  .card .meta { display: flex; gap: 8px; align-items: center; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+  .pill { display: inline-flex; align-items: center; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 500; background: var(--sunken); color: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .pill.good { background: var(--good-soft); color: var(--good); }
+  .pill.bad { background: var(--bad-soft); color: var(--bad); }
+  .spark { width: 100%; height: 40px; display: block; }
+  .bar { height: 8px; border-radius: 999px; background: var(--sunken); position: relative; overflow: visible; }
+  .bar > i { display: block; height: 100%; border-radius: 999px; background: var(--good); }
+  .bar > b { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--ink-2); }
+  .rows { display: flex; flex-direction: column; font-size: 13px; }
+  .rows > div { display: flex; justify-content: space-between; gap: 8px; padding: 6px 0; border-top: 1px solid var(--line); }
+  .rows > div:first-child { border-top: 0; }
+  .rows .n { color: var(--muted); font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+  .stack { display: flex; gap: 2px; height: 10px; border-radius: 999px; overflow: hidden; }
+  .stack > i { display: block; height: 100%; background: var(--bad); }
+  .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 12px; font-size: 12px; }
+  .legend > div { display: flex; align-items: center; gap: 6px; }
+  .legend .dot { width: 8px; height: 8px; border-radius: 999px; background: var(--bad); flex: none; }
+  .example { font-size: 11px; color: var(--muted); font-family: var(--latin); }
+
+  /* type reference */
+  .types { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+  .type { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+  .type .glyph { width: 100%; height: 44px; display: block; }
+  .type h4 { display: flex; align-items: baseline; gap: 8px; }
+  .type h4 .latin { color: var(--muted); font-weight: 500; font-size: 12px; }
+  .type p { font-size: 14px; color: var(--ink-2); }
+  .type .uses { font-size: 13px; color: var(--muted); }
+  .type .needs { font-size: 12px; display: flex; flex-wrap: wrap; gap: 4px; }
+  .type .needs span { background: var(--sunken); border-radius: 4px; padding: 1px 7px; }
+  .group-title { display: flex; align-items: center; gap: 12px; }
+  .group-title::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+  table { border-collapse: collapse; width: 100%; font-size: 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+  th, td { padding: 9px 12px; text-align: start; vertical-align: top; border-top: 1px solid var(--line); }
+  th { background: var(--sunken); font-weight: 600; font-size: 13px; color: var(--ink-2); border-top: 0; }
+  .tablewrap { overflow-x: auto; }
+
+  .steps { counter-reset: step; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .step { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 14px 16px 14px; position: relative; display: flex; flex-direction: column; gap: 6px; }
+  .step::before { counter-increment: step; content: counter(step); font-family: var(--latin); font-weight: 600; font-size: 12px; color: var(--accent-ink); background: var(--accent-soft); width: 24px; height: 24px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; }
+  .step h4 { font-size: 15px; }
+  .step p { font-size: 14px; color: var(--ink-2); }
+
+  .note { border-inline-start: 3px solid var(--accent); background: var(--surface); padding: 10px 14px; border-radius: 4px; font-size: 14px; color: var(--ink-2); }
+  .note.warn { border-color: var(--bad); }
+  .kv { display: grid; grid-template-columns: max-content 1fr; gap: 6px 14px; font-size: 14px; }
+  .kv dt { color: var(--muted); }
+  .kv dd { margin: 0; }
+  kbd { font-family: var(--latin); font-size: 12px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 4px; padding: 0 6px; background: var(--surface); }
+  .btn { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; border: 1px solid var(--line); border-radius: 4px; padding: 3px 10px; background: var(--surface); color: var(--ink); vertical-align: middle; }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; padding: 2px; background: var(--sunken); gap: 2px; vertical-align: middle; }
+  .seg span { padding: 2px 10px; font-size: 13px; border-radius: 4px; color: var(--ink-2); }
+  .seg span.on { background: var(--surface); color: var(--accent-ink); font-weight: 500; }
+
+  @media (max-width: 860px) {
+    .wrap { grid-template-columns: 1fr; gap: 20px; padding: 20px 16px 48px; }
+    nav.toc { position: static; flex-direction: row; flex-wrap: wrap; }
+    nav.toc .eyebrow { width: 100%; }
+    h1 { font-size: 26px; }
+  }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+</style>
+
+<header class="topbar">
+  <span class="brand">
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="10" width="4" height="10" rx="1" fill="#5b9cff"/><rect x="10" y="4" width="4" height="16" rx="1" fill="#8fbbff"/><rect x="17" y="13" width="4" height="7" rx="1" fill="#5b9cff"/></svg>
+    INNOMATE
+  </span>
+  <span class="sub">دليل المستخدم — العناصر الذكية ومساحات العمل</span>
+</header>
+
+<div class="wrap">
+  <nav class="toc" aria-label="المحتويات">
+    <span class="eyebrow">Contents</span>
+    <a href="#what">ما هو Business Overview؟</a>
+    <a href="#quick">إنشاء عنصر في 4 خطوات</a>
+    <a href="#types">الأشكال الأحد عشر</a>
+    <a href="#periods">الفترات والمقارنات</a>
+    <a href="#fields">مرجع الحقول</a>
+    <a href="#reading">كيف تقرأ الكارت</a>
+    <a href="#workspace">مساحات العمل والتابات</a>
+    <a href="#record360">صفحة السجل 360°</a>
+    <a href="#lists">القوائم</a>
+    <a href="#ready">عناصر جاهزة</a>
+    <a href="#colors">ألوان الشارتس</a>
+    <a href="#faq">أسئلة شائعة</a>
+  </nav>
+
+  <main>
+    <section id="what">
+      <div class="hero">
+        <div>
+          <span class="eyebrow">Business Overview</span>
+          <h1>Business Overview: كروت ذكية تقرأ أرقامك مباشرة من بياناتك</h1>
+          <p class="lead" style="margin-top:12px">العنصر الذكي كارت صغير يتحسب لحظيًا من أي نوع مستند في النظام — فواتير، عملاء، فرص بيع، مخزون — ويعرضه بالشكل اللي يناسبه — رقم، حلقة هدف، عداد، أعمدة، دونات، قمع، أو قائمة بحاجة لانتباهك — مع مقارنة بالفترة السابقة أو بنفس الفترة من العام الماضي. تضيفه إلى أي مساحة عمل، وتعدّله وقتما تشاء من غير كود.</p>
+        </div>
+        <div class="card" aria-label="مثال لكارت KPI">
+          <div class="head">
+            <span class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 18 10 11l4 4 6-8"/></svg></span>
+            <div><div class="title">Sales This Month</div><div class="period">This Month</div></div>
+          </div>
+          <div class="value">106,750.00 ج.م</div>
+          <div class="meta"><span class="pill good">↑ 304%</span><span>مقابل 26,400.00 ج.م · الفترة السابقة</span></div>
+          <svg class="spark" viewBox="0 0 120 32" preserveAspectRatio="none" aria-hidden="true">
+            <path d="M2,30 L14,30 L26,6 L38,30 L50,30 L62,29 L74,30 L86,30 L98,28 L118,30 L118,30 L2,30 Z" fill="var(--accent)" opacity="0.12"/>
+            <path d="M2,30 L14,30 L26,6 L38,30 L50,30 L62,29 L74,30 L86,30 L98,28 L118,30" fill="none" stroke="var(--accent)" stroke-width="1.5" vector-effect="non-scaling-stroke"/>
+          </svg>
+          <span class="example">مثال من بيانات تجريبية</span>
+        </div>
+      </div>
+      <div class="note">كل عنصر يحترم صلاحياتك: لو مش مسموح لك تقرأ نوع المستند، الكارت يعرض «غير مسموح» ولا يعرض أرقامًا. الأرقام تتحدث كل دقيقة، وأيقونة التحديث في رأس الكارت تجدّدها فورًا.</div>
+    </section>
+
+    <section id="quick">
+      <h2>إنشاء عنصر في 4 خطوات</h2>
+      <div class="steps">
+        <div class="step"><h4>افتح InnoDash Widget</h4><p>من شريط البحث اكتب <code>InnoDash Widget</code> ثم <span class="btn">+ New</span>. اكتب اسمًا واضحًا (هو اللي هيظهر على الكارت).</p></div>
+        <div class="step"><h4>اختر الشكل من المعرض ثم نوع المستند</h4><p>أعلى النموذج معرض مصوّر بالأحد عشر شكلًا — اضغط الكارت اللي يناسب سؤالك، مثلًا <b>KPI</b> على <code>Sales Invoice</code>. بمجرد اختيار المستند تظهر حقوله في قوائم الاختيار (الحقل الرقمي، حقل التاريخ، التجميع).</p></div>
+        <div class="step"><h4>اضبط الحساب والفلاتر</h4><p>الدالة (عدد / مجموع / متوسط)، الحقل، الفترة، المقارنة، والفلاتر بالضغط على الجدول — نفس فلاتر القوائم اللي تعرفها.</p></div>
+        <div class="step"><h4>احفظ ثم «Add to Workspace»</h4><p>بعد الحفظ تظهر معاينة حقيقية للكارت أعلى النموذج، وزرار <span class="btn">Add to Workspace</span> يضيفه لمساحة عملك بالعرض اللي تختاره.</p></div>
+      </div>
+      <p>طريقة ثانية: من مساحة عمل خاصة بك اضغط <span class="btn">Edit</span> ثم <kbd>+</kbd> بين البلوكات واختر <b>Business Overview</b>، وحدّد العنصر من القائمة. من نفس القائمة تقدر تنشئ عنصرًا جديدًا.</p>
+    </section>
+
+    <section id="types">
+      <h2>الأشكال الأحد عشر</h2>
+      <p>أحد عشر شكلًا في أربع عائلات، وكل شكل له رسمة مختلفة علشان تعرف من أول نظرة إيه اللي بتبص عليه. لكل شكل: إيه اللي بيعرضه، إمتى تستخدمه، والحقول اللي بيحتاجها.</p>
+
+      <h3 class="group-title">أرقام</h3>
+      <div class="types">
+        <div class="type">
+          <svg class="glyph" viewBox="0 0 200 44" aria-hidden="true"><text x="0" y="16" font-family="Inter,sans-serif" font-size="16" font-weight="600" fill="var(--ink)">106,750</text><rect x="80" y="3" width="42" height="15" rx="7.5" fill="var(--good-soft)"/><text x="101" y="14" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="var(--good)">↑ 304%</text><rect x="0" y="23" width="120" height="4" rx="2" fill="var(--accent)"/><rect x="0" y="30" width="30" height="4" rx="2" fill="var(--accent)" opacity="0.35"/><path d="M130,42 C150,40 155,26 170,30 S190,40 200,32" fill="none" stroke="var(--accent)" stroke-width="1.5"/><circle cx="200" cy="32" r="2.5" fill="var(--accent)"/></svg>
+          <h4>مؤشر أداء <span class="latin">KPI</span></h4>
+          <p>رقم واحد للفترة (عدد أو مجموع أو متوسط) مع نسبة التغيير، وشريطين «الحالي / السابق» يوضحوا حجم الفرق، وخط اتجاه صغير بنقطة عند آخر يوم.</p>
+          <div class="uses">مبيعات الشهر، عدد الفواتير، عملاء جدد، مشتريات الشهر.</div>
+          <div class="needs"><span>Function</span><span>Value Field</span><span>Date Field</span><span>Period</span><span>Compare With</span></div>
+        </div>
+        <div class="type">
+          <svg class="glyph" viewBox="0 0 200 44" aria-hidden="true"><circle cx="22" cy="22" r="17" fill="none" stroke="var(--sunken)" stroke-width="6"/><circle cx="22" cy="22" r="17" fill="none" stroke="var(--good)" stroke-width="6" stroke-linecap="round" stroke-dasharray="38 120" transform="rotate(-90 22 22)"/><circle cx="35" cy="34" r="3" fill="var(--surface)" stroke="var(--ink-2)" stroke-width="1.5"/><text x="22" y="25" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="var(--ink)">36%</text><g font-family="Inter,sans-serif" font-size="9" fill="var(--muted)"><text x="52" y="12">Achieved</text><text x="52" y="26">Target</text><text x="52" y="40">Remaining</text></g><g font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="var(--ink)" text-anchor="end"><text x="200" y="12">106,750</text><text x="200" y="26">300,000</text><text x="200" y="40">193,250</text></g></svg>
+          <h4>هدف <span class="latin">Goal</span></h4>
+          <p>حلقة تقدم مقابل هدف تكتبه، وعليها نقطة صغيرة = «المتوقع حتى اليوم». لو الحلقة وصلت للنقطة أنت على المسار، ولو قبلها متأخر — وبجانبها المحقق والهدف والمتبقي.</p>
+          <div class="uses">هدف مبيعات الشهر، عدد عقود الربع، فرص مغلقة السنة دي.</div>
+          <div class="needs"><span>Target</span><span>Period</span><span>Value Field</span></div>
+        </div>
+        <div class="type">
+          <svg class="glyph" viewBox="0 0 200 44" aria-hidden="true"><path d="M62 40 A38 38 0 0 1 138 40" fill="none" stroke="var(--sunken)" stroke-width="8" stroke-linecap="round"/><path d="M62 40 A38 38 0 0 1 118 12" fill="none" stroke="var(--accent)" stroke-width="8" stroke-linecap="round"/><line x1="128" y1="8" x2="134" y2="18" stroke="var(--ink-2)" stroke-width="1.5"/><text x="100" y="38" text-anchor="middle" font-family="Inter,sans-serif" font-size="13" font-weight="600" fill="var(--ink)">67%</text><rect x="150" y="14" width="46" height="15" rx="7.5" fill="var(--good-soft)"/><text x="173" y="25" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="var(--good)">↑ 4 pts</text></svg>
+          <h4>نسبة <span class="latin">Rate</span></h4>
+          <p>نسبة مئوية على عداد نصف دائري: السجلات اللي تحقق «فلاتر البسط» من إجمالي السجلات اللي تحقق الفلاتر. الشرطة الصغيرة على العداد = نسبة فترة المقارنة، والتغيير يُقاس بالنقاط المئوية.</p>
+          <div class="uses">نسبة الفواتير المدفوعة، تحويل الفرص لعروض، التسليم في الموعد.</div>
+          <div class="needs"><span>Filters</span><span>Numerator Filters</span><span>Period</span></div>
+        </div>
+        <div class="type">
+          <svg class="glyph" viewBox="0 0 200 44" aria-hidden="true"><g fill="var(--accent)" opacity="0.4"><rect x="4" y="30" width="10" height="12"/><rect x="20" y="22" width="10" height="20"/><rect x="36" y="34" width="10" height="8"/><rect x="52" y="10" width="10" height="32"/><rect x="68" y="26" width="10" height="16"/><rect x="84" y="18" width="10" height="24"/><rect x="100" y="30" width="10" height="12"/><rect x="116" y="6" width="10" height="36"/><rect x="132" y="24" width="10" height="18"/><rect x="148" y="14" width="10" height="28"/><rect x="164" y="28" width="10" height="14"/><rect x="180" y="20" width="10" height="22" opacity="1"/></g><path d="M0,26 H200" stroke="var(--ink-2)" stroke-dasharray="3 2" stroke-width="1"/><path d="M0,42.5 H200" stroke="var(--line)"/></svg>
+          <h4>اتجاه <span class="latin">Trend</span></h4>
+          <p>الرقم موزعًا على الفترة كأعمدة — يوم بيوم للشهر، أسبوع بأسبوع للربع والسنة، شهر بشهر لما أطول. آخر عمود مضيء، وخط متقطع عند المتوسط علشان تشوف الأيام فوقه وتحته.</p>
+          <div class="uses">المبيعات اليومية آخر 30 يوم، الطلبات الأسبوعية للربع.</div>
+          <div class="needs"><span>Function</span><span>Value Field</span><span>Date Field</span><span>Period</span></div>
+        </div>
+      </div>
+
+      <h3 class="group-title">ترتيب وتوزيع</h3>
+      <div class="types">
+        <div class="type">
+          <svg class="glyph" viewBox="0 0 200 44" aria-hidden="true"><circle cx="6" cy="7" r="5" fill="#f2c94c"/><circle cx="6" cy="22" r="5" fill="#c3cad3"/><circle cx="6" cy="37" r="5" fill="#d9a06b"/><circle cx="21" cy="7" r="6" fill="#dbeafe"/><circle cx="21" cy="22" r="6" fill="#fde7d3"/><circle cx="21" cy="37" r="6" fill="#dcfce7"/><g font-family="Inter,sans-serif" font-size="6" font-weight="600" text-anchor="middle"><text x="21" y="9.5" fill="#1d4ed8">AN</text><text x="21" y="24.5" fill="#b45309">CT</text><text x="21" y="39.5" fill="#15803d">AM</text></g><g fill="var(--sunken)"><rect x="34" y="5" width="166" height="5" rx="2.5"/><rect x="34" y="20" width="166" height="5" rx="2.5"/><rect x="34" y="35" width="166" height="5" rx="2.5"/></g><g fill="#722ed1"><rect x="34" y="5" width="166" height="5" rx="2.5"/><rect x="34" y="20" width="44" height="5" rx="2.5" opacity="0.8"/><rect x="34" y="35" width="12" height="5" rx="2.5" opacity="0.65"/></g></svg>
+          <h4>المتصدرون <span class="latin">Leaderboard</span></h4>
+          <p>أعلى N قيمة بعد التجميع بحقل: عملاء، أصناف، مندوبون، موردون. أول ثلاثة عليهم ميداليات ذهب/فضة/برونز، وكل صف له صورة رمزية بحروف الاسم، القيمة، نسبته من الإجمالي، وشريط مقارنة.</p>
+          <div class="uses">أعلى العملاء إيرادًا، أكثر الأصناف مبيعًا، أداء المندوبين.</div>
+          <div class="needs"><span>Group By</span><span>Function</span><span>Rows</span><span>Period</span></div>
+        </div>
+        <div class="type">
+          <svg class="glyph" viewBox="0 0 200 44" aria-hidden="true"><circle cx="22" cy="22" r="16" fill="none" stroke="#1677ff" stroke-width="7" stroke-dasharray="60 120" transform="rotate(-90 22 22)"/><circle cx="22" cy="22" r="16" fill="none" stroke="#13c2c2" stroke-width="7" stroke-dasharray="25 120" stroke-dashoffset="-61" transform="rotate(-90 22 22)"/><circle cx="22" cy="22" r="16" fill="none" stroke="#faad14" stroke-width="7" stroke-dasharray="14 120" stroke-dashoffset="-87" transform="rotate(-90 22 22)"/><text x="22" y="25" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="var(--ink)">128</text><g font-family="Inter,sans-serif" font-size="9" fill="var(--ink-2)"><circle cx="52" cy="9" r="3" fill="#1677ff"/><text x="60" y="12">Paid 60%</text><circle cx="52" cy="23" r="3" fill="#13c2c2"/><text x="60" y="26">Unpaid 25%</text><circle cx="52" cy="37" r="3" fill="#faad14"/><text x="60" y="40">Overdue 15%</text></g></svg>
+          <h4>توزيع <span class="latin">Breakdown</span></h4>
+          <p>الرقم مقسّمًا بحقل (حالة، فئة، مخزن) على دونات في وسطها الإجمالي، وبجانبها قائمة بالأجزاء ونِسبها. الأجزاء الزائدة عن العدد تتجمع في «أخرى». ألوان الأجزاء من لوحة الشارتس بتاعتك.</p>
+          <div class="uses">الفواتير حسب الحالة، الطلبات حسب مصدر العميل، المخزون حسب المخزن.</div>
+          <div class="needs"><span>Group By</span><span>Function</span><span>Rows</span></div>
+        </div>
+        <div class="type">
+          <svg class="glyph" viewBox="0 0 200 44" aria-hidden="true"><g font-family="Inter,sans-serif" font-size="8" fill="var(--ink-2)"><text x="0" y="9">Open</text><text x="0" y="23">Quotation</text><text x="0" y="37">Won</text></g><g fill="#fa8c16"><path d="M50 2 H170 L155 12 H65 Z"/><path d="M65 16 H155 L140 26 H80 Z" opacity="0.8"/><path d="M80 30 H140 L128 40 H92 Z" opacity="0.65"/></g><g font-family="Inter,sans-serif" font-size="8" fill="var(--muted)" text-anchor="end"><text x="200" y="9">120</text><text x="200" y="23">84 · ↓70%</text><text x="200" y="37">48 · ↓57%</text></g></svg>
+          <h4>قمع <span class="latin">Funnel</span></h4>
+          <p>مراحل بترتيب تكتبه أنت (مثل Open, Replied, Quotation, Converted) مرسومة كقمع حقيقي: كل مرحلة شريحة أضيق من اللي قبلها بنسبتها من الأولى، وبجانبها العدد ونسبة التحويل من المرحلة السابقة.</p>
+          <div class="uses">قمع الفرص البيعية، مراحل التوظيف، خطوات معالجة الشكاوى.</div>
+          <div class="needs"><span>Group By</span><span>Stages</span><span>Period</span></div>
+        </div>
+      </div>
+
+      <h3 class="group-title">قوائم</h3>
+      <div class="types">
+        <div class="type">
+          <svg class="glyph" viewBox="0 0 200 44" aria-hidden="true"><rect x="0" y="3" width="3" height="13" rx="1.5" fill="var(--bad)"/><rect x="0" y="19" width="3" height="13" rx="1.5" fill="var(--accent)" opacity="0.4"/><g font-family="Inter,sans-serif" font-size="9" fill="var(--ink)"><text x="9" y="12">ACC-SINV-00004</text><text x="9" y="28">ACC-SINV-00001</text></g><rect x="150" y="3" width="50" height="13" rx="6" fill="var(--bad-soft)"/><text x="175" y="13" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="600" fill="var(--bad)">12d</text><rect x="158" y="19" width="42" height="13" rx="6" fill="var(--sunken)"/><text x="179" y="29" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="var(--ink-2)">today</text><path d="M0,38 H200" stroke="var(--line)"/></svg>
+          <h4>قائمة متابعة <span class="latin">Watchlist</span></h4>
+          <p>سجلات تحقق الفلاتر ومحتاجة انتباه، كل سجل عليه عمره من حقل التاريخ وشريط جانبي رفيع؛ الأقدم من «Warn After» شريطه أحمر وعمره أحمر، وأعلى القائمة شارة «N متأخر». العدد الكلي في رأس الكارت.</p>
+          <div class="uses">فواتير غير مدفوعة، فرص مفتوحة من غير رد، طلبات معلقة، أصناف تحت حد الطلب.</div>
+          <div class="needs"><span>Filters</span><span>Date Field</span><span>Title Field</span><span>Warn After</span></div>
+        </div>
+        <div class="type">
+          <svg class="glyph" viewBox="0 0 200 44" aria-hidden="true"><rect x="0" y="1" width="20" height="18" rx="3" fill="var(--surface)" stroke="var(--accent)"/><rect x="0" y="1" width="20" height="6" rx="3" fill="var(--accent)"/><text x="10" y="16" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="600" fill="var(--ink)">18</text><rect x="0" y="24" width="20" height="18" rx="3" fill="var(--surface)" stroke="var(--line)"/><rect x="0" y="24" width="20" height="6" rx="3" fill="var(--sunken)"/><text x="10" y="39" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="600" fill="var(--ink)">23</text><g font-family="Inter,sans-serif" font-size="9" fill="var(--ink)"><text x="28" y="12">Cairo Tech Solutions</text><text x="28" y="35">Al Fajr Est.</text></g><rect x="150" y="3" width="50" height="13" rx="6" fill="var(--accent-soft)"/><text x="175" y="13" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="600" fill="var(--accent-ink)">today</text><rect x="152" y="19" width="48" height="13" rx="6" fill="var(--sunken)"/><text x="176" y="29" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="var(--ink-2)">in 3d</text><path d="M0,38 H200" stroke="var(--line)"/></svg>
+          <h4>القادم <span class="latin">Upcoming</span></h4>
+          <p>السجلات اللي تاريخها خلال الأيام القادمة (من اليوم إلى «Next Days»)، الأقرب أولًا، كل صف عليه بطاقة تاريخ (اليوم والشهر) وشارة «خلال 3 أيام»؛ بطاقة النهارده ملوّنة.</p>
+          <div class="uses">فواتير تستحق هذا الأسبوع، تسليمات قادمة، عقود على وشك الانتهاء.</div>
+          <div class="needs"><span>Date Field</span><span>Next (Days)</span><span>Title Field</span></div>
+        </div>
+        <div class="type">
+          <svg class="glyph" viewBox="0 0 200 44" aria-hidden="true"><path d="M8 2 V42" stroke="var(--line)" stroke-dasharray="2 2"/><circle cx="8" cy="9" r="6" fill="#fde7d3" stroke="var(--surface)" stroke-width="2"/><circle cx="8" cy="25" r="6" fill="#dbeafe" stroke="var(--surface)" stroke-width="2"/><g font-family="Inter,sans-serif" font-size="5.5" font-weight="600" text-anchor="middle"><text x="8" y="11" fill="#b45309">AM</text><text x="8" y="27" fill="#1d4ed8">CT</text></g><g font-family="Inter,sans-serif" font-size="9" fill="var(--ink)"><text x="20" y="12">Ahmed Mostafa</text><text x="20" y="28">Cairo Tech Solutions</text></g><rect x="146" y="3" width="54" height="13" rx="6" fill="var(--sunken)"/><text x="173" y="13" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="var(--ink-2)">5d ago</text><rect x="146" y="19" width="54" height="13" rx="6" fill="var(--sunken)"/><text x="173" y="29" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="var(--ink-2)">6d ago</text><path d="M0,38 H200" stroke="var(--line)"/></svg>
+          <h4>الأحدث <span class="latin">Recent</span></h4>
+          <p>آخر السجلات على حقل التاريخ، الأحدث أولًا، على خط زمني رأسي بصور رمزية بحروف الاسم، مع «منذ كذا يوم».</p>
+          <div class="uses">آخر الفواتير، آخر العملاء المسجلين، آخر التذاكر.</div>
+          <div class="needs"><span>Date Field</span><span>Title Field</span><span>Secondary Field</span></div>
+        </div>
+      </div>
+
+      <h3 class="group-title">أعمار</h3>
+      <div class="types">
+        <div class="type">
+          <svg class="glyph" viewBox="0 0 200 44" aria-hidden="true"><rect x="10" y="4" width="30" height="28" rx="2" fill="#52c41a"/><rect x="60" y="12" width="30" height="20" rx="2" fill="#faad14"/><rect x="110" y="20" width="30" height="12" rx="2" fill="#fa8c16"/><rect x="160" y="26" width="30" height="6" rx="2" fill="#ff4d4f"/><g font-family="Inter,sans-serif" font-size="8.5" fill="var(--ink-2)" text-anchor="middle"><text x="25" y="42">0–30</text><text x="75" y="42">31–60</text><text x="125" y="42">61–90</text><text x="175" y="42">91+</text></g></svg>
+          <h4>أعمار <span class="latin">Aging</span></h4>
+          <p>القيمة موزعة على شرائح عمرية من حقل التاريخ (0–30، 31–60، 61–90، أكثر من 90 يومًا) كأعمدة، لونها يشتد من الأخضر للأحمر كل ما الشريحة أقدم، وفوق كل عمود مبلغه. تكتب حدود الشرائح بنفسك.</p>
+          <div class="uses">أعمار الذمم المدينة، أعمار الدائنين، أعمار الطلبات المفتوحة.</div>
+          <div class="needs"><span>Value Field</span><span>Date Field</span><span>Buckets</span><span>Filters</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="periods">
+      <h2>الفترات والمقارنات</h2>
+      <p>الفترة تحدد الأرقام اللي بتتحسب، والمقارنة تحدد إيه اللي بتتقارن بيه. الاتنين بيتحسبوا من <b>حقل التاريخ</b> اللي اخترته (لو تركته فاضي، تاريخ الإنشاء).</p>
+      <div class="tablewrap">
+      <table>
+        <thead><tr><th>الفترة</th><th>تعني</th><th>Previous Period</th><th>Same Period Last Year</th></tr></thead>
+        <tbody>
+          <tr><td>This Month</td><td>من أول الشهر إلى آخره</td><td>الشهر الكامل السابق (مارس ↔ فبراير كاملًا، مش 31 يوم لورا)</td><td>نفس الشهر العام الماضي</td></tr>
+          <tr><td>This Quarter / This Year</td><td>الربع أو السنة الحالية</td><td>الربع أو السنة السابقة كاملة</td><td>نفس الربع أو السنة السابقة</td></tr>
+          <tr><td>Last 7 / 30 / 90 Days</td><td>حتى اليوم</td><td>نفس عدد الأيام قبلها مباشرة</td><td>نفس الأيام العام الماضي</td></tr>
+          <tr><td>Custom Range</td><td>من تاريخ إلى تاريخ</td><td>نفس عدد أيام الفترة قبلها مباشرة</td><td>نفس التواريخ العام الماضي</td></tr>
+          <tr><td>Today / This Week</td><td>اليوم، أو من الاثنين للأحد</td><td>أمس، أو الأسبوع الماضي</td><td>نفس اليوم/الأسبوع العام الماضي</td></tr>
+          <tr><td>All Time</td><td>كل السجلات</td><td colspan="2">لا مقارنة</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="note">اختر <b>None</b> في «Compare With» لو الرقم ملوش معنى يتقارن (مثل قيمة المخزون الحالية). ولو الفترة السابقة فيها صفر، الكارت يكتب «لا بيانات سابقة» بدل نسبة مضللة.</div>
+    </section>
+
+    <section id="fields">
+      <h2>مرجع الحقول</h2>
+      <div class="tablewrap">
+      <table>
+        <thead><tr><th>الحقل</th><th>يستخدمه</th><th>معناه</th></tr></thead>
+        <tbody>
+          <tr><td class="field">Function</td><td>الأرقام، الترتيب، التوزيع، الأعمار</td><td>Count = عدد السجلات؛ Sum / Average / Minimum / Maximum على الحقل الرقمي.</td></tr>
+          <tr><td class="field">Value Field</td><td>كل ما الدالة غير Count</td><td>الحقل الرقمي (Currency / Float / Int / Percent). لو Currency الكارت يعرض العملة الافتراضية للشركة.</td></tr>
+          <tr><td class="field">Date Field</td><td>الكل</td><td>الحقل اللي الفترة والعمر يتحسبوا عليه: تاريخ الفاتورة، تاريخ الاستحقاق، تاريخ الإنشاء…</td></tr>
+          <tr><td class="field">Period</td><td>الأرقام والترتيب</td><td>الفترة (انظر الجدول أعلاه). Custom Range يفتح حقلي From / To.</td></tr>
+          <tr><td class="field">Compare With</td><td>KPI, Goal, Rate, Trend</td><td>Previous Period / Same Period Last Year / None.</td></tr>
+          <tr><td class="field">Higher Is Better</td><td>KPI, Rate, Trend</td><td>يحدد لون التغيير: الزيادة خضراء (مبيعات) أو حمراء (مصروفات، شكاوى).</td></tr>
+          <tr><td class="field">Filters</td><td>الكل</td><td>نفس فلاتر القوائم: <code>docstatus = 1</code>، <code>status = Open</code>، <code>outstanding_amount &gt; 0</code>… اضغط الجدول لتعديلها.</td></tr>
+          <tr><td class="field">Numerator Filters</td><td>Rate</td><td>الشرط اللي «يحسب كنجاح» (مثل status = Paid). البسط ÷ المقام = النسبة.</td></tr>
+          <tr><td class="field">Target</td><td>Goal</td><td>الهدف للفترة. الكارت يقارن التقدم بنسبة الأيام المنقضية من الفترة.</td></tr>
+          <tr><td class="field">Group By</td><td>Leaderboard, Breakdown, Funnel</td><td>حقل الربط أو الاختيار اللي تتجمع عليه القيم (customer, status, warehouse, owner…).</td></tr>
+          <tr><td class="field">Stages</td><td>Funnel</td><td>قيم المراحل بالترتيب، مفصولة بفاصلة. لو فاضي يأخذ أكبر القيم.</td></tr>
+          <tr><td class="field">Rows</td><td>القوائم والترتيب</td><td>عدد الصفوف المعروضة (الافتراضي 5).</td></tr>
+          <tr><td class="field">Title / Secondary Field</td><td>Watchlist, Upcoming, Recent</td><td>عنوان الصف (اسم العميل مثلًا) وقيمة جانبية (المبلغ المتبقي مثلًا).</td></tr>
+          <tr><td class="field">Warn After (Days)</td><td>Watchlist</td><td>الصفوف الأقدم من كذا يوم تتعلّم بالأحمر. صفر = كل ما تجاوز تاريخه.</td></tr>
+          <tr><td class="field">Next (Days)</td><td>Upcoming</td><td>كم يومًا للأمام (7 = هذا الأسبوع، 30 = هذا الشهر).</td></tr>
+          <tr><td class="field">Buckets (Days)</td><td>Aging</td><td>حدود الشرائح: <code>30,60,90</code> تعطي 0–30، 31–60، 61–90، 91+.</td></tr>
+          <tr><td class="field">Colour / Icon</td><td>الكل</td><td>لون الكارت وأيقونته (chart, users, cart, stock, income…). اللون للهوية فقط؛ الأخضر/الأحمر في المقارنات لهم معنى ثابت.</td></tr>
+          <tr><td class="field">Disabled</td><td>الكل</td><td>يخفي البيانات ويترك الكارت بعلامة «معطّل» من غير حذفه من مساحات العمل.</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <section id="reading">
+      <h2>كيف تقرأ الكارت</h2>
+      <dl class="kv">
+        <dt><span class="pill good">↑ 304%</span></dt><dd>التغيير عن فترة المقارنة. أخضر = تحرّك في الاتجاه الجيد حسب «Higher Is Better»، أحمر = العكس، رمادي = لا تغيير أو لا بيانات سابقة.</dd>
+        <dt>مقابل 26,400 · الفترة السابقة</dt><dd>قيمة فترة المقارنة ونوعها؛ مرّر الماوس لتشوف تواريخها بالضبط.</dd>
+        <dt>النقطة الصغيرة على حلقة الهدف</dt><dd>«المتوقع حتى اليوم» — لو نصف الشهر عدّى، تقع عند 50%. الحلقة قبلها = متأخر، وصلتها أو عدّتها = على المسار. الشرطة الصغيرة على عداد النسبة بنفس الفكرة: نسبة فترة المقارنة.</dd>
+        <dt>الخط المتقطع في الاتجاه</dt><dd>متوسط الفترة. الأعمدة اللي فوقه أيام أحسن من المعتاد، واللي تحته أضعف. آخر عمود مضيء علشان تلاقيه بسرعة.</dd>
+        <dt><span class="pill bad">12d</span> / <span class="pill">in 3d</span> / <span class="pill">5d ago</span></dt><dd>عمر السجل من حقل التاريخ: متأخر (Watchlist)، قادم خلال أيام (Upcoming)، منذ أيام (Recent).</dd>
+        <dt>الضغط على الكارت أو الصف</dt><dd>يفتح القائمة مفلترة بنفس الشروط والفترة — أو المستند نفسه في القوائم. عمود العمر يفتح القائمة بنطاق التواريخ بتاعه، وجزء الدونات أو صف المتصدرين يفتحها مفلترة على القيمة دي.</dd>
+        <dt>أيقونة التحديث</dt><dd>تظهر عند المرور على رأس الكارت وتعيد الحساب فورًا (الأرقام بتتحدث تلقائيًا كل دقيقة).</dd>
+        <dt>«This Month ▾» في رأس الكارت</dt><dd>مبدّل الفترة: غيّر الفترة اللي بتشوفها أنت (هذا الشهر، هذه السنة، آخر 90 يوم…) من غير ما تعدّل العنصر نفسه — الاختيار محفوظ لك في المتصفح، والمقارنة بتتحسب على الفترة الجديدة.</dd>
+      </dl>
+    </section>
+
+    <section id="workspace">
+      <h2>مساحات العمل والتابات</h2>
+      <h3>التابات في رأس الصفحة</h3>
+      <p>كل مساحة عمل فيها مجموعتان: <span class="seg"><span class="on">Dashboard</span><span>Records</span></span> — <b>Dashboard</b> فيها الأرقام والشارتات، و<b>Records</b> فيها الاختصارات وقوائم المستندات. اختيارك بيتحفظ لكل مساحة.</p>
+      <ul>
+        <li>لو الموديول له داشبوردات (Dashboard) فهي اللي تظهر تحت تاب Dashboard؛ لو أكثر من واحدة تظهر كتابات فرعية، واللي ما يسعش العرض يتجمع في قائمة <b>+N</b>. أي داشبورد جديدة بنفس الموديول تظهر تلقائيًا في مكانها.</li>
+        <li>زرار <span class="btn">Start Tour 0/5</span> يفتح جولة الإعداد في نافذة بدل ما تحتل الصفحة؛ الخطوات نفسها، والتجاهل (Dismiss) يخفيه.</li>
+      </ul>
+      <h3>مساحات عملي</h3>
+      <p>في الشريط الجانبي قسم <b>My Workspaces</b> وبجانبه <kbd>+</kbd>: ينشئ مساحة خاصة بك — سمّها، وابدأ تضيف عناصر ذكية وشارتات واختصارات. مساحاتك الخاصة تظهر تحت القسم ده وأنت فقط تراها.</p>
+      <ul>
+        <li>مساحتك الخاصة فيها زرار <span class="btn">Edit</span> في رأس الصفحة، وقائمة <b>…</b> فيها Rename و Delete.</li>
+        <li>مساحات الموديولات العامة (Accounting, Selling…) ما فيهاش زرار تعديل؛ مدير مساحات العمل (Workspace Manager) يلاقي «Edit Workspace» في قائمة …</li>
+        <li>في وضع التعديل: اسحب البلوكات لترتيبها، مقبض الجانب لتغيير العرض، أيقونة القلم على العنصر الذكي لتبديله أو فتح إعداداته، ثم <span class="btn primary">Save</span>.</li>
+      </ul>
+      <h3>ترتيب الشريط الجانبي</h3>
+      <p>من <b>Theme Settings › Sidebar</b>: جدول <b>Groups and Hidden Items</b> يحط أي مساحة عمل في القسم اللي تختاره (اكتب اسم قسم جديد وهيتعمل)، وحقل <b>Group Order</b> يرتّب الأقسام من فوق لتحت — اسم قسم في كل سطر، مثلًا: Workspace / Operations / Governance / Setup. الأقسام اللي ما كتبتهاش تيجي بعدها بترتيبها المعتاد. المسافات بين الصفوف والأقسام بتتبع <b>Density</b> بتاعة الثيم (Comfortable أو Compact من الإعدادات أو من الـ Customizer).</p>
+      <h3>لوحات القرار (InnoDash)</h3>
+      <p><b>تقسيم وصلاحيات:</b> لكل موديول لوحتان — <b>لوحة إدارة</b> (المؤشرات والمصادر والزخم والمتصدرون؛ لأدوار المديرين) و<b>لوحة متابعة «Desk»</b> (قائمة العمل اليومية: المتأخر والمستحق وغير المسنَد؛ لأدوار المستخدمين). كل لوحة تظهر فقط لمن يملك أحد أدوارها (<b>Visible to Roles</b> في فورم الـ Dashboard)، وأي كارت لا يملك المستخدم صلاحية قراءة مستنده يُحذف من اللوحة قبل عرضها، والأرقام نفسها تُحسب بصلاحيات المستخدم (User Permissions). مدير النظام يرى كل شيء.</p>
+      <p>على الصفحة الرئيسية لوحتان لكل الشركة: <b>Strategy Board</b> — أهداف الشركة، كل هدف قسم باسمه: حلقة تقدّم لرقمه الرئيسي مقابل هدفه ثم الأرقام اللي تحرّكه (تكتب الأهداف في <b>InnoDash Strategy Goal</b>: عنوان، ملاحظة، العنصر الرئيسي، حتى خمسة عناصر مساندة، وهدف اختياري؛ اللوحة تتبني نفسها مع كل حفظ. أربعة أهداف عيّنة موجودة للبداية — عدّلها أو احذفها). و<b>My Numbers</b> — لوحة كل موظف عن نفسه: مهامه وتذاكره وعروضه وطلباته وساعاته وإجراءاته، بدون أدوار وبدون شريط تقسيم، وMine مقفول عليها (شارة <b>Only yours</b>)؛ ما فيهاش سطر واحد عن حد غيره.</p>
+      <p>مع تطبيق <b>InnoDash</b> كل موديول يبدأ بلوحة جاهزة تظهر <b>أولًا</b> تحت تاب Dashboard: <b>Executive Pulse</b> على الصفحة الرئيسية، ثم Sales Performance، Procurement and Spend، Finance and Cash، Inventory Health، Production Floor، Pipeline and Leads، Project Delivery، Customer Support، Asset Register، Quality Watch، وPeople (لما يكون Frappe HR مثبتًا). اللوحة مكتوبة كقصة قصيرة: مقدمة تقول لمن هي وماذا تجيب، ثم أقسام مرقّمة كل قسم سؤال («كيف كان أداؤنا هذا الشهر؟»، «من يدين لمن؟»، «ما الذي يحتاج قرارًا هذا الأسبوع؟») وتحته سطر يشرح كيف تقرأ الكروت اللي بعده.</p>
+      <ul>
+        <li>الكروت هي نفس عناصر Business Overview والشارتات اللي في هذا الدليل، فكل كارت يفتح القائمة اللي وراء رقمه، ومبدّل الفترة شغال عليها.</li>
+        <li>تقدر تعدّل أي لوحة من <b>Dashboard</b> › جدول <b>Themate Layout</b>: أضف عنوانًا، حرّك صفًا، غيّر العرض (ثلث / نصف / ثلثان / كامل)، أو وجّه الصف لعنصر أو شارت آخر. حقل <b>Sequence</b> يحدد ترتيب اللوحة بين لوحات مساحة العمل (1 أولًا).</li>
+        <li>الهدف في حلقات Goal محسوب تلقائيًا من متوسط آخر اثني عشر شهرًا زائد 10٪؛ عدّله من InnoDash Widget لو الخطة تقول غير كدا.</li>
+        <li>اللوحات تُنشأ لما الموديول يكون مثبتًا فقط، وتعديلاتك عليها محفوظة عبر التحديثات.</li>
+      </ul>
+      <h3>أدوات فوق اللوحة</h3>
+      <ul>
+        <li><b>شريط التقسيم (Segment)</b>: اختر شركة أو منطقة أو مخزن… فتتغير كل الكروت والشارتات مرة واحدة. الاختيار بيتحفظ لك. زرار <b>Mine</b> في لوحات المتابعة يخلي الأرقام على سجلاتك أنت (اللي أنشأتها أو المسندة إليك).</li>
+        <li><b>Insights</b>: جملة رئيسية وقائمة قصيرة تحت العنوان بتقول إيه اللي شاذ دلوقتي — مؤشر بعيد عن العام الماضي، هدف متأخر عن وتيرته، عميل واحد بنصف الإيراد، ثلث المستحقات فوق 90 يوم، يوم كسر النمط. الضغط على الجملة ينقلك لكارتها. جنب كل جملة 👍/👎: مرتين «مش مفيدة» على نفس الجملة ونفس الكارت تكتمها لك.</li>
+        <li><b>Group by</b> من قائمة أي Leaderboard أو Breakdown: نفس الكارت يتجمّع بمنطقة أو شريك مبيعات أو مصدر بدل العميل. اختيارك ليك أنت وبيتحفظ زي مبدّل الفترة.</li>
+        <li><b>توقع وهدف على الـ KPI</b>: «بالوتيرة الحالية: X» طول ما الفترة مفتوحة، ولون أخضر/أصفر/أحمر لو حددت هدفًا، وشارة «غير معتاد» لليوم اللي خرج عن سلسلته.</li>
+        <li><b>خمسة أشكال إضافية</b>: <b>Ratio</b> (عنصر ÷ عنصر: تغطية خط المبيعات، القيمة لكل أصل)، <b>Cycle Time</b> (متوسط الأيام بين تاريخين على السجل: من الطلب للتسليم الموعود، أيام الائتمان، زمن الإصلاح)، <b>Retention</b> (من عاد: محتفظ بهم / جدد / مفقودون)، <b>Heatmap</b> (السجلات على أيام الأسبوع × ساعات اليوم: إمتى بتيجي الطلبات والتذاكر والعملاء المحتملين، وأنشط خلية تحتاج أكتر ناس)، و<b>Journey</b> (قمع عبر أنواع مستندات مختلفة: عمود لكل نوع بفلاتره — عروض ← طلبات ← تسليمات ← فواتير ← مدفوعات — والفاقد بين كل عمودين مظلّل ومكتوب عليه نسبته؛ فوق لوحة Order to Cash).</li>
+        <li><b>قائمة الكارت (…)</b>: «كيف يُحسب هذا؟» (وبيقول كمان كام سجل اتستبعد لأن ملوش تاريخ)، «تسجيل إجراء…» (بتكتب اللي عملته والكارت يحتفظ برقمه لحظتها ويعرض بعدها «منذ ذلك الحين −40٪»)، «سجل الإجراءات»، و«إسناد الظاهرين إليّ» في قوائم المتابعة. Mine بيعرف صاحب السجل من الإسناد ومن حقول السجل نفسه (Allocated To، Employee، Sales Person، صاحب العميل المحتمل).</li>
+        <li><b>تعليم حدث على الشارت</b>: من قائمة أي شارت زمني «Annotate…» — تاريخ وعنوان (تغيير سعر، حملة، فرع جديد) يظهر كخط منقّط على الشارت ده أو على كل الشارتات، ويفضل للكل.</li>
+        <li><b>وضع الشاشة (TV mode)</b>: من قائمة مساحة العمل، أو <code>?tv=1</code> في الرابط — ملء الشاشة بدون قوائم، واللوحات بتلف تلقائيًا. Esc للخروج.</li>
+        <li><b>ملخص أسبوعي بالبريد</b>: من InnoDash Settings — كل اثنين صباحًا كل مستخدم يستلم اللوحات اللي يشوفها (الـ insights والأرقام الرئيسية) بلغته هو. مقفول افتراضيًا.</li>
+        <li><b>الصلاحيات على الـ API كمان</b>: اللوحة المخفية عن مستخدم بالأدوار مش بس بتختفي من القائمة — طلبها بالاسم بيترفض (403)، فما فيش طريق جانبي لأرقام الإدارة.</li>
+      </ul>
+    </section>
+
+    <section id="record360">
+      <h2>صفحة السجل 360°</h2>
+      <p>افتح تاب <b>Dashboard</b> في أي سجل رئيسي (عميل، مورد، صنف، موظف…) تلاقي الصفحة اتجمّعت في لوحة واحدة:</p>
+      <ul>
+        <li><b>إحصائيات السجل</b> أول حاجة — لو النظام بيوفرها (زي فواتير السنة والمتبقي لكل شركة للعميل والمورد) بتظهر كبلاطات، والمتبقي بالأحمر لو أكبر من صفر.</li>
+        <li><b>ملخص المستندات المرتبطة</b>: نوع المستند الأكثر ارتباطًا بالسجل (فواتير البيع للعميل، فواتير الشراء للمورد…) بإجماليه وعدده والمتبقي عليه، وشريط حالات (مدفوع / غير مدفوع / متأخر). مش مثبت على نوع معين — بيتحدد من بيانات السجل نفسه.</li>
+        <li><b>تابات المستندات المرتبطة</b>: تاب لكل نوع (فرص، عروض، أوامر، فواتير، مدفوعات…) بعدد السجلات والمفتوح منها بالأحمر، جدول بالاسم والتاريخ والإجمالي والحالة، بحث سريع، <span class="btn">Open list</span> للقائمة الكاملة بنفس الفلتر، و<span class="btn primary">New</span> لإنشاء مستند مربوط بالسجل.</li>
+        <li><b>يسار الصفحة</b>: العناوين (الفوترة والشحن ككروت، الأساسي مميز)، جهات الاتصال (الأساسي بعلامة)، والملفات المرفقة بنوعها وزرار تحميل — وزرار <kbd>+</kbd> على كل قسم لإضافة جديد مربوط بالسجل.</li>
+      </ul>
+      <div class="note">الجدول بيعرض آخر 20 مستند؛ «Open list» يفتح الباقي. كل حاجة بتحترم صلاحياتك: نوع مستند مش مسموح لك تقراه مش بيظهر كتاب أصلًا.</div>
+    </section>
+
+    <section id="print">
+      <h2>صفحة الطباعة</h2>
+      <p>الصفحة بقت عارض مستندات: الورقة بحجمها الحقيقي (A4/Letter من Print Settings) على أرضية رمادية بتتحرك لوحدها (scroll داخلي)، وفوقها شريط رفيع ثابت: <b>صفحة 1 من 2</b> · <b>− 97% +</b> · ملء العرض · مقاس الورقة. تحت عنوان الصفحة سطر يقول إنت بتطبع إيه: نوع المستند · العميل · التاريخ · الإجمالي، والحالة جنب الرقم. لو جاي من قائمة، أسهم <b>‹ ›</b> تقلّب على سجلاتها. <b>Esc</b> يرجّعك للفورم.</p>
+      <p>العمود اليمين فورم هادي: <b>نماذج الطباعة</b> كقائمة اختيار (النوع باهت في الآخر، ★ صغيرة على الافتراضي، وCustomize)، <b>اللغة</b> كلمتين EN / AR، <b>الترويسة</b>، و<b>الخيارات</b> كمربعات اختيار. اختياراتك بتتحفظ لكل نوع مستند. الأزرار: <b>Print</b> · PDF · <b>Email</b> (المستند مرفق) · <b>Copy link</b> · Open in tab؛ Refresh وPrint Settings في قائمة «…».</p>
+    </section>
+
+    <section id="lists">
+      <h2>القوائم</h2>
+      <h3>الفلاتر</h3>
+      <p>سطر واحد فوق القائمة (List و Report و Kanban و Gantt والتقويم كلهم): بحث بالاسم، زرار <b>Filter</b> وعليه عدد الفلاتر، و<b>chip</b> لكل فلتر بتتقرا كجملة («الحالة هو مدفوع») — الضغط عليها يفتح المحرر و× تشيلها، و«Clear all» تمسح الكل. الزرار يفتح <b>محرر الشروط</b>: صفوف «حيث / و» (الحقل، الشرط، القيمة)، «+ إضافة شرط»، و<b>مجموعة «أيٌّ من»</b> لما تحتاج «أو» (الحالة حرجة <i>أو</i> مفيش اجتماع) — مجموعة واحدة، لأن الـ API بتاع Frappe بيقبل مستوى واحد من «أو». تحت المحرر «اختيارات سريعة» هي حقول الفلترة الأساسية بضغطة. المجموعة بتتحفظ لك لكل نوع مستند.</p>
+      <h3>العروض المحفوظة</h3>
+      <p>فوق الشريط تابات: <b>الكل</b> + كل عرض محفوظ (List Filter) + «حفظ العرض». الضغط على تاب يطبّق فلاتره، و× عند المرور يحذفه. «حفظ العرض» بيحفظ الفلاتر الحالية باسم — لك أنت، أو للجميع لو مدير نظام.</p>
+      <h3>لوحة Explore</h3>
+      <p>بدل «Assigned To / Created By / Tags» الفاضية: <b>الخاص بي</b> (مسندة إليّ · أنشأتها · أعجبتني)، <b>أبعاد</b> بعدّاد وشريط نسبة لكل قيمة (الضغط يفلتر، «إضافة بُعد» تضيف أي حقل)، <b>الوقت</b> على تاريخ المستند الرئيسي (اليوم / الأسبوع / الشهر / الربع / العام)، <b>الوسوم</b> بعدّادها، و<b>إجمالي</b> حقل العملة الرئيسي للسجلات المعروضة. اللوحة بتتطوى لشريط ضيّق وبتفتكر اختيارك.</p>
+      <ul>
+        <li><b>صفحات مرقّمة</b> بدل «Load More»: أسفل القائمة «Page 2 of 39» مع أرقام الصفحات و‹ ›، وأزرار حجم الصفحة (20 / 100 / 500) على الجانب. تغيير الفلاتر أو الترتيب يرجّعك للصفحة الأولى.</li>
+        <li><b>قائمة الصف ⋮</b>: تظهر عند المرور على أي صف — فتح، فتح في تبويب جديد، نسخ (Duplicate).</li>
+        <li>لو دخلت على رابط مش موجود (صفحة أو مستند اتحذف) تظهر صفحة <b>404</b> بنفس هوية النظام مع الرجوع للرئيسية أو للخلف أو البحث.</li>
+      </ul>
+    </section>
+
+    <section id="ready">
+      <h2>عناصر جاهزة</h2>
+      <p>على المواقع اللي عليها ERPNext بتلاقي العناصر دي جاهزة في قائمة InnoDash Widget — كل واحد قابل للتعديل أو الحذف، وتضيفه لمساحتك بزرار Add to Workspace.</p>
+      <div class="tablewrap">
+      <table>
+        <thead><tr><th>العنصر</th><th>النوع</th><th>على</th><th>يعرض</th></tr></thead>
+        <tbody>
+          <tr><td>Sales This Month</td><td>KPI</td><td>Sales Invoice</td><td>مجموع الفواتير المعتمدة هذا الشهر مقابل الشهر الماضي</td></tr>
+          <tr><td>Sales vs Last Year</td><td>KPI</td><td>Sales Invoice</td><td>نفس الرقم مقابل نفس الشهر العام الماضي</td></tr>
+          <tr><td>Monthly Sales Target</td><td>Goal</td><td>Sales Invoice</td><td>مبيعات الشهر مقابل هدف 100,000 (عدّله)</td></tr>
+          <tr><td>Paid Invoice Rate</td><td>Rate</td><td>Sales Invoice</td><td>نسبة الفواتير المدفوعة هذه السنة</td></tr>
+          <tr><td>Daily Sales</td><td>Trend</td><td>Sales Invoice</td><td>المبيعات يومًا بيوم آخر 30 يومًا</td></tr>
+          <tr><td>Top Customers</td><td>Leaderboard</td><td>Sales Invoice</td><td>أعلى 5 عملاء هذه السنة</td></tr>
+          <tr><td>Invoices by Status</td><td>Breakdown</td><td>Sales Invoice</td><td>الفواتير حسب الحالة</td></tr>
+          <tr><td>Unpaid Invoices</td><td>Watchlist</td><td>Sales Invoice</td><td>الفواتير المتبقي عليها مبالغ، مرتبة بالأقدم استحقاقًا</td></tr>
+          <tr><td>Due This Week</td><td>Upcoming</td><td>Sales Invoice</td><td>فواتير تستحق خلال 7 أيام</td></tr>
+          <tr><td>Latest Invoices</td><td>Recent</td><td>Sales Invoice</td><td>آخر 5 فواتير</td></tr>
+          <tr><td>Receivables Aging</td><td>Aging</td><td>Sales Invoice</td><td>الذمم المدينة بشرائح 30/60/90</td></tr>
+          <tr><td>New Leads This Month</td><td>KPI</td><td>Lead</td><td>عملاء محتملون جدد هذا الشهر</td></tr>
+          <tr><td>Sales Pipeline</td><td>Funnel</td><td>Opportunity</td><td>Open → Replied → Quotation → Converted</td></tr>
+          <tr><td>Open Opportunities</td><td>Watchlist</td><td>Opportunity</td><td>فرص مفتوحة، الأقدم من 14 يومًا بالأحمر</td></tr>
+          <tr><td>Purchases This Month</td><td>KPI</td><td>Purchase Invoice</td><td>مشتريات الشهر (الزيادة حمراء)</td></tr>
+          <tr><td>Top Suppliers</td><td>Leaderboard</td><td>Purchase Invoice</td><td>أعلى 5 موردين هذه السنة</td></tr>
+          <tr><td>Payables Aging</td><td>Aging</td><td>Purchase Invoice</td><td>الذمم الدائنة بشرائح 30/60/90</td></tr>
+          <tr><td>Stock Value</td><td>KPI</td><td>Bin</td><td>قيمة المخزون الحالية</td></tr>
+          <tr><td>Stock by Warehouse</td><td>Breakdown</td><td>Bin</td><td>قيمة المخزون حسب المخزن</td></tr>
+        </tbody>
+      </table>
+      </div>
+    </section>
+
+    <section id="colors">
+      <h2>ألوان الشارتس واللوحة</h2>
+      <p>كل الشارتس (Dashboard Charts) وكروت Business Overview بتاخد ألوانها من لوحة واحدة، وتقدر تغيّرها من <b>Theme Customizer</b> (أيقونة الإعدادات في الشريط العلوي، أو <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd>) قسم <b>Charts</b>:</p>
+      <dl class="kv">
+        <dt>Site default</dt><dd>اللوحة اللي حددها مدير النظام للموقع كله.</dd>
+        <dt>Brand</dt><dd>مشتقة من لون الهوية بتاعك — لو غيّرت لون الهوية، الشارتس بتتغير معاه.</dd>
+        <dt>Ocean · Sunset · Forest · Slate · Pastel</dt><dd>لوحات جاهزة بثمانية ألوان متناسقة لكل مزاج: أزرق بحري، دافئة، خضراء، رمادية هادئة، أو باستيل.</dd>
+        <dt>Custom</dt><dd>ثمانية ألوان تختارها بنفسك، لون لون.</dd>
+      </dl>
+      <p>الاختيار بيتطبق فورًا على الشارتس المفتوحة قدامك قبل ما تضغط <span class="btn">Apply</span>. مدير النظام يقدر يعلّم «Save as site default for everyone» علشان يبقى الافتراضي للجميع، وأي مستخدم يقدر يختار لوحته الخاصة فوقه.</p>
+    </section>
+
+    <section id="faq">
+      <h2>أسئلة شائعة</h2>
+      <dl class="kv">
+        <dt>الكارت بيقول «Not permitted»</dt><dd>ليس لديك صلاحية قراءة نوع المستند. العناصر تستخدم صلاحياتك بالضبط كما في القوائم.</dd>
+        <dt>الرقم مش بيتغير بعد ما عدّلت العنصر</dt><dd>الأرقام تتحدث كل دقيقة، واضغط أيقونة التحديث على الكارت أو «Refresh Preview» في النموذج لإعادة الحساب فورًا.</dd>
+        <dt>عايز نفس العنصر بفلتر مختلف</dt><dd>افتح العنصر واستخدم <b>Duplicate</b> من قائمة النموذج، وغيّر الاسم والفلاتر.</dd>
+        <dt>مين يقدر ينشئ عناصر؟</dt><dd>System Manager و Workspace Manager. كل المستخدمين يشوفون العناصر (مع احترام صلاحيات بياناتهم).</dd>
+        <dt>حذفت عنصرًا وهو موجود على مساحة عمل</dt><dd>الكارت يعرض «تعذر التحميل». افتح المساحة في وضع التعديل واحذف البلوك أو بدّله بعنصر آخر.</dd>
+        <dt>ينفع أضيف العنصر على داشبورد Frappe العادية؟</dt><dd>لا — العناصر الذكية تعيش على مساحات العمل (تاب Dashboard أو مساحتك الخاصة). داشبوردات الموديول بتظهر جنبها تحت نفس التاب.</dd>
+      </dl>
+    </section>
+  </main>
+</div>

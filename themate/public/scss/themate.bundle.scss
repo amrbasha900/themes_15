@@ -1,0 +1,61 @@
+/* Themate Desk bundle — loaded via hooks.py `app_include_css`, after
+ * Frappe's desk.bundle.css (verified: frappe/www/app.py:48).
+ *
+ * No @import url(...) — all fonts are bundled under public/fonts and declared
+ * in tokens/_semantic.scss.
+ *
+ * Order matters: tokens define the vocabulary, the bridge points native
+ * variables at it, dark redefines the tokens, then components add only the
+ * structure the bridge cannot express. RTL and responsive are corrections and
+ * come last. */
+
+@import "tokens/guard";
+@import "tokens/palette";
+@import "tokens/semantic";
+@import "tokens/bridge";
+@import "tokens/dark";
+
+@import "base/base";
+
+@import "layout/navbar";
+@import "layout/sidebar";
+@import "layout/page";
+
+@import "components/buttons";
+@import "components/forms";
+@import "components/dropdowns";
+@import "components/list";
+@import "components/list-filters";
+@import "components/print";
+@import "components/form-page";
+@import "components/grid";
+@import "components/datatable";
+@import "components/kanban";
+@import "components/calendar";
+@import "components/gantt";
+@import "components/modals";
+@import "components/tasks";
+@import "components/indicators";
+@import "components/timeline";
+/* after modals + timeline: see the header of _activity.scss */
+@import "components/activity";
+@import "components/workspace";
+@import "components/charts";
+@import "components/form-360";
+@import "components/form-dashboard";
+@import "components/user-profile";
+@import "components/misc";
+@import "components/customizer";
+@import "components/typography";
+@import "components/whitelabel";
+
+@import "layout/responsive";
+@import "layout/rtl";
+
+/* The persistent custom sidebar. Plain CSS kept verbatim in a partial (Sass
+ * passes a `.css` import through as a CSS @import instead of inlining it),
+ * imported last so it keeps the cascade position it had as a separate <link>
+ * after this bundle, and now content-hashed with it. It opts out of rtlcss
+ * itself (see its header). */
+@import "layout/modern-sidebar";
+@import "components/departments";

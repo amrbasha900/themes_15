@@ -1,0 +1,42 @@
+{#- The desk's splash (Themate, themate/splash.py): the Theme Settings logo
+    over a soft halo, and a thin progress line in the brand colour, until the
+    desk has booted. Frappe removes `.splash` (desk.js make_page_container);
+    core/splash.js fades a copy out so it does not blink away. Styles inline, on the theme's
+    tokens (with fallbacks): it paints before anything else is drawn. -#}
+{%- if tm_splash -%}
+<div class="centered splash tm-splash" style="--tm-splash-brand: {{ tm_splash.brand | e }}" role="status" aria-label="{{ _('Loading...') }}">
+	<style>
+		.tm-splash { position: fixed; inset: 0; z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; margin: 0; transform: none; inset-inline-start: 0; background: var(--tm-surface-app, #f6f7f9); transition: opacity .28s ease; }
+		.tm-splash-mark { position: relative; display: grid; place-items: center; inline-size: 132px; block-size: 132px; }
+		.tm-splash-halo { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, color-mix(in srgb, var(--tm-splash-brand) 22%, transparent) 0, transparent 70%); animation: tm-splash-breathe 2.4s ease-in-out infinite; }
+		.tm-splash-logo { position: relative; max-inline-size: 96px; max-block-size: 96px; object-fit: contain; animation: tm-splash-in .6s cubic-bezier(.2,.8,.2,1) both; }
+		.tm-splash-logo.is-dark, html[data-theme="dark"] .tm-splash-logo.is-light { display: none; }
+		html[data-theme="dark"] .tm-splash-logo.is-dark { display: block; }
+		.tm-splash-name { font: 600 15px/1.2 system-ui, -apple-system, "Segoe UI", sans-serif; letter-spacing: .02em; color: var(--tm-text-2, #5c6370); animation: tm-splash-in .6s .12s cubic-bezier(.2,.8,.2,1) both; }
+		.tm-splash-line { position: relative; inline-size: 120px; block-size: 3px; border-radius: 3px; overflow: hidden; background: color-mix(in srgb, var(--tm-splash-brand) 14%, transparent); }
+		.tm-splash-line::after { content: ""; position: absolute; inset-block: 0; inline-size: 40%; border-radius: 3px; background: var(--tm-splash-brand); animation: tm-splash-run 1.1s ease-in-out infinite; }
+		[dir="rtl"] .tm-splash-line::after { animation-direction: reverse; }
+		.tm-splash.is-leaving * { animation: none !important; }
+		.tm-splash.is-out { opacity: 0; pointer-events: none; }
+		@keyframes tm-splash-in { from { opacity: 0; transform: translateY(6px) scale(.96); } to { opacity: 1; transform: none; } }
+		@keyframes tm-splash-breathe { 0%, 100% { transform: scale(.86); opacity: .7; } 50% { transform: scale(1.06); opacity: 1; } }
+		@keyframes tm-splash-run { 0% { left: -40%; } 100% { left: 100%; } }
+		@media (prefers-reduced-motion: reduce) {
+			.tm-splash-halo, .tm-splash-logo, .tm-splash-name, .tm-splash-line::after { animation: none; }
+			.tm-splash-line::after { left: 30%; }
+		}
+	</style>
+	<div class="tm-splash-mark">
+		<span class="tm-splash-halo" aria-hidden="true"></span>
+		<img class="tm-splash-logo is-light" src="{{ tm_splash.logo | e }}" alt="">
+		<img class="tm-splash-logo is-dark" src="{{ tm_splash.logo_dark | e }}" alt="">
+	</div>
+	{%- if tm_splash.name %}<div class="tm-splash-name">{{ tm_splash.name | e }}</div>{% endif %}
+	<div class="tm-splash-line" aria-hidden="true"></div>
+</div>
+{%- else -%}
+<div class="centered splash">
+	<img src="{{ splash_image or "/assets/frappe/images/frappe-framework-logo.png" }}"
+		style="max-width: 100px; max-height: 100px;">
+</div>
+{%- endif -%}

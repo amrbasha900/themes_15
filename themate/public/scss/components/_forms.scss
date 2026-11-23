@@ -1,0 +1,426 @@
+/* Form controls — the densest, most-used surface in the product.
+ *
+ * Verified native DOM (frappe/public/js/frappe/form/controls/base_input.js:13-26):
+ *   div.form-group.frappe-control
+ *     div.clearfix > label.control-label        <- carries an INLINE padding-right
+ *     div.control-input-wrapper
+ *       div.control-input        > input.form-control | select | textarea
+ *       div.control-value.like-disabled-input   <- read-only display
+ *       p.help-box.small.text-muted             <- description AND error text
+ *
+ * Native .form-control is borderless and filled (common/form.scss:1-7). The
+ * contract calls for an outlined control on a white surface, so the border is
+ * introduced here rather than by re-tinting --control-bg alone.
+ *
+ * Scoped to the form kill-switch (DESIGN_CONTRACT.md §5). */
+
+#{$tm-on}[data-tm-form="on"] {
+	/* Link / Dynamic Link: a picker, so it gets a chevron like a Select.
+	 * Physical background-position on purpose: rtlcss mirrors it. Frappe's
+	 * .link-btn (the open arrow) appears on hover further in and stays clear. */
+	.frappe-control[data-fieldtype="Link"] input.form-control,
+	/* Color: Frappe's swatch (.selected-color, color_picker.scss) sits 8px
+	 * from the left over the input; the theme's tighter input padding put
+	 * the value under it ("#1677ff" read "677ff"). Room for the swatch,
+	 * and it is vertically centred in the 32px control. */
+	.frappe-control[data-fieldtype="Color"] {
+		input.form-control {
+			padding-inline-start: 32px;
+		}
+
+		.selected-color {
+			inset-inline-start: 10px;
+			left: auto;
+			inset-block-start: 50%;
+			top: auto;
+			transform: translateY(-50%);
+		}
+	}
+
+	/* Icon picker: room for the search glyph (the theme's input padding
+	 * outranked Frappe's 30px here). */
+	.icon-picker .search-icons input.form-control {
+		padding-inline-start: 32px;
+	}
+
+	.frappe-control[data-fieldtype="Dynamic Link"] input.form-control {
+		padding-inline-end: var(--tm-space-6);
+		background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238c8c8c' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+		background-repeat: no-repeat;
+		background-position: right 10px center;
+		background-size: 12px 12px;
+	}
+
+	/* The clear (×) and open (→) buttons Frappe shows on hover/focus of a
+	 * Link field (common/controls.scss:194). Native drops them at right:4px
+	 * on top of whatever is there — here, the picker chevron. They become
+	 * two centred 22px icon buttons, and the chevron steps aside while they
+	 * are shown. */
+	.link-field {
+		.link-btn {
+			display: none;
+			position: absolute;
+			inset-block: 0;
+			inset-inline-end: var(--tm-space-1);
+			align-items: center;
+			gap: 2px;
+			background: none;
+			padding: 0;
+			margin: 0;
+
+			.btn-clear,
+			.btn-open {
+				display: inline-flex !important;
+				align-items: center;
+				justify-content: center;
+				inline-size: 22px;
+				block-size: 22px;
+				border-radius: var(--tm-radius-xs);
+				color: var(--tm-text-3);
+
+				&:hover {
+					background-color: var(--tm-surface-hover);
+					color: var(--tm-text);
+				}
+
+				.icon {
+					inline-size: 12px;
+					block-size: 12px;
+				}
+			}
+		}
+
+		&:hover .link-btn,
+		&:focus-within .link-btn,
+		.link-btn[style*="inline"] {
+			display: flex;
+		}
+
+		&:hover input.form-control,
+		&:focus-within input.form-control {
+			background-image: none;
+			padding-inline-end: 56px;
+		}
+	}
+
+	.form-control {
+		height: var(--tm-control-h);
+		padding: 0 var(--tm-space-2);
+		border: 1px solid var(--tm-border-strong);
+		border-radius: var(--tm-radius-sm);
+		background-color: var(--tm-surface);
+		color: var(--tm-text);
+		font-size: var(--tm-text-sm);
+		line-height: var(--tm-leading-dense);
+		transition: border-color var(--tm-dur-fast) var(--tm-ease),
+			box-shadow var(--tm-dur-fast) var(--tm-ease);
+
+		&:hover:not(:disabled):not([readonly]) {
+			border-color: var(--tm-action-primary-hover);
+		}
+
+		&:focus {
+			border-color: var(--tm-action-primary);
+			box-shadow: var(--tm-ring);
+			outline: none;
+		}
+
+		&::placeholder {
+			color: var(--tm-text-3);
+		}
+
+		/* Native sets both :disabled and [readonly] to the same treatment
+		 * (desk/form.scss:144). The contract separates them: disabled is
+		 * inert and filled, readonly is simply not editable. */
+		&:disabled {
+			background-color: var(--tm-surface-disabled);
+			border-color: var(--tm-border-strong);
+			color: var(--tm-text-disabled);
+			cursor: not-allowed;
+		}
+
+		&[readonly] {
+			background-color: var(--tm-surface-sunken);
+			border-color: var(--tm-border);
+			color: var(--tm-text);
+			cursor: default;
+		}
+	}
+
+	/* Multi-line controls grow; the fixed control height must not apply. */
+	textarea.form-control {
+		height: auto;
+		min-height: calc(var(--tm-control-h) * 2);
+		padding: var(--tm-space-2);
+		line-height: var(--tm-leading);
+		resize: vertical;
+	}
+
+	select.form-control {
+		padding-inline-end: var(--tm-space-5);
+		cursor: pointer;
+	}
+
+	/* ---- Label ---------------------------------------------------------- */
+	/* base_input.js:19 writes style="padding-right: 0px" inline on the label.
+	 * Inline styles beat stylesheets, so spacing is expressed as margin here
+	 * instead of fighting that declaration. */
+	.control-label {
+		margin-block-end: var(--tm-space-1);
+		font-size: var(--tm-ts-label-size, var(--tm-text-sm));
+		font-weight: var(--tm-ts-label-weight, var(--tm-weight-regular));
+		font-style: var(--tm-ts-label-style, normal);
+		color: var(--tm-ts-label-color, var(--tm-text-2));
+		line-height: var(--tm-leading-dense);
+	}
+
+	/* Required marker. Native rule: common/controls.scss:151. */
+	.frappe-control .control-label.reqd::after {
+		content: "*";
+		color: var(--tm-action-danger);
+		margin-inline-start: var(--tm-space-1);
+	}
+
+	/* ---- Help, description and validation ------------------------------- */
+	/* .help-box carries BOTH the field description and, when Frappe marks the
+	 * control .has-error, the validation message. Only the error state is
+	 * recoloured; description text stays muted. */
+	.help-box {
+		margin-block-start: var(--tm-space-1);
+		margin-block-end: 0;
+		font-size: var(--tm-text-xs);
+		line-height: var(--tm-leading-dense);
+		color: var(--tm-text-3);
+	}
+
+	.frappe-control.has-error {
+		.form-control {
+			border-color: var(--tm-action-danger);
+
+			&:focus {
+				box-shadow: var(--tm-ring-danger);
+			}
+		}
+
+		.help-box {
+			color: var(--tm-danger-text);
+		}
+	}
+
+	/* ---- Read-only display value ---------------------------------------- */
+	/* common/form.scss:14-25 — the read-only display of a field.
+	 * DESIGN_CONTRACT.md wanted bare text here; in use a bare "ZG" under
+	 * "Abbr" was indistinguishable from a label, and nothing said "this is a
+	 * field you cannot edit". Rendered as a disabled control instead: same
+	 * box as an input, sunken ground, no focus affordance. The contract is
+	 * amended, not ignored. */
+	.like-disabled-input {
+		display: flex;
+		align-items: center;
+		min-height: var(--tm-control-h);
+		padding: var(--tm-space-1) var(--tm-space-2);
+		background-color: var(--tm-surface-sunken);
+		border: 1px solid var(--tm-border);
+		border-radius: var(--tm-radius-sm);
+		color: var(--tm-text-2);
+		font-size: var(--tm-text-sm);
+		line-height: var(--tm-leading-dense);
+		cursor: default;
+		/* A hash, token or URL has no space to break at. The value is a flex
+		 * item, and a flex item never shrinks below its min-content width, so
+		 * overflow-wrap: break-word (which min-content ignores) let a 64-char
+		 * sha256 run out of the box and under the next column. `anywhere`
+		 * counts toward min-content: the box keeps its width and the value
+		 * wraps inside it, growing the box downwards. Ordinary words still
+		 * break at spaces first. */
+		overflow-wrap: anywhere;
+		min-inline-size: 0;
+	}
+
+	/* Read-only Link / Dynamic Link values are links to the record: keep the
+	 * link colour so "EGP" reads as "open Currency EGP". */
+	.like-disabled-input a {
+		color: var(--tm-text-link);
+	}
+
+	/* ---- Checkbox and radio --------------------------------------------- */
+	/* Native: scss/element/checkbox.scss, element/radio.scss */
+	.checkbox {
+		.input-area input[type="checkbox"],
+		input[type="checkbox"] {
+			inline-size: 16px;
+			block-size: 16px;
+			border: 1px solid var(--tm-border-strong);
+			border-radius: var(--tm-radius-xs);
+			cursor: pointer;
+
+			&:checked {
+				background-color: var(--tm-action-primary);
+				border-color: var(--tm-action-primary);
+			}
+
+			&:focus-visible {
+				box-shadow: var(--tm-ring);
+			}
+
+			&:disabled {
+				background-color: var(--tm-surface-disabled);
+				border-color: var(--tm-border-strong);
+				cursor: not-allowed;
+			}
+
+			/* Read-only and ticked. Frappe draws a read-only Check as
+			 * <input disabled class="disabled-selected"> (formatters.js Check):
+			 * the input is NOT :checked, the class carries the value, and
+			 * element/checkbox.scss gives it a white tick on a dark fill. The
+			 * :disabled rule above repainted the fill with the disabled ground
+			 * and left the white tick on it — invisible, so a ticked read-only
+			 * box read as an empty one. Grey fill, same tick as an editable
+			 * box: "on, and you cannot change it". Drawn here in full so
+			 * Frappe's dark-mode gradient cannot paint over it. */
+			&:disabled:checked,
+			&.disabled-selected {
+				background-color: var(--tm-text-3);
+				background-image: url("data:image/svg+xml,<svg viewBox='0 0 8 7' fill='none' xmlns='http://www.w3.org/2000/svg'><path d='M1 4.00001L2.66667 5.80001L7 1.20001' stroke='white' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+				background-size: 57%;
+				background-position: center;
+				background-repeat: no-repeat;
+				border-color: var(--tm-text-3);
+				box-shadow: none;
+			}
+		}
+
+		.label-area {
+			font-size: var(--tm-text-sm);
+			color: var(--tm-text);
+			margin-inline-start: var(--tm-space-1);
+		}
+	}
+
+	/* ---- Link / Dynamic Link affordance --------------------------------- */
+	/* common/controls.scss:196 — the arrow that opens the linked document. */
+	.link-btn {
+		.btn-open {
+			color: var(--tm-text-3);
+
+			&:hover {
+				color: var(--tm-action-primary-fg);
+			}
+		}
+	}
+
+	/* ---- Table MultiSelect / MultiSelectPills --------------------------- */
+	/* common/controls.scss:56-95, 215-223. Pills sit inside a control that
+	 * must still align with single-line inputs beside it. */
+	.frappe-control[data-fieldtype="Table MultiSelect"],
+	.frappe-control[data-fieldtype="MultiSelectPills"] {
+		.form-control {
+			height: auto;
+			min-height: var(--tm-control-h);
+			padding: 3px var(--tm-space-1);
+			display: flex;
+			flex-wrap: wrap;
+			gap: var(--tm-space-1);
+			align-items: center;
+		}
+
+		.tb-selected-value {
+			display: inline-flex;
+			align-items: center;
+			gap: var(--tm-space-1);
+			background-color: var(--tm-surface-sunken);
+			border: 1px solid var(--tm-border);
+			border-radius: var(--tm-radius-xs);
+			padding: 1px var(--tm-space-1);
+			font-size: var(--tm-text-xs);
+			color: var(--tm-text);
+			max-inline-size: 100%;
+		}
+
+		input {
+			border: none;
+			background: transparent;
+			min-inline-size: 60px;
+			flex: 1;
+
+			&:focus {
+				box-shadow: none;
+			}
+		}
+	}
+
+	/* ---- Attach controls ------------------------------------------------- */
+	/* common/controls.scss:248-265 */
+	.frappe-control[data-fieldtype="Attach"],
+	.frappe-control[data-fieldtype="Attach Image"] {
+		.attached-file {
+			border: 1px solid var(--tm-border);
+			border-radius: var(--tm-radius-sm);
+			padding: var(--tm-space-1) var(--tm-space-2);
+			background-color: var(--tm-surface-sunken);
+			font-size: var(--tm-text-sm);
+		}
+	}
+
+	/* ---- Currency / Int / Float ----------------------------------------- */
+	/* Numeric values align right so magnitudes compare at a glance — but only
+	 * in LTR. In RTL the digits stay LTR while the box aligns to the start;
+	 * layout/_rtl.scss handles that. */
+	.frappe-control[data-fieldtype="Currency"],
+	.frappe-control[data-fieldtype="Float"],
+	.frappe-control[data-fieldtype="Int"],
+	.frappe-control[data-fieldtype="Percent"] {
+		input.form-control {
+			text-align: end;
+			font-variant-numeric: tabular-nums;
+		}
+	}
+
+	/* ---- Date / Datetime ------------------------------------------------- */
+	.frappe-control[data-fieldtype="Date"],
+	.frappe-control[data-fieldtype="Datetime"],
+	.frappe-control[data-fieldtype="Time"] {
+		input.form-control {
+			font-variant-numeric: tabular-nums;
+		}
+	}
+
+	/* ---- Password strength ---------------------------------------------- */
+	/* common/controls.scss:8-54 */
+	.frappe-control[data-fieldtype="Password"] {
+		.toggle-password {
+			color: var(--tm-text-3);
+
+			&:hover {
+				color: var(--tm-text);
+			}
+		}
+	}
+
+	/* ---- Rich text ------------------------------------------------------- */
+	.ql-container,
+	.ql-toolbar {
+		border-color: var(--tm-border-strong);
+	}
+
+	.ql-toolbar {
+		border-start-start-radius: var(--tm-radius-sm);
+		border-start-end-radius: var(--tm-radius-sm);
+		background-color: var(--tm-surface-sunken);
+	}
+
+	.ql-container {
+		border-end-start-radius: var(--tm-radius-sm);
+		border-end-end-radius: var(--tm-radius-sm);
+		font-size: var(--tm-text-sm);
+	}
+
+	/* Quill paints its own dark grey; in dark mode that vanished on the ground. */
+	.ql-editor {
+		color: var(--tm-text);
+	}
+
+	.ql-editor.ql-blank::before {
+		color: var(--tm-text-3);
+	}
+}
