@@ -99,6 +99,57 @@ async function boot(browser, { themate = {}, setTheme = true, local = {}, dir = 
 	const exe = chromiumPath();
 	const browser = await chromium.launch(exe ? { executablePath: exe } : {});
 
+	/* Desk has a separate navbar-nav for breadcrumbs; tools belong beside the avatar. */
+	for (const [lang, dir, width] of [["ar", "rtl", 390], ["en", "ltr", 1280]]) {
+		const languages = [{ code: "ar", label: "العربية" }, { code: "en", label: "English" }];
+		const page = await boot(browser, { dir, themate: { navbar: { language_switcher: 1, languages } } });
+		await page.setViewportSize({ width, height: 800 });
+		await page.addScriptTag({ path: JQUERY });
+		const bootstrap = path.resolve(ROOT, "../frappe/node_modules/bootstrap/dist");
+		await page.addStyleTag({ path: path.join(bootstrap, "css/bootstrap.min.css") });
+		await page.addScriptTag({ path: path.join(bootstrap, "js/bootstrap.bundle.min.js") });
+		await page.evaluate((lang) => {
+			frappe.boot.lang = lang;
+			frappe.session = { user: "user@example.test" };
+			frappe.call = ({ args }) => { window.languageWrite = args; };
+			frappe.utils = { icon: (name) => `<svg><use href="#${name}"></use></svg>` };
+			document.body.innerHTML = '<header class="navbar navbar-expand"><ul class="navbar-nav" id="navbar-breadcrumbs"></ul>' +
+				'<ul class="navbar-nav"><li class="dropdown-navbar-user"></li></ul></header>';
+		}, lang);
+		await page.addScriptTag({ path: path.join(JS_DIR, "core/navbar_tools.js") });
+		await page.evaluate(() => { $(document).trigger("toolbar_setup").trigger("toolbar_setup"); });
+		const row = page.locator(".navbar-nav").last();
+		const toggle = row.locator(".tm-lang-toggle");
+		check(`navbar (${lang}): one visible language button beside the user menu`,
+			[await toggle.count(), await toggle.isVisible(), (await toggle.textContent()).trim()],
+			[1, true, lang.toUpperCase()]);
+		check(`navbar (${lang}): the button requests the globe icon`,
+			await toggle.locator("use").getAttribute("href"), "#es-line-globe");
+		await toggle.click();
+		check(`navbar (${lang}): the active language is visible in the open menu`,
+			await row.locator(`.tm-lang-option.active[data-lang="${lang}"]`).isVisible(), true);
+		const next = lang === "ar" ? "en" : "ar";
+		await row.locator(`.tm-lang-option[data-lang="${next}"]`).click();
+		check(`navbar (${lang}): the selection saves the session user's language`, await page.evaluate(() => window.languageWrite),
+			{ doctype: "User", name: "user@example.test", fieldname: "language", value: next });
+
+		/* The two companion apps can mount before or after the theme. */
+		const peer = lang === "ar" ? "fk-nav-lang" : "dropdown-language";
+		await row.evaluate((list, cls) => list.insertAdjacentHTML("afterbegin", `<li class="${cls}"></li>`), peer);
+		check(`navbar: ${peer} takes over while the customizer stays`,
+			[await row.locator("." + peer).count(), await toggle.count(), await row.locator(".tm-customizer-nav").count()], [1, 0, 1]);
+		await page.evaluate(() => $(document).triggerHandler("toolbar_setup"));
+		check(`navbar: a toolbar with ${peer} already present keeps one switcher`, await toggle.count(), 0);
+		await row.locator("." + peer).evaluate((el) => el.remove());
+		check("navbar: the theme switcher returns when the companion item goes away", await toggle.count(), 1);
+		await page.evaluate(() => {
+			frappe.boot.themate.navbar.language_switcher = 0;
+			$(document).triggerHandler("toolbar_setup");
+		});
+		check("navbar: disabling the language switcher keeps the customizer", [await toggle.count(), await row.locator(".tm-customizer-nav").count()], [0, 1]);
+		await page.close();
+	}
+
 	/* ---- Font: the Outfit-substitution regression ------------------------- */
 	{
 		const page = await boot(browser, { themate: { font_family: "Inter" } });

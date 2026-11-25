@@ -6,8 +6,7 @@
  * that touches the navbar template then has to be re-merged. This version
  * injects two <li>s into the live navbar instead, right before the user
  * menu, on the same toolbar_setup event Frappe fires when the navbar exists.
- * If Langumate itself is installed on a site (its .dropdown-language is
- * present) the theme's switcher stays out of the way.
+ * Use the site's existing switcher when Langumate or Fikrity Login adds one.
  *
  * Choices come from Theme Settings > Navbar (boot.themate.navbar):
  *   languages   – [{code, label}] from the Languages table, else en + ar
@@ -17,6 +16,7 @@
 
 const boot = () => window.frappe?.boot?.themate || {};
 const __ = (s, args) => (window.__ ? window.__(s, args) : s);
+const watchedNavbars = new WeakSet();
 
 function icon(name, size = "md") {
 	return window.frappe?.utils?.icon ? window.frappe.utils.icon(name, size) : "";
@@ -31,17 +31,17 @@ function buildLanguageItem(nav) {
 	if (!languages.length) return null;
 
 	const current = currentLanguage();
-	const active = languages.find((l) => l.code === current) || { code: current, label: current };
 
 	const li = document.createElement("li");
 	li.className = "nav-item dropdown dropdown-mobile tm-lang";
 	li.innerHTML = `
 		<button type="button" class="btn-reset nav-link tm-lang-toggle" data-toggle="dropdown"
-			aria-haspopup="true" aria-expanded="false" title="${__("Language")}">
-			${icon("website", "sm")}
-			<span class="tm-lang-code">${active.code.toUpperCase()}</span>
+			aria-haspopup="true" aria-expanded="false" title="${__("Language")}" aria-label="${__("Language")}">
+			${icon("es-line-globe", "sm")}
+			<span class="tm-lang-code"></span>
 		</button>
 		<div class="dropdown-menu dropdown-menu-right tm-lang-menu" role="menu"></div>`;
+	li.querySelector(".tm-lang-code").textContent = current.toUpperCase();
 
 	const menu = li.querySelector(".tm-lang-menu");
 	languages.forEach((l) => {
@@ -49,7 +49,9 @@ function buildLanguageItem(nav) {
 		a.href = "#";
 		a.className = "dropdown-item tm-lang-option" + (l.code === current ? " active" : "");
 		a.dataset.lang = l.code;
-		a.innerHTML = `<span class="tm-lang-option-code">${l.code.toUpperCase()}</span><span>${l.label}</span>`;
+		a.innerHTML = '<span class="tm-lang-option-code"></span><span></span>';
+		a.firstElementChild.textContent = l.code.toUpperCase();
+		a.lastElementChild.textContent = l.label;
 		a.addEventListener("click", (e) => {
 			e.preventDefault();
 			switchLanguage(l);
@@ -67,7 +69,8 @@ function veil(message) {
 	el.className = "tm-veil";
 	el.setAttribute("role", "status");
 	el.setAttribute("aria-live", "polite");
-	el.innerHTML = `<div class="tm-veil-card"><span class="tm-veil-spinner" aria-hidden="true"></span><span class="tm-veil-text">${message}</span></div>`;
+	el.innerHTML = '<div class="tm-veil-card"><span class="tm-veil-spinner" aria-hidden="true"></span><span class="tm-veil-text"></span></div>';
+	el.querySelector(".tm-veil-text").textContent = message;
 	document.body.appendChild(el);
 	document.body.classList.add("tm-veiled");
 	return el;
@@ -123,17 +126,26 @@ function mountSearchShortcut() {
 function mount() {
 	mountSearchShortcut();
 	if (window.themate?.enabled?.() === false) return; /* master switch off: Frappe's own navbar */
-	const list = document.querySelector("header.navbar .navbar-nav:has(.dropdown-navbar-user)")
-		|| document.querySelector(".navbar .dropdown-navbar-user")?.parentElement;
-	const userItem = list?.querySelector(".dropdown-navbar-user");
-	if (!list || !userItem || list.querySelector(".tm-lang, .tm-customizer-nav")) return;
+	const userItem = document.querySelector(".navbar .dropdown-navbar-user");
+	if (!userItem) return;
+	const list = userItem.parentElement;
 
 	const nav = boot().navbar || {};
-	const items = [];
-	/* Frappe already provides the working language switcher. Do not add a
-	 * second tm-lang control beside it. */
-	if (nav.customizer_button !== 0) items.push(buildCustomizerItem());
-	items.forEach((li) => list.insertBefore(li, userItem));
+	const language = list.querySelector(".tm-lang");
+	const customizer = list.querySelector(".tm-customizer-nav");
+	if (nav.language_switcher === 0 || list.querySelector(".dropdown-language, .fk-nav-lang")) {
+		language?.remove();
+	} else if (!language) {
+		const item = buildLanguageItem(nav);
+		if (item) list.insertBefore(item, customizer || userItem);
+	}
+	if (nav.customizer_button !== 0 && !customizer) list.insertBefore(buildCustomizerItem(), userItem);
+
+	/* A companion app can insert its switcher after our toolbar_setup handler. */
+	if (!watchedNavbars.has(list)) {
+		watchedNavbars.add(list);
+		new MutationObserver(mount).observe(list, { childList: true });
+	}
 }
 
 if (window.jQuery) {
